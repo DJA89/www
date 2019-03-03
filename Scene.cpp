@@ -30,8 +30,8 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
-	string mapName = "levels/level01.txt";
-	// string mapName = "levels/level01.tmx";
+	string mapName = LEVEL_DIR + "level01.tmx";
+	// string mapName = LEVEL_DIR + "level01.txt";
 	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);

@@ -3,9 +3,10 @@
 #include <sstream>
 #include <vector>
 #include "TileMap.h"
-
+#include "lib/tinyxml2.h"
 
 using namespace std;
+namespace xml = tinyxml2;
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -45,7 +46,80 @@ void TileMap::free()
 	glDeleteBuffers(1, &vbo);
 }
 
-bool TileMap::loadLevel(const string &levelFile)
+bool TileMap::loadLevel(const string & levelFile){
+	// call different functions for tmx and normal (txt) map files
+	if (levelFile.rfind(".tmx") == (levelFile.size()-4)) {
+		return TileMap::loadLevelTmx(levelFile);
+	} else {
+		return TileMap::loadLevelTxt(levelFile);
+	}
+}
+
+bool TileMap::loadLevelTmx(const string &levelFile){
+	// Structure of the XML file:
+	// <?xml ... ?>
+	// <map ... width="20" height="15" tilewidth="16" ...>
+	//   <tileset ... />
+	//   <layer ... >
+	//     <data ... >
+	//       0,1,0,1,... // data
+	//     </data>
+	//   </layer>
+	// </map>
+
+	xml::XMLDocument mapTmx;
+	mapTmx.LoadFile(levelFile.c_str());
+
+	// get metadata
+	const xml::XMLElement* mapConf = mapTmx.FirstChildElement("map");
+	mapSize.x = atoi(mapConf->Attribute("width"));
+	mapSize.y = atoi(mapConf->Attribute("height"));
+	tileSize = atoi(mapConf->Attribute("tilewidth"));
+	blockSize = tileSize; // TODO differentiate???
+
+	// get tilesheet name and config
+	string tileSetTmxName = mapConf->FirstChildElement("tileset")->Attribute("source");
+	xml::XMLDocument tileSetTmx;
+	tileSetTmx.LoadFile((LEVEL_DIR + tileSetTmxName).c_str());
+	const xml::XMLElement* tileSetConf = tileSetTmx.FirstChildElement("tileset");
+	tileSetTmx.SaveFile("bla.xml");
+	tilesheetSize.x = atoi(tileSetConf->Attribute("columns"));
+	tilesheetSize.y = atoi(tileSetConf->Attribute("tilecount")) / tilesheetSize.x;
+	string tilesheetFile = tileSetConf->FirstChildElement("image")->Attribute("source");
+	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
+
+	// load tilesheet file
+	tilesheet.loadFromFile(tilesheetFile, TEXTURE_PIXEL_FORMAT_RGBA);
+	tilesheet.setWrapS(GL_CLAMP_TO_EDGE);
+	tilesheet.setWrapT(GL_CLAMP_TO_EDGE);
+	tilesheet.setMinFilter(GL_NEAREST);
+	tilesheet.setMagFilter(GL_NEAREST);
+
+	// extract map data
+	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
+	map = new int[mapSize.x * mapSize.y];
+	string row;
+	getline(tiles, row); // skip empty line
+	for (int j = 0; j < mapSize.y; j++){
+		getline(tiles, row); // for each row
+		istringstream ss(row);
+		for (int i = 0; i < mapSize.x; i++){
+			string tileID;
+			getline(ss, tileID, ','); // split into tiles
+			if (isNumber(tileID)){
+				// INFO: 0 means empty, texture tiles start with 1
+				map[j*mapSize.x + i] = stoi(tileID);
+			} else {
+			}
+		}
+	}
+}
+
+bool TileMap::isNumber(const string &toCheck){
+	return !toCheck.empty() && toCheck.find_first_not_of("-0123456789") == std::string::npos;
+}
+
+bool TileMap::loadLevelTxt(const string &levelFile)
 {
 	ifstream fin;
 	string line, tilesheetFile;
