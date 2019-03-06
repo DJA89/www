@@ -6,8 +6,6 @@
 #include "Texture.h"
 #include "ShaderProgram.h"
 
-#define LEVEL_DIR string("levels/")
-
 
 // Class Tilemap is capable of loading a tile map from a text file in a very
 // simple format (see level01.txt for an example). With this information
@@ -27,19 +25,16 @@ public:
 
 	void render() const;
 	void free();
-
+	
 	int getTileSize() const { return tileSize; }
 
 	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-
+	
 private:
 	bool loadLevel(const string &levelFile);
-	bool loadLevelTmx(const string &levelFile);
-	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
-	static bool isNumber(const string &toCheck);
 
 private:
 	GLuint vao;

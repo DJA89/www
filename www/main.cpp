@@ -1,5 +1,5 @@
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 #include "Game.h"
 
 
@@ -69,7 +69,7 @@ static void idleCallback()
 {
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = currentTime - prevTime;
-
+	
 	if(deltaTime > TIME_PER_FRAME)
 	{
 		// Every time we enter here is equivalent to a game loop execution
@@ -85,7 +85,6 @@ int main(int argc, char **argv)
 {
 	// GLUT initialization
 	glutInit(&argc, argv);
-	glutInitContextVersion(3,3);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -103,7 +102,7 @@ int main(int argc, char **argv)
 	// GLEW will take care of OpenGL extension functions
 	glewExperimental = GL_TRUE;
 	glewInit();
-
+	
 	// Game instance initialization
 	Game::instance().init();
 	prevTime = glutGet(GLUT_ELAPSED_TIME);
@@ -112,3 +111,6 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
+
+
