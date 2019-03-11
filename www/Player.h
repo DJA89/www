@@ -25,6 +25,8 @@ private:
 	bool bJumping;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jumpAngle, startY;
+	glm::vec2 vPlayer;
+	float gravity = -0.4;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
