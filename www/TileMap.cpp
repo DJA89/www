@@ -88,6 +88,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 
 	// load tilesheet file
+	tilesheetFile.erase(0, 3);
 	tilesheet.loadFromFile(tilesheetFile, TEXTURE_PIXEL_FORMAT_RGBA);
 	tilesheet.setWrapS(GL_CLAMP_TO_EDGE);
 	tilesheet.setWrapT(GL_CLAMP_TO_EDGE);
