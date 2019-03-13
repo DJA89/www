@@ -82,7 +82,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	xml::XMLDocument tileSetTmx;
 	tileSetTmx.LoadFile((LEVEL_DIR + tileSetTmxName).c_str());
 	const xml::XMLElement* tileSetConf = tileSetTmx.FirstChildElement("tileset");
-	tileSetTmx.SaveFile("bla.xml");
 	tilesheetSize.x = atoi(tileSetConf->Attribute("columns"));
 	tilesheetSize.y = atoi(tileSetConf->Attribute("tilecount")) / tilesheetSize.x;
 	string tilesheetFile = tileSetConf->FirstChildElement("image")->Attribute("source");
