@@ -1,5 +1,8 @@
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GL/glut.h>
+#ifndef _WIN32
+	#include <GL/freeglut.h>
+#endif
 #include "Game.h"
 
 
@@ -85,7 +88,9 @@ int main(int argc, char **argv)
 {
 	// GLUT initialization
 	glutInit(&argc, argv);
-	glutInitContextVersion(3,3);
+	#ifndef _WIN32
+		glutInitContextVersion(3, 3);
+	#endif
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
