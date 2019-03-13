@@ -270,10 +270,11 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	{
 		if(map[y*mapSize.x+x] != 0)
 		{
-			// cout << "collision DOWN" << endl;
-			// move to next tile up
-			*posY = tileSize * y - size.y;
-			return true;
+			if(*posY - tileSize * y + size.y <= 4)
+			{
+				*posY = tileSize * y - size.y;
+				return true;
+			}
 		}
 	}
 
@@ -289,16 +290,10 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = pos.y / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0){
-			// cout << "collision UP" << endl;
-			// move to next tile down
-			*posY = tileSize * y;
-			// if we miss more than one entire tile between frames, we more it into
-			// walls by adjusting it to the closest tile below. Therefore we have
-			// to move the object downward until we find a free tile
-			while (map[(*posY/tileSize) * mapSize.x+x] != 0){
-				cout << "not enough" << endl;
-				y += 1; // move one tile up
+		if(map[y*mapSize.x+x] != 0)
+		{
+			if(tileSize * y + size.y - *posY <= 4)
+			{
 				*posY = tileSize * y;
 			}
 			return true;

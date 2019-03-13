@@ -4,12 +4,10 @@
 #include "Scene.h"
 #include "Game.h"
 
-// top left window border offsets
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-// initial player position (in tiles)
 #define INIT_PLAYER_X_TILES 2
 #define INIT_PLAYER_Y_TILES 10
 

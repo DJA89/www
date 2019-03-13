@@ -80,70 +80,39 @@ void Player::update(int deltaTime)
 		else if(sprite->animation() == MOVE_RIGHT)
 			sprite->changeAnimation(STAND_RIGHT);
 	}
-
-	cout << posPlayer.x << ",\t" << posPlayer.y << endl;
-
-	// actualize player velocity & player position
-	vPlayer.y -= gravity;
-	posPlayer.y += vPlayer.y;
-
-	// handle jumps
-	if (bJumping){
-		if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y)){
-			// if hit ceiling => stop moving upwards
-			vPlayer.y = 0;
-		}
-		// if hit ground stop jump
-		if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)){
+	
+	if(bJumping)
+	{
+		jumpAngle += JUMP_ANGLE_STEP;
+		if(jumpAngle == 180)
+		{
 			bJumping = false;
-			vPlayer.y = 0;
+			posPlayer.y = startY;
 		}
-	} else {
-		if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)){
-			vPlayer.y = 0;
-		}
-		// jump key hit
-		if(Game::instance().getSpecialKey(GLUT_KEY_UP)){
-			// jump
-			bJumping = true;
-			vPlayer.y = -8;
+		else
+		{
+			posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
+			if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y)){
+				bJumping = false;
+			}
+			if(jumpAngle > 90)
+				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
 		}
 	}
-
-	// if(bJumping)
-	// {
-	// 	jumpAngle += JUMP_ANGLE_STEP;
-	// 	if(jumpAngle == 180)
-	// 	{
-	// 		bJumping = false;
-	// 		posPlayer.y = startY;
-	// 	}
-	// 	else
-	// 	{
-	// 		posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
-	// 		if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y)){
-	// 			bJumping = false;
-	// 		}
-	// 		if(jumpAngle > 90){
-	// 			bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-	// 	posPlayer.y += FALL_STEP;
-	// 	if(map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
-	// 	{
-	// 		if(Game::instance().getSpecialKey(GLUT_KEY_UP))
-	// 		{
-	// 			// start jump
-	// 			bJumping = true;
-	// 			jumpAngle = 0;
-	// 			startY = posPlayer.y;
-	// 		}
-	// 	}
-	// }
-
+	else
+	{
+		posPlayer.y += FALL_STEP;
+		if(map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
+		{
+			if(Game::instance().getSpecialKey(GLUT_KEY_UP))
+			{
+				bJumping = true;
+				jumpAngle = 0;
+				startY = posPlayer.y;
+			}
+		}
+	}
+	
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
