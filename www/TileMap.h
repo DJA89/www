@@ -51,6 +51,7 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
+	const static int non_collision_tiles[];
 
 };
 
