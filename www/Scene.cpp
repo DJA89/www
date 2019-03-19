@@ -32,8 +32,7 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
-	currentLevel = 1;
-	LevelMap *levelMap = new LevelMap();
+	levelMap = new LevelMap(); // autoloads level 1
 	string mapName = LEVEL_DIR + "level01.tmx";
 	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
@@ -53,14 +52,14 @@ void Scene::update(int deltaTime)
 	// if player left level => change level and wrap player position around
 	// cout << "posPlayer.x = " << player->posPlayer.x << "\t maxPos.x = " << maxPos.x << endl;
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
-		// right
-		currentLevel = 2;
-		changeToLevel(currentLevel);
+		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
+		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		player->setTileMap(map);
 		player->posPlayer.x = 0;
-	} else if (player->posPlayer.x <= 0){
-		// left
-		currentLevel = 1;
-		changeToLevel(currentLevel);
+	} else if (player->posPlayer.x < 0){
+			string nextLevelName = levelMap->nameOfNextLevel(LEFT);
+			map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			player->setTileMap(map);
 		player->posPlayer.x = maxPos.x - player->sizePlayer.x;
 	}
 	// else if (player->posPlayer.y > maxPos.y){
@@ -116,13 +115,4 @@ void Scene::initShaders()
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
-}
-
-void Scene::changeToLevel(int levelID){
-	string levelID_s = std::to_string(levelID);
-	if (levelID < 10)
-		levelID_s = "0" + levelID_s;
-	string mapName = LEVEL_DIR + "level" + levelID_s + ".tmx";
-	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setTileMap(map);
 }

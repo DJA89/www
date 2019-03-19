@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Player.h"
+#include "LevelMap.h"
 
 
 // Scene contains all the entities of our game.
@@ -27,13 +28,15 @@ public:
 private:
 	void initShaders();
 
+public:
+	ShaderProgram texProgram;
+
 private:
+	LevelMap *levelMap;
 	TileMap *map;
 	Player *player;
-	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
-	int currentLevel;
 };
 
 
