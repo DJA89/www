@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
+#include "LevelMap.h"
 
 // border left and up of tilemap
 #define SCREEN_X 32
@@ -32,6 +33,7 @@ void Scene::init()
 {
 	initShaders();
 	currentLevel = 1;
+	LevelMap *levelMap = new LevelMap();
 	string mapName = LEVEL_DIR + "level01.tmx";
 	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
