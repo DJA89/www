@@ -29,6 +29,8 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
+	void playerFalling(int);
+	bool upsidedown, actionPressedBeforeCollition;
 
 };
 
