@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include "Texture.h"
 #include "ShaderProgram.h"
+#include "SavedState.h"
 
 #define LEVEL_DIR string("levels/")
 
@@ -34,6 +35,8 @@ public:
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
+	bool triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const;
+	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const;
 
 private:
 	bool loadLevel(const string &levelFile);
@@ -52,6 +55,7 @@ private:
 	glm::vec2 tileTexSize;
 	int *map;
 	const static int non_collision_tiles[];
+	const static int death_tiles[];
 
 };
 

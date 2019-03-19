@@ -4,6 +4,7 @@
 
 #include "Sprite.h"
 #include "TileMap.h"
+#include "SavedState.h"
 
 
 // Player is basically a Sprite that represents the player. As such it has
@@ -20,16 +21,19 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	
+	void loadState();
+	void playerFalling(int);
+	void initializeSavedState();
+
 private:
-	bool bJumping;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jumpAngle, startY;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-	void playerFalling(int);
-	bool upsidedown, actionPressedBeforeCollition;
+	bool upsidedown, actionPressedBeforeCollition, dying;
+	int framesSinceDeath;
+	SavedState savedState;
+	bool renderInDeath();
 
 };
 
