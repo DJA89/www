@@ -1,0 +1,8 @@
+# LEVEL MAP
+# 0 is a filler, all other digits are the levels
+# the first 1 encountered will be the first level loaded
+4 4 # width & height
+ 9, 8, 6, 5
+10,11, 7, 4
+ 0, 1, 2, 3
+ 0, 0, 0, 0
