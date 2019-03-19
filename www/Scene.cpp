@@ -57,20 +57,21 @@ void Scene::update(int deltaTime)
 		player->setTileMap(map);
 		player->posPlayer.x = 0;
 	} else if (player->posPlayer.x < 0){
-			string nextLevelName = levelMap->nameOfNextLevel(LEFT);
-			map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			player->setTileMap(map);
+		string nextLevelName = levelMap->nameOfNextLevel(LEFT);
+		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		player->setTileMap(map);
 		player->posPlayer.x = maxPos.x - player->sizePlayer.x;
+	} else if (player->posPlayer.y + player->sizePlayer.y >= maxPos.y){
+		string nextLevelName = levelMap->nameOfNextLevel(DOWN);
+		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		player->setTileMap(map);
+		player->posPlayer.y = 0;
+	} else if (player->posPlayer.y < 0){
+		string nextLevelName = levelMap->nameOfNextLevel(UP);
+		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		player->setTileMap(map);
+		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
 	}
-	// else if (player->posPlayer.y > maxPos.y){
-	// 	// top
-	// 	changeToLevel(2);
-	// 	player->posPlayer.y = player->posPlayer.y % maxPos.y;
-	// } else {
-	// 	// bottom
-	// 	changeToLevel(2);
-	// 	player->posPlayer.y = player->posPlayer.y % maxPos.y;
-	// }
 }
 
 void Scene::render()
