@@ -5,39 +5,39 @@
 #include "Player.h"
 #include "Game.h"
 
-
-#define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 96
 #define FALL_STEP 6
 #define SPACEBAR 32
 
 enum PlayerAnims
 {
-	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, STAND_LEFTU, STAND_RIGHTU, MOVE_LEFTU, MOVE_RIGHTU
+	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, STAND_LEFTU, STAND_RIGHTU, MOVE_LEFTU, MOVE_RIGHTU,
+	DEATH_LEFT, DEATH_RIGHT, DEATH_LEFTU, DEATH_RIGHTU
 };
 
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
-	bJumping = false;
 	upsidedown = false;
 	actionPressedBeforeCollition = false;
+	dying = false;
+	framesSinceDeath = 0;
+
 	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(8);
-	
+	sprite->setNumberAnimations(12);
+
 		sprite->setAnimationSpeed(STAND_LEFT, 8);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(0.f, 0.f));
-		
+
 		sprite->setAnimationSpeed(STAND_RIGHT, 8);
 		sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.25f, 0.f));
-		
+
 		sprite->setAnimationSpeed(MOVE_LEFT, 8);
 		sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.f));
 		sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.25f));
 		sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.5f));
-		
+
 		sprite->setAnimationSpeed(MOVE_RIGHT, 8);
 		sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.f));
 		sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.25f));
@@ -59,14 +59,35 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(MOVE_RIGHTU, glm::vec2(0.75, 0.25f));
 		sprite->addKeyframe(MOVE_RIGHTU, glm::vec2(0.75, 0.5f));
 
+		sprite->setAnimationSpeed(DEATH_LEFT, 8);
+		sprite->addKeyframe(DEATH_LEFT, glm::vec2(0.f, 0.75f));
+
+		sprite->setAnimationSpeed(DEATH_RIGHT, 8);
+		sprite->addKeyframe(DEATH_RIGHT, glm::vec2(0.25f, 0.75f));
+
+		sprite->setAnimationSpeed(DEATH_LEFTU, 8);
+		sprite->addKeyframe(DEATH_LEFTU, glm::vec2(0.5f, 0.75f));
+
+		sprite->setAnimationSpeed(DEATH_RIGHTU, 8);
+		sprite->addKeyframe(DEATH_RIGHTU, glm::vec2(0.75f, 0.75f));
+
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	
+}
+
+void Player::initializeSavedState() {
+	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
 void Player::update(int deltaTime)
 {
+	if (dying) {
+		if (framesSinceDeath > 60) {
+			loadState();
+		}
+		return;
+	}
 	int playerMovementSpeed = 2;
 	sprite->update(deltaTime);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
@@ -135,6 +156,23 @@ void Player::update(int deltaTime)
 	else {
 		playerFalling(FALL_STEP);
 	}
+	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
+	if (map->triggerDeath(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown)) {
+		dying = true;
+		int currentAnimation = sprite->animation();
+		int newAnimation;
+		if (currentAnimation == MOVE_LEFT || currentAnimation == STAND_LEFT) {
+			newAnimation = DEATH_LEFT;
+		} else if (currentAnimation == MOVE_RIGHT || currentAnimation == STAND_RIGHT) {
+			newAnimation = DEATH_RIGHT;
+		} else if (currentAnimation == MOVE_RIGHTU || currentAnimation == STAND_RIGHTU) {
+			newAnimation = DEATH_RIGHTU;
+		} else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
+			newAnimation = DEATH_LEFTU;
+		}
+		sprite->changeAnimation(newAnimation);
+	}
+
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
@@ -180,12 +218,54 @@ void Player::playerFalling(int pixels) {
 				actionPressedBeforeCollition = false;
 			}
 		}
-	} 
+	}
+}
+
+void Player::loadState() {
+	tileMapDispl = savedState.getSavedTileMapDispl();
+	posPlayer = savedState.getSavedPosPlayer();
+	upsidedown = savedState.getSavedUpsideDown();
+	posPlayer.x -= 8;
+	if (upsidedown) {
+		sprite->changeAnimation(STAND_RIGHTU);
+	} else {
+		sprite->changeAnimation(STAND_RIGHT);
+		posPlayer.y -= 16;
+	}
+	framesSinceDeath = 0;
+	dying = false;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
 void Player::render()
 {
-	sprite->render();
+	if (dying) {
+		framesSinceDeath += 1;
+		if (renderInDeath()) {
+			sprite->render();
+		}
+	}
+	else{
+		sprite->render();
+	}
+}
+
+bool Player::renderInDeath() {
+	bool ret = true;
+	if (framesSinceDeath <= 15 && (framesSinceDeath % 10 == 0 || framesSinceDeath % 9 == 1)) {
+		ret = false;
+	}
+	else if (framesSinceDeath > 15 && framesSinceDeath <= 30 && (framesSinceDeath % 7 == 0 || framesSinceDeath % 7 == 1)) {
+		ret = false;
+	}
+	else if (framesSinceDeath > 30 && framesSinceDeath <= 45 && (framesSinceDeath % 5 == 0 || framesSinceDeath % 5 == 1)) {
+		ret = false;
+	}
+	else if (framesSinceDeath > 45 && (framesSinceDeath % 3 == 0 || framesSinceDeath % 3 == 1)) {
+		ret = false;
+	}
+
+	return ret;
 }
 
 void Player::setTileMap(TileMap *tileMap)
@@ -198,7 +278,3 @@ void Player::setPosition(const glm::vec2 &pos)
 	posPlayer = pos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
-
-
-
-

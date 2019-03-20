@@ -2,12 +2,15 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
 
 using namespace std;
 namespace xml = tinyxml2;
-
+const int TileMap::non_collision_tiles[4] = {0, 140, 465, 595};
+const int TileMap::death_tiles[2] = {140, 465};
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
 {
@@ -236,8 +239,10 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
+		{
 			return true;
+		}
 	}
 
 	return false;
@@ -252,8 +257,11 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
+		{
 			return true;
+		}		
+
 	}
 
 	return false;
@@ -268,7 +276,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
 			if(*posY - tileSize * y + size.y <= 6)
 			{
@@ -290,7 +298,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = (pos.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
 			if(*posY - tileSize * y >= 10)
 			{
@@ -300,5 +308,62 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 		}
 	}
 
+	return false;
+}
+
+
+bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
+	int x0, y0, x1, y1, y0disp, y1disp;
+
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	if (upsidedown) {
+		y0disp = 0;
+		y1disp = -7;
+	}
+	else {
+		y0disp = 7;
+		y1disp = 0;
+	}
+	y0 = (pos.y - 1 + y0disp) / tileSize;
+	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
+	for (int x = x0; x <= x1; x++) {
+		for (int y = y0; y <= y1; y++) {
+			if (map[y*mapSize.x + x] == 595) {
+				bool savedUpsidedown = false;
+				if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[(y - 1)*mapSize.x + x]) != std::end(non_collision_tiles))) {
+					savedUpsidedown = true;
+				}
+
+				savedState.update(glm::ivec2(32, 16), glm::ivec2(x*16, y*16), savedUpsidedown);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
+	int x0, y0, x1, y1, y0disp, y1disp;
+
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	if (upsidedown) {
+		y0disp = 0;
+		y1disp = -7;
+	}
+	else {
+		y0disp = 7;
+		y1disp = 0;
+	}
+	y0 = (pos.y - 1 + y0disp) / tileSize;
+	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
+	for (int x = x0; x <= x1; x++) {
+		for (int y = y0; y <= y1; y++) {
+			if ((std::find(std::begin(death_tiles), std::end(death_tiles), map[y*mapSize.x + x]) != std::end(death_tiles))) {
+				return true;
+			}
+		}
+	}
 	return false;
 }

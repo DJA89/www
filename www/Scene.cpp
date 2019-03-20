@@ -37,6 +37,7 @@ void Scene::init()
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
+	player->initializeSavedState();
 	projection = glm::ortho(32.f, float(SCREEN_WIDTH/2 - 1 + 32), float(SCREEN_HEIGHT/2 - 1), 32.f);
 	currentTime = 0.0f;
 }
