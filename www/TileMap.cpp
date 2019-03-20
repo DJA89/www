@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
 
