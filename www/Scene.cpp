@@ -26,6 +26,8 @@ Scene::~Scene()
 		delete map;
 	if(player != NULL)
 		delete player;
+	if(levelMap != NULL)
+		delete levelMap;
 }
 
 
