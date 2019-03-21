@@ -45,21 +45,22 @@ private:
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
 
+public:
+	glm::ivec2 position, mapSize, tilesheetSize;
+
 private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
-	glm::ivec2 position, mapSize, tilesheetSize;
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
-	const static int non_collision_tiles[];
-	const static int death_tiles[];
+	const static int non_collision_tiles[4];
+	const static int death_tiles[2];
+	int *levelMap;
 
 };
 
 
 #endif // _TILE_MAP_INCLUDE
-
-

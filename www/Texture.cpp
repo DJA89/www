@@ -9,15 +9,15 @@ Texture::Texture()
 {
 	wrapS = GL_REPEAT;
 	wrapT = GL_REPEAT;
-	minFilter = GL_LINEAR_MIPMAP_LINEAR;
-	magFilter = GL_LINEAR_MIPMAP_LINEAR;
+	minFilter = GL_NEAREST; //GL_LINEAR_MIPMAP_LINEAR;
+	magFilter = GL_NEAREST; //GL_LINEAR_MIPMAP_LINEAR;
 }
 
 
 bool Texture::loadFromFile(const string &filename, PixelFormat format)
 {
 	unsigned char *image = NULL;
-	
+
 	switch(format)
 	{
 	case TEXTURE_PIXEL_FORMAT_RGB:
@@ -41,7 +41,7 @@ bool Texture::loadFromFile(const string &filename, PixelFormat format)
 		break;
 	}
 	glGenerateMipmap(GL_TEXTURE_2D);
-	
+
 	return true;
 }
 
@@ -109,5 +109,3 @@ void Texture::use() const
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 }
-
-
