@@ -81,12 +81,13 @@ void Player::initializeSavedState() {
 	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
+bool Player::deathAnimationFinished(){
+	return dying && (framesSinceDeath > 60);
+}
+
 void Player::update(int deltaTime)
 {
 	if (dying) {
-		if (framesSinceDeath > 60) {
-			loadState();
-		}
 		return;
 	}
 	int playerMovementSpeed = 2;
@@ -223,9 +224,11 @@ void Player::playerFalling(int pixels) {
 }
 
 void Player::loadState() {
+	// restoring state
 	tileMapDispl = savedState.getSavedTileMapDispl();
 	posPlayer = savedState.getSavedPosPlayer();
 	upsidedown = savedState.getSavedUpsideDown();
+	// player specific init
 	posPlayer.x -= 8;
 	if (upsidedown) {
 		sprite->changeAnimation(STAND_RIGHTU);

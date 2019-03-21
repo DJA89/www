@@ -49,6 +49,9 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	if(player->deathAnimationFinished()){
+		player->loadState();
+	}
 	player->update(deltaTime);
 
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
@@ -83,6 +86,7 @@ void Scene::saveState(){
 }
 
 void Scene::restoreState(){
+	player->loadState();
 	// player->restoreStateDEBUG(savedState);
 }
 
