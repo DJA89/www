@@ -6,6 +6,8 @@
 #include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
+#include "Platform.h"
+#include "Utils.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -15,7 +17,6 @@ const int TileMap::death_tiles[2] = {140, 465};
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
 {
 	TileMap *map = new TileMap(levelFile, minCoords, program);
-
 	return map;
 }
 
@@ -30,6 +31,13 @@ TileMap::~TileMap()
 {
 	if(map != NULL)
 		delete map;
+
+	// remove all platforms
+	vector<Platform*>::iterator it;
+	for ( it = platforms.begin(); it != platforms.end(); ){
+		delete * it;
+		it = platforms.erase(it);
+	}
 }
 
 
@@ -68,6 +76,10 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	//       0,1,0,1,... // data
 	//     </data>
 	//   </layer>
+	//   <objectgroup ... >
+	//     <object name="Platform_1_spawn" gid="58" x="160" y="160" width="32" height="16"/>
+	//     <object name="Platform_1_path" x="112" y="148" width="176" height="8"/>
+	//   </objectgroup>
 	// </map>
 
 	xml::XMLDocument mapTmx;
@@ -98,7 +110,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tilesheet.setMinFilter(GL_NEAREST);
 	tilesheet.setMagFilter(GL_NEAREST);
 
-	// extract map data
+	// extract tilemap data
 	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
 	map = new int[mapSize.x * mapSize.y];
 	string row;
@@ -115,6 +127,51 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			} else {
 			}
 		}
+	}
+
+	// extract platforms in object layer
+	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
+	const xml::XMLElement* object;
+	// for each object found
+	vector<Platform> *plats = {};
+	object = objectgroup->FirstChildElement("object");
+	while (object){
+		string objectName = object->Attribute("name");
+		int xPos = stoi(object->Attribute("x"));
+		int yPos = stoi(object->Attribute("y"));
+		int width = stoi(object->Attribute("width"));
+		int height = stoi(object->Attribute("height"));
+
+		vector<string> objectAttribs = Utils::split(objectName, '_');
+		// cout << objectAttribs.at(1) << endl;
+		if (objectAttribs.at(0) == "Platform"){ // platform vs ...
+			int ID = stoi(objectAttribs.at(1));
+			// check if there is already a platform with this ID
+			vector<Platform*>::iterator it;
+			for ( it = platforms.begin(); it != platforms.end(); ){
+				if ((**it).getID() == ID)
+					break; // found existing platform
+			}
+			Platform *plat;
+			if (it != platforms.end()){
+				plat = *it; // exists, add new data to it
+			} else {
+				plat = new Platform(); // else create new and add to vector
+				plat->setID(ID);
+				platforms.push_back(plat);
+			}
+			if (objectAttribs.at(2) == "spawn"){ // spawn vs path
+				plat->setSpawn(glm::vec2(xPos, yPos));
+				plat->setSize(glm::vec2(width, height));
+				int tileID = stoi(object->Attribute("gid"));
+				plat->setTileID(tileID); // tile idx in spritesheet
+			} else if (objectAttribs.at(2) == "path"){
+				// path of platform
+				plat->setPathStart(glm::vec2(xPos, yPos));
+				plat->setPathEnd(glm::vec2(xPos+width, yPos+height));
+			}
+		}
+		object = object->NextSiblingElement("object");
 	}
 
 	return true;
@@ -260,7 +317,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
 			return true;
-		}		
+		}
 
 	}
 

@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "SavedState.h"
+#include "Platform.h"
 
 #define LEVEL_DIR string("levels/")
 
@@ -56,10 +57,9 @@ private:
 	int *map;
 	const static int non_collision_tiles[];
 	const static int death_tiles[];
+	vector<Platform*> platforms;
 
 };
 
 
 #endif // _TILE_MAP_INCLUDE
-
-
