@@ -23,7 +23,6 @@ private:
 
 public:
 	int currentLevelMapIdx; // for map array
-	int currentLevelFileID; // for level file
 
 private:
 	glm::ivec2 size;

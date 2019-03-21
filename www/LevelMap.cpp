@@ -84,6 +84,5 @@ string LevelMap::nameOfNextLevel(direction nextLevelIs){
 	string nextLevelName = LEVEL_DIR + "level" + nextLevelFileID_s + ".tmx";
 	// store current level
 	currentLevelMapIdx = nextLevelMapIdx;
-	currentLevelFileID = nextLevelFileID;
 	return nextLevelName;
 }

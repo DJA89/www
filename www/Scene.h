@@ -23,7 +23,6 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
-	void changeToLevel(int levelID);
 
 private:
 	void initShaders();
