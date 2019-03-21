@@ -26,6 +26,8 @@ public:
 
 private:
 	void initShaders();
+	void saveState();
+	void restoreState();
 
 public:
 	ShaderProgram texProgram;
