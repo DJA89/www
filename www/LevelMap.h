@@ -8,7 +8,7 @@ using namespace std;
 
 // Class LevelMap manages the layout of the game levels
 
-enum direction { RIGHT, LEFT, UP, DOWN };
+enum direction { RIGHT, LEFT, UP, DOWN }; // TODO move to common place
 
 class LevelMap
 {

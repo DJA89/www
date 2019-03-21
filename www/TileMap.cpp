@@ -331,6 +331,7 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 		for (int y = y0; y <= y1; y++) {
 			if (map[y*mapSize.x + x] == 595) {
 				bool savedUpsidedown = false;
+				// checking if tile above checkpoint is collidable
 				if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[(y - 1)*mapSize.x + x]) != std::end(non_collision_tiles))) {
 					savedUpsidedown = true;
 				}
