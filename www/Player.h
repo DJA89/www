@@ -24,7 +24,7 @@ public:
 	void loadState();
 	void playerFalling(int);
 	void initializeSavedState();
-	bool deathAnimationFinished();
+	bool hasDied();
 
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
 

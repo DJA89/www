@@ -81,7 +81,7 @@ void Player::initializeSavedState() {
 	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
-bool Player::deathAnimationFinished(){
+bool Player::hasDied(){
 	return dying && (framesSinceDeath > 60);
 }
 

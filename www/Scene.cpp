@@ -41,7 +41,7 @@ void Scene::init()
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
-	saveState();
+	saveGame();
 	projection = glm::ortho(32.f, float(SCREEN_WIDTH/2 - 1 + 32), float(SCREEN_HEIGHT/2 - 1), 32.f);
 	currentTime = 0.0f;
 }
@@ -49,8 +49,8 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	if(player->deathAnimationFinished()){
-		player->loadState();
+	if(player->hasDied()){
+		loadGame();
 	}
 	player->update(deltaTime);
 
@@ -80,14 +80,14 @@ void Scene::update(int deltaTime)
 	}
 }
 
-void Scene::saveState(){
-	// player->saveStateDEBUG(savedState);
+// completely saves game (fully restoreable)
+void Scene::saveGame(){
 	player->initializeSavedState();
 }
 
-void Scene::restoreState(){
+// completely restores game to last save
+void Scene::loadGame(){
 	player->loadState();
-	// player->restoreStateDEBUG(savedState);
 }
 
 void Scene::render()
