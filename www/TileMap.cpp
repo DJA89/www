@@ -317,7 +317,7 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
-	if (upsidedown) {
+	if (upsidedown) { // don't collide on empty space above spider
 		y0disp = 0;
 		y1disp = -7;
 	}
@@ -329,33 +329,13 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
-			if (map[y*mapSize.x + x] == 595) {
+			if (map[y*mapSize.x + x] == 595) { // floor checkpoint
 				// (x,y) is a checkpoint
-				// TODO check if this makes sense
-				if (checkpointValid(x, y, upsidedown)){
 					return glm::ivec2(x*tileSize, y*tileSize);
-				} else {
-					// if no solid ground in falling direction under checkpoint
-					// => don't collide with it (=> don't save checkpoint)
-					return glm::ivec2(0, 0); // TODO does this make sense?
-				}
-			}
+			} // TODO add if for ceiling checkpoint tileid
 		}
 	}
 	return glm::ivec2(0, 0); // no collision with checkpoints found
-}
-
-//TODO is this function really necessary? is it just agains glitches/floating checkpoints, or am I missing something?
-bool TileMap::checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const {
-	int yGround;
-	if (upsidedown){
-		yGround = yCheckpoint - 1;
-	} else {
-		yGround = yCheckpoint + 1;
-	}
-	// check if ground below/above checkpoint is collidable/solid (player stops there when respawning)
-	bool isGroundCollidable = std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[yGround*mapSize.x + xCheckpoint]) == std::end(non_collision_tiles); // check if ground is NOT non_collision
-	return isGroundCollidable;
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
