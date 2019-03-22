@@ -185,6 +185,24 @@ void Player::checkForCheckpointCollision(SavedState &savedState){
 	}
 }
 
+void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 centerCheckpointPosition){
+	int xCenter = centerCheckpointPosition.x;
+	int yCenter = centerCheckpointPosition.y;
+	posPlayer.x = xCenter - 8;
+	posPlayer.y = yCenter; // - sizePlayer.y;
+	// posPlayer.x -= 8;
+	if (upsidedown) {
+		sprite->changeAnimation(STAND_RIGHTU);
+	} else {
+		sprite->changeAnimation(STAND_RIGHT);
+		posPlayer.y -= 16;
+	}
+	framesSinceDeath = 0;
+	dying = false;
+	this->upsidedown = upsidedown;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+}
+
 void Player::playerFalling(int pixels) {
 	posPlayer.y += pixels;
 	bool collition = map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
@@ -232,19 +250,9 @@ void Player::playerFalling(int pixels) {
 
 void Player::loadState(SavedState &savedState) {
 	// restoring state
-	posPlayer = savedState.getSavedPosPlayer();
-	upsidedown = savedState.getSavedUpsideDown();
-	// player specific init
-	posPlayer.x -= 8;
-	if (upsidedown) {
-		sprite->changeAnimation(STAND_RIGHTU);
-	} else {
-		sprite->changeAnimation(STAND_RIGHT);
-		posPlayer.y -= 16;
-	}
-	framesSinceDeath = 0;
-	dying = false;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	glm::ivec2 centerCheckpointPosition = savedState.getSavedPosPlayer();
+	bool upsidedown = savedState.getSavedUpsideDown();
+	restorePlayerPosition(upsidedown, centerCheckpointPosition);
 }
 
 void Player::render()
