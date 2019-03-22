@@ -98,12 +98,12 @@ void Scene::checkForCheckpointCollision(){
 // completely saves game (fully restoreable)
 // normalized: the player will be spawned shifted left by half its length
 void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
-	savedState.update(normalizedPosition, isUpsideDown);
+	savedState.save(normalizedPosition, isUpsideDown);
 }
 
 // completely restores game to last save
 void Scene::loadGame(){
-	glm::ivec2 normalizedPosition = savedState.getSavedPosPlayer();
+	glm::ivec2 normalizedPosition = savedState.getSavedPlayerPosition();
 	bool upsidedown = savedState.getSavedUpsideDown();
 	player->restorePlayerPosition(upsidedown, normalizedPosition);
 }
