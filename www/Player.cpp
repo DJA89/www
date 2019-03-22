@@ -78,7 +78,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 }
 
 void Player::initializeSavedState(SavedState &savedState) {
-	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
+	savedState.init(glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
 bool Player::hasDied(){
@@ -181,7 +181,7 @@ void Player::checkForCheckpointCollision(SavedState &savedState){
 	glm::ivec2 checkpointPosition;
 	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
+		savedState.update(checkpointPosition, map->isCheckpointUpsideDown(checkpointPosition));
 	}
 }
 
@@ -232,7 +232,6 @@ void Player::playerFalling(int pixels) {
 
 void Player::loadState(SavedState &savedState) {
 	// restoring state
-	tileMapDispl = savedState.getSavedTileMapDispl();
 	posPlayer = savedState.getSavedPosPlayer();
 	upsidedown = savedState.getSavedUpsideDown();
 	// player specific init
