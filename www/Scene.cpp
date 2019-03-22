@@ -81,20 +81,24 @@ void Scene::update(int deltaTime)
 }
 
 void Scene::checkForCheckpointCollision(){
+	// TODO store checkpoint in checkpoint class (or TileMap class)
+	// TODO => move saving to saveGame() and call if collision
 	glm::ivec2 playerPosition = player->posPlayer;
 	glm::ivec2 playerSize = player->sizePlayer;
 	bool upsidedown = player->upsidedown;
-	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
+	glm::ivec2 checkpointPosition =
+		map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		glm::ivec2 saveStatePos = map->getNormalizedCheckpointPosition(checkpointPosition);
-		bool saveStateDir = map->isCheckpointUpsideDown(checkpointPosition);
-		savedState.update(saveStatePos, saveStateDir);
+		saveGame(
+			map->getNormalizedCheckpointPosition(checkpointPosition),
+			map->isCheckpointUpsideDown(checkpointPosition));
 	}
 }
 
 // completely saves game (fully restoreable)
-void Scene::saveGame(){
+// normalized: the player will be spawned shifted left by half its length
+void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
+	savedState.update(normalizedPosition, isUpsideDown);
 }
 
 // completely restores game to last save
