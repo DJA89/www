@@ -329,13 +329,22 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
-			if (map[y*mapSize.x + x] == 595) { // floor checkpoint
+			if (map[y*mapSize.x + x] == 595) { // only floor checkpoint
 				// (x,y) is a checkpoint
 					return glm::ivec2(x*tileSize, y*tileSize);
-			} // TODO add if for ceiling checkpoint tileid
+			}
 		}
 	}
 	return glm::ivec2(0, 0); // no collision with checkpoints found
+}
+
+bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
+	int x = checkpointPosition.x / tileSize;
+	int y = checkpointPosition.y / tileSize;
+	if (map[y*mapSize.x + x] == 595){ // floor checkpoint
+		return false; // floor
+	}
+	return false; // in case of doubt assume floor
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
