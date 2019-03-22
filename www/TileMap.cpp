@@ -312,7 +312,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 }
 
 
-bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
+glm::ivec2 TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
 	int x0, y0, x1, y1, y0disp, y1disp;
 
 	x0 = pos.x / tileSize;
@@ -331,14 +331,18 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 		for (int y = y0; y <= y1; y++) {
 			if (map[y*mapSize.x + x] == 595) {
 				// (x,y) is a checkpoint
+				// TODO check if this makes sense
 				if (checkpointValid(x, y, upsidedown)){
-					savedState.update(glm::ivec2(32, 16), glm::ivec2(x*16, y*16), upsidedown);
+					return glm::ivec2(x*tileSize, y*tileSize);
+				} else {
+					// if no ground in falling direction under checkpoint
+					// => don't collide with it (=> don't save checkpoint)
+					return glm::ivec2(0, 0); // TODO does this make sense?
 				}
-				return true;
 			}
 		}
 	}
-	return false;
+	return glm::ivec2(0, 0);
 }
 
 //TODO is this function really necessary? is it just agains glitches/floating checkpoints, or am I missing something?

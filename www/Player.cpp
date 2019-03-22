@@ -158,7 +158,11 @@ void Player::update(int deltaTime)
 	else {
 		playerFalling(FALL_STEP);
 	}
-	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
+	glm::ivec2 checkpointPosition;
+	checkpointPosition = map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
+	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
+	}
 	if (map->triggerDeath(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown)) {
 		dying = true;
 		int currentAnimation = sprite->animation();
