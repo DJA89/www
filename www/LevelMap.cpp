@@ -49,14 +49,14 @@ bool LevelMap::loadLevelMap(const string &fileName){
 		ss.str(line);
 		while(getline(ss, cell, ',')) {
 			if (stoi(cell) == 1) // for autoload of level 1
-				currentLevelMapIdx = j*size.x + i;
+				this->currentLevelMapIdx = j*size.x + i;
 			map[j*size.x + i++] = stoi(cell);
 		}
 	}
 }
 
 string LevelMap::nameOfNextLevel(direction nextLevelIs){
-	int nextLevelMapIdx = currentLevelMapIdx;
+	int nextLevelMapIdx = this->currentLevelMapIdx;
 	switch (nextLevelIs) {
 		case RIGHT:
 			nextLevelMapIdx += 1;
@@ -73,7 +73,7 @@ string LevelMap::nameOfNextLevel(direction nextLevelIs){
 	}
 	// if outside of array, reset to current
 	if (nextLevelMapIdx < 0 || size.x * size.y <= nextLevelMapIdx){
-		nextLevelMapIdx = currentLevelMapIdx;
+		nextLevelMapIdx = this->currentLevelMapIdx;
 	}
 	this->currentLevelMapIdx = nextLevelMapIdx;
 	return nameOfCurrentLevel();

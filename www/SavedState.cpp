@@ -8,11 +8,11 @@ void SavedState::save(glm::ivec2 newSavedPlayerPosition, bool newSavedUpsideDown
 }
 
 glm::ivec2 SavedState::getSavedPlayerPosition() {
-	return savedPlayerPosition;
+	return this->savedPlayerPosition;
 }
 
 bool SavedState::getSavedUpsideDown() {
-	return savedUpsideDown;
+	return this->savedUpsideDown;
 }
 
 int SavedState::getSavedScreen(){
