@@ -28,6 +28,7 @@ private:
 	void initShaders();
 	void saveGame();
 	void loadGame();
+	void checkForCheckpointCollision();
 
 public:
 	ShaderProgram texProgram;

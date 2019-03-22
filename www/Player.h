@@ -24,16 +24,15 @@ public:
 	void loadState(SavedState &savedState);
 	void playerFalling(int);
 	bool hasDied();
-	void checkForCheckpointCollision(SavedState &savedState);
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
+	bool upsidedown, actionPressedBeforeCollition, dying;
 
 private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	bool renderInDeath();
 

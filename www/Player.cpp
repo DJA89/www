@@ -173,14 +173,6 @@ void Player::update(int deltaTime)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
-void Player::checkForCheckpointCollision(SavedState &savedState){
-	// TODO move to Scene
-	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, sizePlayer, &posPlayer.y, upsidedown);	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(map->getNormalizedCheckpointPosition(checkpointPosition), map->isCheckpointUpsideDown(checkpointPosition));
-	}
-}
-
 // center means in the middle of the player touching the floor/ceiling it is standing on
 void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
 	// player specific restoring

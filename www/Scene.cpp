@@ -53,7 +53,7 @@ void Scene::update(int deltaTime)
 		loadGame();
 	}
 	player->update(deltaTime);
-	player->checkForCheckpointCollision(savedState);
+	checkForCheckpointCollision();
 	// update tilemap
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	// if player left level => change level and wrap player position around
@@ -77,6 +77,19 @@ void Scene::update(int deltaTime)
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setTileMap(map);
 		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
+	}
+}
+
+void Scene::checkForCheckpointCollision(){
+	glm::ivec2 playerPosition = player->posPlayer;
+	glm::ivec2 playerSize = player->sizePlayer;
+	bool upsidedown = player->upsidedown;
+	glm::ivec2 checkpointPosition;
+	checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
+	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		glm::ivec2 saveStatePos = map->getNormalizedCheckpointPosition(checkpointPosition);
+		bool saveStateDir = map->isCheckpointUpsideDown(checkpointPosition);
+		savedState.update(saveStatePos, saveStateDir);
 	}
 }
 
