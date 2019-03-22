@@ -23,7 +23,6 @@ public:
 	void setPosition(const glm::vec2 &pos);
 	void loadState(SavedState &savedState);
 	void playerFalling(int);
-	void initializeSavedState(SavedState &savedState);
 	bool hasDied();
 	void checkForCheckpointCollision(SavedState &savedState);
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 centerCheckpointPosition);
