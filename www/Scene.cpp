@@ -54,7 +54,7 @@ void Scene::update(int deltaTime)
 		loadGame();
 	}
 	player->update(deltaTime);
-
+	player->checkForCheckpointCollision(savedState);
 	// update tilemap
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	// if player left level => change level and wrap player position around
@@ -83,12 +83,12 @@ void Scene::update(int deltaTime)
 
 // completely saves game (fully restoreable)
 void Scene::saveGame(){
-	player->initializeSavedState();
+	player->initializeSavedState(savedState);
 }
 
 // completely restores game to last save
 void Scene::loadGame(){
-	player->loadState();
+	player->loadState(savedState);
 }
 
 void Scene::render()

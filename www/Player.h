@@ -21,9 +21,9 @@ public:
 
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	void loadState();
+	void loadState(SavedState &savedState);
 	void playerFalling(int);
-	void initializeSavedState();
+	void initializeSavedState(SavedState &savedState);
 	bool hasDied();
 	void checkForCheckpointCollision(SavedState &savedState);
 
@@ -35,7 +35,6 @@ private:
 	TileMap *map;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
-	SavedState savedState;
 	bool renderInDeath();
 
 };
