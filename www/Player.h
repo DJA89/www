@@ -21,7 +21,6 @@ public:
 
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	void loadState(SavedState &savedState);
 	void playerFalling(int);
 	bool hasDied();
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);

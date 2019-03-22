@@ -103,7 +103,9 @@ void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
 
 // completely restores game to last save
 void Scene::loadGame(){
-	player->loadState(savedState);
+	glm::ivec2 normalizedPosition = savedState.getSavedPosPlayer();
+	bool upsidedown = savedState.getSavedUpsideDown();
+	player->restorePlayerPosition(upsidedown, normalizedPosition);
 }
 
 void Scene::render()

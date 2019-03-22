@@ -239,13 +239,6 @@ void Player::playerFalling(int pixels) {
 	}
 }
 
-void Player::loadState(SavedState &savedState) {
-	// TODO move to Scene
-	glm::ivec2 normalizedCheckpointPosition = savedState.getSavedPosPlayer();
-	bool upsidedown = savedState.getSavedUpsideDown();
-	restorePlayerPosition(upsidedown, normalizedCheckpointPosition);
-}
-
 void Player::render()
 {
 	if (dying) {
