@@ -17,14 +17,15 @@ public:
 	LevelMap();
 	~LevelMap();
 	string nameOfNextLevel(direction nextLevelIs);
+	int getCurrentScreen();
+	void setCurrentScreen(int newCurrentScreen);
+	string nameOfCurrentLevel();
 
 private:
 	bool loadLevelMap(const string &fileName);
 
-public:
-	int currentLevelMapIdx; // for map array
-
 private:
+	int currentLevelMapIdx; // for map array
 	glm::ivec2 size;
 	int *map;
 };

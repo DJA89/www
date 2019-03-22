@@ -26,15 +26,12 @@ Scene::~Scene()
 		delete map;
 	if(player != NULL)
 		delete player;
-	if(levelMap != NULL)
-		delete levelMap;
 }
 
 
 void Scene::init()
 {
 	initShaders();
-	levelMap = new LevelMap(); // autoloads level 1
 	string mapName = LEVEL_DIR + "level01.tmx";
 	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
@@ -58,22 +55,22 @@ void Scene::update(int deltaTime)
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	// if player left level => change level and wrap player position around
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
-		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
+		string nextLevelName = levelMap.nameOfNextLevel(RIGHT);
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setTileMap(map);
 		player->posPlayer.x = 0;
 	} else if (player->posPlayer.x < 0){
-		string nextLevelName = levelMap->nameOfNextLevel(LEFT);
+		string nextLevelName = levelMap.nameOfNextLevel(LEFT);
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setTileMap(map);
 		player->posPlayer.x = maxPos.x - player->sizePlayer.x;
 	} else if (player->posPlayer.y + player->sizePlayer.y >= maxPos.y){
-		string nextLevelName = levelMap->nameOfNextLevel(DOWN);
+		string nextLevelName = levelMap.nameOfNextLevel(DOWN);
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setTileMap(map);
 		player->posPlayer.y = 0;
 	} else if (player->posPlayer.y < 0){
-		string nextLevelName = levelMap->nameOfNextLevel(UP);
+		string nextLevelName = levelMap.nameOfNextLevel(UP);
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		player->setTileMap(map);
 		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
@@ -98,11 +95,21 @@ void Scene::checkForCheckpointCollision(){
 // completely saves game (fully restoreable)
 // normalized: the player will be spawned shifted left by half its length
 void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
-	savedState.save(normalizedPosition, isUpsideDown);
+	int currentScreen = levelMap.getCurrentScreen();
+	savedState.save(normalizedPosition, isUpsideDown, currentScreen);
 }
 
 // completely restores game to last save
 void Scene::loadGame(){
+	// TODO improvement: store normalizedPosition and upsidedown in a PlayerState class and currentLevel in a LevelState class
+	// levelmap related
+	int currentScreen = savedState.getSavedScreen();
+	// TODO move tilemap management to levelmap
+	levelMap.setCurrentScreen(currentScreen);
+	string levelName = levelMap.nameOfCurrentLevel();
+	map = TileMap::createTileMap(levelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	// player related
+	player->setTileMap(map);
 	glm::ivec2 normalizedPosition = savedState.getSavedPlayerPosition();
 	bool upsidedown = savedState.getSavedUpsideDown();
 	player->restorePlayerPosition(upsidedown, normalizedPosition);

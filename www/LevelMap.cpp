@@ -75,14 +75,28 @@ string LevelMap::nameOfNextLevel(direction nextLevelIs){
 	if (nextLevelMapIdx < 0 || size.x * size.y <= nextLevelMapIdx){
 		nextLevelMapIdx = currentLevelMapIdx;
 	}
-	int nextLevelFileID = map[nextLevelMapIdx];
+	this->currentLevelMapIdx = nextLevelMapIdx;
+	return nameOfCurrentLevel();
+}
+
+string LevelMap::nameOfCurrentLevel(){
+	// get current levelFileID from map
+	int currentLevelFileID = map[this->currentLevelMapIdx];
 	// get string from levelFileID
-	string nextLevelFileID_s = std::to_string(nextLevelFileID);
-	if (nextLevelFileID < 10){
-		nextLevelFileID_s = "0" + nextLevelFileID_s;
+	string currentLevelFileID_s = std::to_string(currentLevelFileID);
+	if (currentLevelFileID < 10){
+		currentLevelFileID_s = "0" + currentLevelFileID_s;
 	}
-	string nextLevelName = LEVEL_DIR + "level" + nextLevelFileID_s + ".tmx";
-	// store current level
-	currentLevelMapIdx = nextLevelMapIdx;
-	return nextLevelName;
+	return LEVEL_DIR + "level" + currentLevelFileID_s + ".tmx";
+}
+
+// only use for saving and restoring game
+int LevelMap::getCurrentScreen(){
+	// abstract from implementation (from the fact, that's only an index)
+	return this->currentLevelMapIdx;
+}
+
+// only use for saving and restoring game
+void LevelMap::setCurrentScreen(int newCurrentScreen){
+	this->currentLevelMapIdx = newCurrentScreen;
 }

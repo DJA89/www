@@ -34,9 +34,9 @@ public:
 	ShaderProgram texProgram;
 
 private:
-	LevelMap *levelMap;
 	TileMap *map;
 	Player *player;
+	LevelMap levelMap;
 	SavedState savedState;
 	float currentTime;
 	glm::mat4 projection;
