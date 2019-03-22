@@ -49,14 +49,15 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	// update player
 	if(player->hasDied()){
 		loadGame();
 	}
 	player->update(deltaTime);
 
+	// update tilemap
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	// if player left level => change level and wrap player position around
-	// cout << "posPlayer.x = " << player->posPlayer.x << "\t maxPos.x = " << maxPos.x << endl;
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
 		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
 		map = TileMap::createTileMap(nextLevelName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);

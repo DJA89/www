@@ -25,6 +25,7 @@ public:
 	void playerFalling(int);
 	void initializeSavedState();
 	bool hasDied();
+	void checkForCheckpointCollision(SavedState &savedState);
 
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
 
