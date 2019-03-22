@@ -10,7 +10,7 @@
 #define SCREEN_Y 16
 
 // initial player position
-#define INIT_PLAYER_X_TILES 2
+#define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
 #define INIT_PLAYER_Y_TILES 10
 
 
