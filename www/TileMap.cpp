@@ -312,7 +312,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 }
 
 
-glm::ivec2 TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
+glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
 	int x0, y0, x1, y1, y0disp, y1disp;
 
 	x0 = pos.x / tileSize;

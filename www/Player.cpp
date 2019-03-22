@@ -159,7 +159,7 @@ void Player::update(int deltaTime)
 		playerFalling(FALL_STEP);
 	}
 	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
+	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
 		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
 	}
