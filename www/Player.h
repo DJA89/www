@@ -25,7 +25,7 @@ public:
 	void playerFalling(int);
 	bool hasDied();
 	void checkForCheckpointCollision(SavedState &savedState);
-	void restorePlayerPosition(bool upsidedown, glm::ivec2 centerCheckpointPosition);
+	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
 

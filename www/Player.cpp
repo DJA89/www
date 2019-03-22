@@ -176,17 +176,16 @@ void Player::update(int deltaTime)
 void Player::checkForCheckpointCollision(SavedState &savedState){
 	// TODO move to Scene
 	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
-	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(map->getCenterCheckpointPosition(checkpointPosition), map->isCheckpointUpsideDown(checkpointPosition));
+	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, sizePlayer, &posPlayer.y, upsidedown);	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		savedState.update(map->getNormalizedCheckpointPosition(checkpointPosition), map->isCheckpointUpsideDown(checkpointPosition));
 	}
 }
 
 // center means in the middle of the player touching the floor/ceiling it is standing on
-void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 centerCheckpointPosition){
+void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
 	// player specific restoring
-	int xCenter = centerCheckpointPosition.x;
-	int yCenter = centerCheckpointPosition.y;
+	int xCenter = normalizedCheckpointPosition.x;
+	int yCenter = normalizedCheckpointPosition.y;
 	int xPos, yPos;
 	if (upsidedown) {
 		xPos = xCenter - sizePlayer.x/2;
@@ -250,9 +249,9 @@ void Player::playerFalling(int pixels) {
 
 void Player::loadState(SavedState &savedState) {
 	// TODO move to Scene
-	glm::ivec2 centerCheckpointPosition = savedState.getSavedPosPlayer();
+	glm::ivec2 normalizedCheckpointPosition = savedState.getSavedPosPlayer();
 	bool upsidedown = savedState.getSavedUpsideDown();
-	restorePlayerPosition(upsidedown, centerCheckpointPosition);
+	restorePlayerPosition(upsidedown, normalizedCheckpointPosition);
 }
 
 void Player::render()

@@ -339,7 +339,7 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 }
 
 // x-centered, y touching surface (floor/ceiling) of checkpoint
-glm::ivec2 TileMap::getCenterCheckpointPosition(glm::ivec2 checkpointPosition){
+glm::ivec2 TileMap::getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition){
 	int x = checkpointPosition.x;
 	int y = checkpointPosition.y;
 	if (isCheckpointUpsideDown(checkpointPosition)){
