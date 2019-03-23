@@ -58,7 +58,6 @@ private:
 	int *map;
 	const static int non_collision_tiles[4];
 	const static int death_tiles[2];
-	int *levelMap;
 
 };
 
