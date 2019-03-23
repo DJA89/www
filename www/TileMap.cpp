@@ -59,17 +59,7 @@ bool TileMap::loadLevel(const string & levelFile){
 }
 
 bool TileMap::loadLevelTmx(const string &levelFile){
-	// Structure of the XML file:
-	// <?xml ... ?>
-	// <map ... width="20" height="15" tilewidth="16" ...>
-	//   <tileset ... />
-	//   <layer ... >
-	//     <data ... >
-	//       0,1,0,1,... // data
-	//     </data>
-	//   </layer>
-	// </map>
-
+	// for reference see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/
 	xml::XMLDocument mapTmx;
 	mapTmx.LoadFile(levelFile.c_str());
 
@@ -91,12 +81,12 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 
 	// load tilesheet file
-	tilesheetFile.erase(0, 3);
+	tilesheetFile.erase(0, 3); // remove "../" (current path is project, not levels/)
 	tilesheet.loadFromFile(tilesheetFile, TEXTURE_PIXEL_FORMAT_RGBA);
 	tilesheet.setWrapS(GL_CLAMP_TO_EDGE);
 	tilesheet.setWrapT(GL_CLAMP_TO_EDGE);
-	tilesheet.setMinFilter(GL_NEAREST);
-	tilesheet.setMagFilter(GL_NEAREST);
+	tilesheet.setMinFilter(GL_NEAREST); // Pixelated look
+	tilesheet.setMagFilter(GL_NEAREST); // Pixelated look
 
 	// extract map data
 	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
