@@ -335,7 +335,7 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 					savedUpsidedown = true;
 				}
 
-				savedState.update(glm::ivec2(32, 16), glm::ivec2(x*16, y*16), savedUpsidedown);
+				savedState.update(glm::ivec2(0, 0), glm::ivec2(x*16, y*16), savedUpsidedown);
 				return true;
 			}
 		}
