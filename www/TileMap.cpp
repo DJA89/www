@@ -317,6 +317,8 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
+	// don't collide on empty space above spider
+	// TODO replace with AABB
 	if (upsidedown) {
 		y0disp = 0;
 		y1disp = -7;
