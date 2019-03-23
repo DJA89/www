@@ -3,9 +3,11 @@
 
 
 #include <glm/glm.hpp>
+#include <unordered_map>
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "SavedState.h"
+#include "TileType.h"
 
 #define LEVEL_DIR string("levels/")
 

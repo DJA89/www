@@ -8,6 +8,8 @@ class BoundingEllipse: public BoundingShape
 {
 
 public:
+	BoundingEllipse(glm::vec2 position, glm::vec2 size) :
+		BoundingShape(position, size) {};
 
 private:
 };

@@ -3,17 +3,20 @@
 
 
 #include <glm/glm.hpp>
+#include "BoundingShape.h"
 
 class TileType
 {
 
 public:
+	TileType(int ID, BoundingShape * collisionBounds) : ID(ID), collisionBounds(collisionBounds) {};
+	~TileType();
 
 private:
 	int ID; // like in level file
 	bool isDeath; // TODO for future use
 	bool isCollidable; // TODO for future use
-	BoundingShape collisionBounds; // only if collidable
+	BoundingShape * collisionBounds; // only if collidable
 
 };
 

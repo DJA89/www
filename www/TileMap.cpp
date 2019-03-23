@@ -6,6 +6,7 @@
 #include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
+#include "AxisAlignedBoundingBox.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -115,6 +116,28 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			} else {
 			}
 		}
+	}
+
+	// load collision bounding-shapes for tiles
+	const xml::XMLElement * tile;
+	// for each tile found
+	tile = tileSetConf->FirstChildElement("tile");
+	while (tile){
+		// extract of xml
+		int tileID = stoi(tile->Attribute("id"));
+		const xml::XMLElement * object = tile->FirstChildElement("objectgroup")->FirstChildElement("object");
+		int xPos = stoi(object->Attribute("x"));
+		int yPos = stoi(object->Attribute("y"));
+		int width = stoi(object->Attribute("width"));
+		int height = stoi(object->Attribute("height"));
+		// store in objects
+		glm::vec2 position = glm::vec2(xPos, yPos);
+		glm::vec2 size = glm::vec2(width, height);
+		AxisAlignedBoundingBox * aabb = new AxisAlignedBoundingBox(position, size);
+		TileType * tileType = new TileType(tileID, aabb);
+		tileTypeByID[tileID] = tileType;
+		// next iteration
+		tile = tile->NextSiblingElement("tile");
 	}
 
 	return true;

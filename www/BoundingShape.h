@@ -8,10 +8,14 @@ class BoundingShape
 {
 
 public:
+	BoundingShape(glm::vec2 position, glm::vec2 size) :
+		position(position), size(size) {};
+	// inline void setPosition(glm::vec2 pos){ this->position = pos; };
+	// inline void setSize(glm::vec2 size){ this->size = size; };
 
 protected:
-	glm::ivec2 position; // top left
-	glm::ivec2 size; // for ellipse: containing rectangle
+	glm::vec2 position; // top left
+	glm::vec2 size; // for ellipse: containing rectangle
 };
 
 
