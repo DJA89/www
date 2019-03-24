@@ -187,14 +187,17 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					platforms[ID] = plat;
 				}
 				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
-					plat->setSpawn(glm::vec2(xPos, yPos));
-					plat->setSize(glm::vec2(width, height));
 					int tileID = stoi(object->Attribute("gid"));
 					plat->setTileID(tileID); // tile idx in spritesheet
+					// position is bottom left
+					// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
+					plat->setSpawn(glm::vec2(xPos, yPos));
+					plat->setSize(glm::vec2(width, height));
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform
-					plat->setPathStart(glm::vec2(xPos, yPos));
-					plat->setPathEnd(glm::vec2(xPos+width, yPos+height));
+					// position is top left => correct, because sprite pos is bottom left (y += height)
+					plat->setPathStart(glm::vec2(xPos, yPos + height));
+					plat->setPathEnd(glm::vec2(xPos+width, yPos+height + height));
 				}
 			}
 			object = object->NextSiblingElement("object");
