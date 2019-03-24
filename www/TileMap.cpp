@@ -179,6 +179,8 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
 					plat->setSpawn(glm::vec2(xPos, yPos - height));
 					plat->setSize(glm::vec2(width, height));
+					// add bounding shape to platform
+					plat->setBoundingShape(tileTypeByID[tileID]->collisionBounds);
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform
 					plat->setPathStart(glm::vec2(xPos, yPos));

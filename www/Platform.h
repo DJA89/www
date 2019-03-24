@@ -24,6 +24,7 @@ public:
 	void setSize(glm::vec2 size){ this->size = size; }
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; } // gets corrected in init() to match upper left corner
+	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
 
 private:
 	glm::ivec2 tileMapDispl, posPlatform;
@@ -37,6 +38,7 @@ private:
 	glm::vec2 position; // bottom left
 	glm::vec2 pathStart;
 	glm::vec2 pathEnd; // in init gets subtracted size (then matches path of bottom left corner)
+	BoundingShape * collisionBounds;
 
 };
 
