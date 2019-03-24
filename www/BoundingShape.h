@@ -3,7 +3,6 @@
 
 
 #include <glm/glm.hpp>
-
 class BoundingEllipse;
 class AxisAlignedBoundingBox;
 
@@ -13,6 +12,9 @@ class BoundingShape
 public:
 	BoundingShape(glm::vec2 position, glm::vec2 size) :
 		position(position), size(size) {};
+	virtual bool intersects(BoundingShape & shape) = 0;
+	virtual bool intersects(BoundingEllipse & ellipse) = 0;
+	virtual bool intersects(AxisAlignedBoundingBox & box) = 0;
 	glm::vec2 getPosition(){ return position; }
 	glm::vec2 getSize(){ return size; }
 

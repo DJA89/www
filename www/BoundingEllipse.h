@@ -10,6 +10,9 @@ class BoundingEllipse: public BoundingShape
 
 public:
 	BoundingEllipse(glm::vec2 position, glm::vec2 size) : BoundingShape(position, size) {};
+	bool intersects(BoundingShape & shape);
+	bool intersects(BoundingEllipse & ellipse);
+	bool intersects(AxisAlignedBoundingBox & box);
 
 private:
 };
