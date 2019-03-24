@@ -165,7 +165,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	if (objectgroup){
 		const xml::XMLElement* object;
 		// for each object found
-		vector<Platform> *plats = {};
 		object = objectgroup->FirstChildElement("object");
 		while (object){
 			string objectName = object->Attribute("name");
@@ -179,8 +178,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				int ID = stoi(objectAttribs.at(1));
 
 				// check if there is already a platform with this ID
-
-				//
 				Platform *plat;
 				if (platforms.count(ID) == 1){
 					plat = platforms[ID]; // exists, add new data to it

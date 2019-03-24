@@ -14,12 +14,6 @@ class Platform
 {
 
 public:
-	// void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
-	// void update(int deltaTime);
-	// void render();
-	//
-	// void setTileMap(TileMap *tileMap);
-	// void setPosition(const glm::vec2 &pos);
 
 	void setTileID(int tileID){ this->tileID = tileID; }
 	void setID(int ID){ this->ID = ID; }
@@ -32,8 +26,7 @@ public:
 private:
 	glm::ivec2 tileMapDispl, posPlatform;
 	Texture spritesheet;
-	Sprite *sprite;
-	// TileMap *map;
+	Sprite * sprite;
 
 	int ID; // like in object layer of level
 	int tileID; // index in stylesheet
@@ -41,6 +34,5 @@ private:
 	// TODO subtract size from pathEnd to get final topLeftEdge position
 
 };
-
 
 #endif // _PLATFORM_INCLUDE
