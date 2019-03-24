@@ -62,7 +62,7 @@ private:
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
 	const static int non_collision_tiles[4];
 	const static int death_tiles[2];
-	vector<Platform*> platforms;
+	std::unordered_map<int, Platform *> platforms;
 	int *levelMap;
 
 };

@@ -35,11 +35,10 @@ TileMap::~TileMap()
 		delete map;
 
 	// remove all platforms
-	vector<Platform*>::iterator it;
-	for ( it = platforms.begin(); it != platforms.end(); ){
-		delete * it;
-		it = platforms.erase(it);
+	for (auto it = platforms.begin(); it != platforms.cend(); ++it ){
+		delete it->second;
 	}
+	platforms.clear();
 }
 
 
@@ -176,22 +175,19 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			int height = stoi(object->Attribute("height"));
 
 			vector<string> objectAttribs = Utils::split(objectName, '_');
-			// cout << objectAttribs.at(1) << endl;
 			if (objectAttribs.at(0) == "Platform"){ // platform vs ...
 				int ID = stoi(objectAttribs.at(1));
+
 				// check if there is already a platform with this ID
-				vector<Platform*>::iterator it;
-				for ( it = platforms.begin(); it != platforms.end(); ){
-					if ((**it).getID() == ID)
-						break; // found existing platform
-				}
+
+				//
 				Platform *plat;
-				if (it != platforms.end()){
-					plat = *it; // exists, add new data to it
+				if (platforms.count(ID) == 1){
+					plat = platforms[ID]; // exists, add new data to it
 				} else {
-					plat = new Platform(); // else create new and add to vector
+					plat = new Platform(); // else create new and store
 					plat->setID(ID);
-					platforms.push_back(plat);
+					platforms[ID] = plat;
 				}
 				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
 					plat->setSpawn(glm::vec2(xPos, yPos));
