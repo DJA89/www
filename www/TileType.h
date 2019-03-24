@@ -3,7 +3,7 @@
 
 
 #include <glm/glm.hpp>
-#include "BoundingShape.h"
+class BoundingShape;
 
 class TileType
 {

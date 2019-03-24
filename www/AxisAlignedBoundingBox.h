@@ -3,13 +3,13 @@
 
 
 #include <glm/glm.hpp>
+#include "BoundingShape.h"
 
 class AxisAlignedBoundingBox: public BoundingShape
 {
 
 public:
-	AxisAlignedBoundingBox(glm::vec2 position, glm::vec2 size) :
-		BoundingShape(position, size) {};
+	AxisAlignedBoundingBox(glm::vec2 position, glm::vec2 size) : BoundingShape(position, size) {};
 
 private:
 };

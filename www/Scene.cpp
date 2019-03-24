@@ -55,14 +55,19 @@ void Scene::loadLevel(string levelName){
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	// update all moving entities: platforms, player, ...
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		it->second->update(deltaTime);
 	}
 	player->update(deltaTime);
+	// check for collisions between player and platforms
+	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+		Platform * plat = it->second;
 
-	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
+	}
+
 	// if player left level => change level and wrap player position around
-	// cout << "posPlayer.x = " << player->posPlayer.x << "\t maxPos.x = " << maxPos.x << endl;
+	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
 		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
 		loadLevel(nextLevelName);

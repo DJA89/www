@@ -6,6 +6,7 @@
 #include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
+#include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "BoundingEllipse.h"
 #include "Platform.h"

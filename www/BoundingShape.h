@@ -4,12 +4,17 @@
 
 #include <glm/glm.hpp>
 
+class BoundingEllipse;
+class AxisAlignedBoundingBox;
+
 class BoundingShape
 {
 
 public:
 	BoundingShape(glm::vec2 position, glm::vec2 size) :
 		position(position), size(size) {};
+	glm::vec2 getPosition(){ return position; }
+	glm::vec2 getSize(){ return size; }
 
 protected:
 	glm::vec2 position; // top left

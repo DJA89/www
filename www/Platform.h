@@ -3,7 +3,7 @@
 
 
 #include "Sprite.h"
-#include "BoundingShape.h"
+class BoundingShape;
 
 // Platform is a Sprite that represents a moving platform in game. As such it has
 // all properties it needs to track its path, movement, carrying the player and collisions.
