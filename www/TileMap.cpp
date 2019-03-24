@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
 #include "AxisAlignedBoundingBox.h"
+#include "BoundingEllipse.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -133,12 +134,20 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		// store in objects
 		glm::vec2 position = glm::vec2(xPos, yPos);
 		glm::vec2 size = glm::vec2(width, height);
-		AxisAlignedBoundingBox * aabb = new AxisAlignedBoundingBox(position, size);
-		TileType * tileType = new TileType(tileID, aabb);
+		BoundingShape * bs;
+		if (object->FirstChildElement("ellipse") != NULL){
+			// is an ellipse
+			bs = new BoundingEllipse(position, size);
+		} else {
+			// is normal rectangle
+			bs = new AxisAlignedBoundingBox(position, size);
+		}
+		TileType * tileType = new TileType(tileID, bs);
 		tileTypeByID[tileID] = tileType;
 		// next iteration
 		tile = tile->NextSiblingElement("tile");
 	}
+	tile = NULL; // not needed anymore
 
 	return true;
 }
