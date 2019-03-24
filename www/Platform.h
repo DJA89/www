@@ -29,7 +29,7 @@ private:
 	glm::ivec2 tileMapDispl, posPlatform;
 	Texture spritesheet;
 	Sprite * sprite;
-	float velocity = 2.f;
+	float velocity = 1.f;
 
 	int ID; // like in object layer of level
 	int tileID; // index in stylesheet
