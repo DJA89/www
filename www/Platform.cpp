@@ -28,15 +28,12 @@ void Platform::update(int deltaTime){
 	// cout << direction.y << endl;
 	// position += velocity * glm::normalize(direction);
 	position += velocity * glm::vec2(1, 0);
-	// cout << position.x << "\t" << position.y << endl;
 	float pathLength = glm::distance(pathStart, pathEnd);
 	if (glm::distance(position, pathEnd) > pathLength){
-		// cout << "left pathStart" << endl;
 		// we are behind pathStart
 		position = 2.f * pathStart - position; // mirror on pathStart
 		velocity = -velocity;
 	} else if (glm::distance(position, pathStart) > pathLength){
-		// cout << "left pathEnd" << endl;
 		// we are behind pathEnd
 		position = 2.f * pathEnd - position; // mirror on pathEnd
 		velocity = -velocity;
