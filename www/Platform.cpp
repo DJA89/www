@@ -19,3 +19,7 @@ void Platform::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	sprite->changeAnimation(0);
 }
 
+
+void Platform::render(){
+	sprite->render();
+}

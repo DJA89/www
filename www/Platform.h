@@ -5,7 +5,6 @@
 #include "Sprite.h"
 // #include "TileMap.h"
 
-
 // Platform is a Sprite that represents a moving platform in game. As such it has
 // all properties it needs to track its path, movement, carrying the player and collisions.
 
@@ -16,6 +15,7 @@ class Platform
 public:
 	~Platform();
 	void init(Texture & tilesheet, ShaderProgram & shaderProgram);
+	void render();
 
 	void setTileID(int tileID){ this->tileID = tileID; }
 	void setID(int ID){ this->ID = ID; }

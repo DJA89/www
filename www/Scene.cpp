@@ -92,7 +92,11 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+	// render map, all platforms and player
 	map->render();
+	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+		it->second->render();
+	}
 	player->render();
 }
 
