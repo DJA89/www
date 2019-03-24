@@ -21,7 +21,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="Object Layer 1">
-  <object id="11" name="Platform_1_path" x="112" y="148" width="176" height="8"/>
+  <object id="11" name="Platform_1_path" x="112" y="144" width="176" height="16"/>
   <object id="13" name="Platform_1_spawn" gid="58" x="160" y="160" width="32" height="16"/>
  </objectgroup>
 </map>

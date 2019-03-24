@@ -11,14 +11,38 @@ Platform::~Platform(){
 }
 
 void Platform::init(Texture & tilesheet, ShaderProgram & shaderProgram){
+	// setup sprite
 	sprite = Sprite::createSprite(this->size, this->size, &spritesheet, &shaderProgram);
-	sprite->setPosition(initPos);
+	sprite->setPosition(position);
 	sprite->setNumberAnimations(1);
 	sprite->setAnimationSpeed(0, 8);
 	sprite->addKeyframe(0, glm::vec2(0.f, 0.f));
 	sprite->changeAnimation(0);
+	// correct endpoint so it matches the upper left corner of the platform (and not the bottom right)
+	pathEnd = pathEnd - size; // TODO use collision box to normalize path
 }
 
+void Platform::update(int deltaTime){
+	sprite->update(deltaTime);
+	// glm::vec2 direction = pathEnd - pathStart;
+	// cout << direction.y << endl;
+	// position += velocity * glm::normalize(direction);
+	position += velocity * glm::vec2(1, 0);
+	// cout << position.x << "\t" << position.y << endl;
+	float pathLength = glm::distance(pathStart, pathEnd);
+	if (glm::distance(position, pathEnd) > pathLength){
+		// cout << "left pathStart" << endl;
+		// we are behind pathStart
+		position = 2.f * pathStart - position; // mirror on pathStart
+		velocity = -velocity;
+	} else if (glm::distance(position, pathStart) > pathLength){
+		// cout << "left pathEnd" << endl;
+		// we are behind pathEnd
+		position = 2.f * pathEnd - position; // mirror on pathEnd
+		velocity = -velocity;
+	}
+	sprite->setPosition(position);
+}
 
 void Platform::render(){
 	sprite->render();

@@ -54,6 +54,9 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+		it->second->update(deltaTime);
+	}
 	player->update(deltaTime);
 
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
