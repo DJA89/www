@@ -6,27 +6,27 @@
 
 using namespace std;
 
-bool check(BoundingShape & bs1, BoundingShape & bs2){
+bool check(const BoundingShape & bs1, const BoundingShape & bs2){
 	return bs1.intersects(bs2);
 }
 
-bool Intersection::check(AxisAlignedBoundingBox & aabb1, AxisAlignedBoundingBox & aabb2){
+bool Intersection::check(const AxisAlignedBoundingBox & aabb1, const AxisAlignedBoundingBox & aabb2){
 	// actual code
 	cout << "NOT IMPLEMENTED" << endl;
 	return false;
 }
 
-bool Intersection::check(AxisAlignedBoundingBox & aabb, BoundingEllipse & be){
+bool Intersection::check(const AxisAlignedBoundingBox & aabb, const BoundingEllipse & be){
 	// actual code
 	cout << "NOT IMPLEMENTED" << endl;
 	return false;
 }
 
-bool Intersection::check(BoundingEllipse & be, AxisAlignedBoundingBox & aabb){
+bool Intersection::check(const BoundingEllipse & be, const AxisAlignedBoundingBox & aabb){
 	return check(aabb, be);
 }
 
-bool Intersection::check(BoundingEllipse & be1, BoundingEllipse & be2){
+bool Intersection::check(const BoundingEllipse & be1, const BoundingEllipse & be2){
 	// actual code
 	cout << "NOT IMPLEMENTED" << endl;
 	return false;

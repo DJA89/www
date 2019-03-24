@@ -12,11 +12,11 @@ class Intersection
 {
 
 public:
-	static bool check(BoundingShape & bs1, BoundingShape & bs2);
-	static bool check(AxisAlignedBoundingBox & aabb1, AxisAlignedBoundingBox & aabb2);
-	static bool check(AxisAlignedBoundingBox & aabb, BoundingEllipse & be);
-	static bool check(BoundingEllipse & be, AxisAlignedBoundingBox & aabb);
-	static bool check(BoundingEllipse & be1, BoundingEllipse & be2);
+	static bool check(const BoundingShape & bs1, const BoundingShape & bs2);
+	static bool check(const AxisAlignedBoundingBox & aabb1, const AxisAlignedBoundingBox & aabb2);
+	static bool check(const AxisAlignedBoundingBox & aabb, const BoundingEllipse & be);
+	static bool check(const BoundingEllipse & be, const AxisAlignedBoundingBox & aabb);
+	static bool check(const BoundingEllipse & be1, const BoundingEllipse & be2);
 
 private:
 };

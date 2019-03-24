@@ -12,9 +12,9 @@ class BoundingShape
 public:
 	BoundingShape(glm::vec2 position, glm::vec2 size) :
 		position(position), size(size) {};
-	virtual bool intersects(BoundingShape & shape) = 0;
-	virtual bool intersects(BoundingEllipse & ellipse) = 0;
-	virtual bool intersects(AxisAlignedBoundingBox & box) = 0;
+	virtual bool intersects(const BoundingShape & shape) const = 0;
+	virtual bool intersects(const BoundingEllipse & ellipse) const = 0;
+	virtual bool intersects(const AxisAlignedBoundingBox & box) const = 0;
 	glm::vec2 getPosition(){ return position; }
 	glm::vec2 getSize(){ return size; }
 

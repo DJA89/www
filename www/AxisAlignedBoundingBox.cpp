@@ -5,16 +5,16 @@
 
 using namespace std;
 
-bool AxisAlignedBoundingBox::intersects(BoundingShape & shape){
+bool AxisAlignedBoundingBox::intersects(const BoundingShape & shape) const {
 	shape.intersects(*this);
 }
 
-bool AxisAlignedBoundingBox::intersects(BoundingEllipse & ellipse){
+bool AxisAlignedBoundingBox::intersects(const BoundingEllipse & ellipse) const {
 	// aabb with ellipse
 	return Intersection::check(*this, ellipse);
 }
 
-bool AxisAlignedBoundingBox::intersects(AxisAlignedBoundingBox & box){
+bool AxisAlignedBoundingBox::intersects(const AxisAlignedBoundingBox & box) const {
 	// aabb with aabb
 	Intersection::check(*this, box);
 }
