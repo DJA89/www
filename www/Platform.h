@@ -3,6 +3,7 @@
 
 
 #include "Sprite.h"
+#include "BoundingShape.h"
 
 // Platform is a Sprite that represents a moving platform in game. As such it has
 // all properties it needs to track its path, movement, carrying the player and collisions.
@@ -25,10 +26,11 @@ public:
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; } // gets corrected in init() to match upper left corner
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
+	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){ this->textureCoordinates = textureCoordinates; this->textureSize = textureSize; }
 
 private:
-	glm::ivec2 tileMapDispl, posPlatform;
 	Texture tilesheet;
+	glm::vec2 textureCoordinates, textureSize; // for tilesheet
 	Sprite * sprite;
 	float velocity = 1.f;
 

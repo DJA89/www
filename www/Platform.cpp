@@ -12,11 +12,11 @@ Platform::~Platform(){
 
 void Platform::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	// setup sprite
-	sprite = Sprite::createSprite(this->size, this->size, &tilesheet, &shaderProgram);
+	sprite = Sprite::createSprite(this->size, textureSize, &tilesheet, &shaderProgram);
 	sprite->setPosition(position);
 	sprite->setNumberAnimations(1);
 	sprite->setAnimationSpeed(0, 8);
-	sprite->addKeyframe(0, glm::vec2(0.f, 0.f));
+	sprite->addKeyframe(0, textureCoordinates);
 	sprite->changeAnimation(0);
 	// correct endpoint so it matches the upper left corner of the platform (and not the bottom right)
 	pathEnd = pathEnd - size; // TODO use collision box to normalize path

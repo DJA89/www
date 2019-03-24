@@ -179,8 +179,13 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
 					plat->setSpawn(glm::vec2(xPos, yPos - height));
 					plat->setSize(glm::vec2(width, height));
+					// add texture coordinates of tile
+					// TODO extract: duplicate of this code in prepareArrays()
+					glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
+					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
+					plat->setTextureBounds(textureCoords, tileTexSize - halfTexel);
 					// add bounding shape to platform
-					plat->setBoundingShape(tileTypeByID[tileID]->collisionBounds);
+					// TODO plat->setBoundingShape(tileTypeByID[tileID]->collisionBounds);
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform
 					plat->setPathStart(glm::vec2(xPos, yPos));
@@ -269,6 +274,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 				// Non-empty tile
 				nTiles++;
 				posTile = glm::vec2(minCoords.x + i * tileSize, minCoords.y + j * tileSize);
+				// TODO extract: duplicate of this code in loadLevelTmx()
 				texCoordTile[0] = glm::vec2(float((tile-1)%tilesheetSize.x) / tilesheetSize.x, float((tile-1)/tilesheetSize.x) / tilesheetSize.y);
 				texCoordTile[1] = texCoordTile[0] + tileTexSize;
 				//texCoordTile[0] += halfTexel;
