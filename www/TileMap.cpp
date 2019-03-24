@@ -163,47 +163,49 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 
 	// extract platforms in object layer
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
-	const xml::XMLElement* object;
-	// for each object found
-	vector<Platform> *plats = {};
-	object = objectgroup->FirstChildElement("object");
-	while (object){
-		string objectName = object->Attribute("name");
-		int xPos = stoi(object->Attribute("x"));
-		int yPos = stoi(object->Attribute("y"));
-		int width = stoi(object->Attribute("width"));
-		int height = stoi(object->Attribute("height"));
+	if (objectgroup){
+		const xml::XMLElement* object;
+		// for each object found
+		vector<Platform> *plats = {};
+		object = objectgroup->FirstChildElement("object");
+		while (object){
+			string objectName = object->Attribute("name");
+			int xPos = stoi(object->Attribute("x"));
+			int yPos = stoi(object->Attribute("y"));
+			int width = stoi(object->Attribute("width"));
+			int height = stoi(object->Attribute("height"));
 
-		vector<string> objectAttribs = Utils::split(objectName, '_');
-		// cout << objectAttribs.at(1) << endl;
-		if (objectAttribs.at(0) == "Platform"){ // platform vs ...
-			int ID = stoi(objectAttribs.at(1));
-			// check if there is already a platform with this ID
-			vector<Platform*>::iterator it;
-			for ( it = platforms.begin(); it != platforms.end(); ){
-				if ((**it).getID() == ID)
-					break; // found existing platform
+			vector<string> objectAttribs = Utils::split(objectName, '_');
+			// cout << objectAttribs.at(1) << endl;
+			if (objectAttribs.at(0) == "Platform"){ // platform vs ...
+				int ID = stoi(objectAttribs.at(1));
+				// check if there is already a platform with this ID
+				vector<Platform*>::iterator it;
+				for ( it = platforms.begin(); it != platforms.end(); ){
+					if ((**it).getID() == ID)
+						break; // found existing platform
+				}
+				Platform *plat;
+				if (it != platforms.end()){
+					plat = *it; // exists, add new data to it
+				} else {
+					plat = new Platform(); // else create new and add to vector
+					plat->setID(ID);
+					platforms.push_back(plat);
+				}
+				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
+					plat->setSpawn(glm::vec2(xPos, yPos));
+					plat->setSize(glm::vec2(width, height));
+					int tileID = stoi(object->Attribute("gid"));
+					plat->setTileID(tileID); // tile idx in spritesheet
+				} else if (objectAttribs.at(2) == "path"){
+					// path of platform
+					plat->setPathStart(glm::vec2(xPos, yPos));
+					plat->setPathEnd(glm::vec2(xPos+width, yPos+height));
+				}
 			}
-			Platform *plat;
-			if (it != platforms.end()){
-				plat = *it; // exists, add new data to it
-			} else {
-				plat = new Platform(); // else create new and add to vector
-				plat->setID(ID);
-				platforms.push_back(plat);
-			}
-			if (objectAttribs.at(2) == "spawn"){ // spawn vs path
-				plat->setSpawn(glm::vec2(xPos, yPos));
-				plat->setSize(glm::vec2(width, height));
-				int tileID = stoi(object->Attribute("gid"));
-				plat->setTileID(tileID); // tile idx in spritesheet
-			} else if (objectAttribs.at(2) == "path"){
-				// path of platform
-				plat->setPathStart(glm::vec2(xPos, yPos));
-				plat->setPathEnd(glm::vec2(xPos+width, yPos+height));
-			}
+			object = object->NextSiblingElement("object");
 		}
-		object = object->NextSiblingElement("object");
 	}
 
 	return true;
