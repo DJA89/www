@@ -38,6 +38,7 @@ private:
 	int ID; // like in object layer of level
 	int tileID; // index in stylesheet
 	glm::vec2 size, initPos, pathStart, pathEnd;
+	// TODO subtract size from pathEnd to get final topLeftEdge position
 
 };
 
