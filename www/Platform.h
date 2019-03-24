@@ -27,7 +27,7 @@ public:
 
 private:
 	glm::ivec2 tileMapDispl, posPlatform;
-	Texture spritesheet;
+	Texture tilesheet;
 	Sprite * sprite;
 	float velocity = 1.f;
 

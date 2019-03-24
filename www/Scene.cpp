@@ -90,7 +90,7 @@ void Scene::render()
 	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
-	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); // TODO remove
 	// render map, all platforms and player
 	map->render();
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){

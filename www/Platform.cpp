@@ -12,7 +12,7 @@ Platform::~Platform(){
 
 void Platform::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	// setup sprite
-	sprite = Sprite::createSprite(this->size, this->size, &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(this->size, this->size, &tilesheet, &shaderProgram);
 	sprite->setPosition(position);
 	sprite->setNumberAnimations(1);
 	sprite->setAnimationSpeed(0, 8);
@@ -27,14 +27,14 @@ void Platform::update(int deltaTime){
 	// glm::vec2 direction = pathEnd - pathStart;
 	// cout << direction.y << endl;
 	// position += velocity * glm::normalize(direction);
-	position += velocity * glm::vec2(1, 0);
+	position += velocity * glm::vec2(1, 0); // TODO change to dynamic
 	float pathLength = glm::distance(pathStart, pathEnd);
 	if (glm::distance(position, pathEnd) > pathLength){
-		// we are behind pathStart
+		// we passed pathStart
 		position = 2.f * pathStart - position; // mirror on pathStart
 		velocity = -velocity;
 	} else if (glm::distance(position, pathStart) > pathLength){
-		// we are behind pathEnd
+		// we passed pathEnd
 		position = 2.f * pathEnd - position; // mirror on pathEnd
 		velocity = -velocity;
 	}
