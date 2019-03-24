@@ -39,7 +39,7 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const;
-	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const;
+	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 
 private:
 	bool loadLevel(const string &levelFile);
@@ -63,7 +63,6 @@ private:
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
 	const static int non_collision_tiles[4];
 	const static int death_tiles[2];
-	int *levelMap;
 
 };
 

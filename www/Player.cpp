@@ -158,7 +158,7 @@ void Player::update(int deltaTime)
 		playerFalling(FALL_STEP);
 	}
 	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
-	if (map->triggerDeath(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown)) {
+	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
 		dying = true;
 		int currentAnimation = sprite->animation();
 		int newAnimation;

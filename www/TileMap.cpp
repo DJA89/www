@@ -68,21 +68,7 @@ bool TileMap::loadLevel(const string & levelFile){
 }
 
 bool TileMap::loadLevelTmx(const string &levelFile){
-	// Structure of the XML file:
-	// <?xml ... ?>
-	// <map ... width="20" height="15" tilewidth="16" ...>
-	//   <tileset ... />
-	//   <layer ... >
-	//     <data ... >
-	//       0,1,0,1,... // data
-	//     </data>
-	//   </layer>
-	//   <objectgroup ... >
-	//     <object name="Platform_1_spawn" gid="58" x="160" y="160" width="32" height="16"/>
-	//     <object name="Platform_1_path" x="112" y="148" width="176" height="8"/>
-	//   </objectgroup>
-	// </map>
-
+	// for reference see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/
 	xml::XMLDocument mapTmx;
 	mapTmx.LoadFile(levelFile.c_str());
 
@@ -104,12 +90,12 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 
 	// load tilesheet file
-	tilesheetFile.erase(0, 3);
+	tilesheetFile.erase(0, 3); // remove "../" (current path is project, not levels/)
 	tilesheet.loadFromFile(tilesheetFile, TEXTURE_PIXEL_FORMAT_RGBA);
 	tilesheet.setWrapS(GL_CLAMP_TO_EDGE);
 	tilesheet.setWrapT(GL_CLAMP_TO_EDGE);
-	tilesheet.setMinFilter(GL_NEAREST);
-	tilesheet.setMagFilter(GL_NEAREST);
+	tilesheet.setMinFilter(GL_NEAREST); // Pixelated look
+	tilesheet.setMagFilter(GL_NEAREST); // Pixelated look
 
 	// extract tilemap data
 	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
@@ -424,7 +410,7 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 					savedUpsidedown = true;
 				}
 
-				savedState.update(glm::ivec2(32, 16), glm::ivec2(x*16, y*16), savedUpsidedown);
+				savedState.update(glm::ivec2(0, 0), glm::ivec2(x*16, y*16), savedUpsidedown);
 				return true;
 			}
 		}
@@ -432,7 +418,7 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	return false;
 }
 
-bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
+bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
 	int x0, y0, x1, y1, y0disp, y1disp;
 
 	x0 = pos.x / tileSize;
