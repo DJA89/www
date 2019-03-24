@@ -6,6 +6,8 @@
 #include <iterator>
 #include "TileMap.h"
 #include "lib/tinyxml2.h"
+#include "AxisAlignedBoundingBox.h"
+#include "BoundingEllipse.h"
 #include "Platform.h"
 #include "Utils.h"
 
@@ -128,6 +130,36 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			}
 		}
 	}
+
+	// load collision bounding-shapes for tiles
+	const xml::XMLElement * tile;
+	// for each tile found
+	tile = tileSetConf->FirstChildElement("tile");
+	while (tile){
+		// extract of xml
+		int tileID = stoi(tile->Attribute("id"));
+		const xml::XMLElement * object = tile->FirstChildElement("objectgroup")->FirstChildElement("object");
+		int xPos = stoi(object->Attribute("x"));
+		int yPos = stoi(object->Attribute("y"));
+		int width = stoi(object->Attribute("width"));
+		int height = stoi(object->Attribute("height"));
+		// store in objects
+		glm::vec2 position = glm::vec2(xPos, yPos);
+		glm::vec2 size = glm::vec2(width, height);
+		BoundingShape * bs;
+		if (object->FirstChildElement("ellipse") != NULL){
+			// is an ellipse
+			bs = new BoundingEllipse(position, size);
+		} else {
+			// is normal rectangle
+			bs = new AxisAlignedBoundingBox(position, size);
+		}
+		TileType * tileType = new TileType(tileID, bs);
+		tileTypeByID[tileID] = tileType;
+		// next iteration
+		tile = tile->NextSiblingElement("tile");
+	}
+	tile = NULL; // not needed anymore
 
 	// extract platforms in object layer
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
@@ -291,9 +323,9 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 {
 	int x, y0, y1;
 
-	x = pos.x / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
+	x = min(pos.x / tileSize, mapSize.x);
+	y0 = min(pos.y / tileSize, mapSize.y);
+	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
@@ -309,9 +341,9 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 {
 	int x, y0, y1;
 
-	x = (pos.x + size.x - 1) / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
+	x = min((pos.x + size.x - 1) / tileSize, mapSize.x);
+	y0 = min(pos.y / tileSize, mapSize.y);
+	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
@@ -374,6 +406,8 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
+	// don't collide on empty space above spider
+	// TODO replace with AABB
 	if (upsidedown) {
 		y0disp = 0;
 		y1disp = -7;

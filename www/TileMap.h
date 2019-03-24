@@ -3,9 +3,11 @@
 
 
 #include <glm/glm.hpp>
+#include <unordered_map>
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "SavedState.h"
+#include "TileType.h"
 #include "Platform.h"
 
 #define LEVEL_DIR string("levels/")
@@ -46,18 +48,22 @@ private:
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
 
+public:
+	glm::ivec2 position, mapSize, tilesheetSize;
+
 private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
-	glm::ivec2 position, mapSize, tilesheetSize;
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
-	const static int non_collision_tiles[];
-	const static int death_tiles[];
+	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
+	const static int non_collision_tiles[4];
+	const static int death_tiles[2];
 	vector<Platform*> platforms;
+	int *levelMap;
 
 };
 

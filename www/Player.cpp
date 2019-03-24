@@ -24,7 +24,8 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 
 	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	sizePlayer = glm::vec2(32, 32);
+	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 
 		sprite->setAnimationSpeed(STAND_LEFT, 8);
@@ -103,7 +104,7 @@ void Player::update(int deltaTime)
 			}
 		}
 		posPlayer.x -= playerMovementSpeed;
-		if(map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32)))
+		if(map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += playerMovementSpeed;
 			if (upsidedown) {
@@ -127,7 +128,7 @@ void Player::update(int deltaTime)
 			}
 		}
 		posPlayer.x += playerMovementSpeed;
-		if(map->collisionMoveRight(posPlayer, glm::ivec2(32, 32)))
+		if(map->collisionMoveRight(posPlayer, sizePlayer))
 		{
 			posPlayer.x -= playerMovementSpeed;
 			if (upsidedown) {
@@ -178,8 +179,8 @@ void Player::update(int deltaTime)
 
 void Player::playerFalling(int pixels) {
 	posPlayer.y += pixels;
-	bool collition = map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y) ||
-		map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
+	bool collition = map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
+		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
 	if(collition) {
 		if (!actionPressedBeforeCollition) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
