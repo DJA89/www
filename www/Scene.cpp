@@ -31,12 +31,7 @@ void Scene::init()
 	// map
 	levelMap = new LevelMap(); // autoloads level 1
 	string mapName = LEVEL_DIR + "level01.tmx";
-	map = TileMap::createTileMap(mapName, glm::vec2(0, 0), texProgram);
-	// platforms
-	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
-		Platform * p = it->second;
-		p->init(map->tilesheet, texProgram);
-	}
+	loadLevel(mapName);
 	// player
 	player = new Player();
 	player->init(glm::ivec2(0, 0), texProgram);
@@ -45,6 +40,16 @@ void Scene::init()
 	player->initializeSavedState();
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH/2 - 1), float(SCREEN_HEIGHT/2 - 1), 0.f);
 	currentTime = 0.0f;
+}
+
+void Scene::loadLevel(string levelName){
+	// tilemap
+	map = TileMap::createTileMap(levelName, glm::vec2(0, 0), texProgram);
+	// platforms
+	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+		Platform * p = it->second;
+		p->init(map->tilesheet, texProgram);
+	}
 }
 
 void Scene::update(int deltaTime)
@@ -60,22 +65,22 @@ void Scene::update(int deltaTime)
 	// cout << "posPlayer.x = " << player->posPlayer.x << "\t maxPos.x = " << maxPos.x << endl;
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
 		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
-		map = TileMap::createTileMap(nextLevelName, glm::vec2(0, 0), texProgram);
+		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->posPlayer.x = 0;
 	} else if (player->posPlayer.x < 0){
 		string nextLevelName = levelMap->nameOfNextLevel(LEFT);
-		map = TileMap::createTileMap(nextLevelName, glm::vec2(0, 0), texProgram);
+		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->posPlayer.x = maxPos.x - player->sizePlayer.x;
 	} else if (player->posPlayer.y + player->sizePlayer.y >= maxPos.y){
 		string nextLevelName = levelMap->nameOfNextLevel(DOWN);
-		map = TileMap::createTileMap(nextLevelName, glm::vec2(0, 0), texProgram);
+		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->posPlayer.y = 0;
 	} else if (player->posPlayer.y < 0){
 		string nextLevelName = levelMap->nameOfNextLevel(UP);
-		map = TileMap::createTileMap(nextLevelName, glm::vec2(0, 0), texProgram);
+		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
 	}
