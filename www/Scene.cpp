@@ -37,6 +37,10 @@ void Scene::init()
 	string mapName = LEVEL_DIR + "level01.tmx";
 	map = TileMap::createTileMap(mapName, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	// platforms
+	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+		Platform * p = it->second;
+		p->init(map->tilesheet, texProgram);
+	}
 	// player
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);

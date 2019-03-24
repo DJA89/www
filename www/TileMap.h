@@ -50,19 +50,19 @@ private:
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
+	std::unordered_map<int, Platform *> platforms;
+	Texture tilesheet;
 
 private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
 	int tileSize, blockSize;
-	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
 	const static int non_collision_tiles[4];
 	const static int death_tiles[2];
-	std::unordered_map<int, Platform *> platforms;
 	int *levelMap;
 
 };

@@ -14,6 +14,8 @@ class Platform
 {
 
 public:
+	~Platform();
+	void init(Texture & tilesheet, ShaderProgram & shaderProgram);
 
 	void setTileID(int tileID){ this->tileID = tileID; }
 	void setID(int ID){ this->ID = ID; }
