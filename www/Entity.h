@@ -6,7 +6,6 @@
 class Sprite;
 class Texture;
 class ShaderProgram;
-// class Collision;
 class BoundingShape;
 class AxisAlignedBoundingBox;
 
@@ -32,7 +31,8 @@ public:
 	float getVelocity() const { return velocity; }
 	void setID(int ID){ this->ID = ID; }
 	int getID(){ return this->ID; }
-	// virtual void handleCollision(Collision c);
+
+	virtual void handleCollision(Entity & e) = 0;
 
 protected:
 	// physical

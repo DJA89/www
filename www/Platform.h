@@ -19,11 +19,11 @@ class Platform: public FixedPathEntity
 
 public:
 	void init(Texture & tilesheet, ShaderProgram & shaderProgram);
-	// virtual void handleCollision(Collision c);
 	void update(int deltaTime);
 	void render();
-
 	void setTileID(int tileID){ this->tileID = tileID; }
+
+	void handleCollision(Entity & e);
 
 private:
 	int tileID; // index in stylesheet

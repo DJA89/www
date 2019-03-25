@@ -16,3 +16,7 @@ void Platform::update(int deltaTime){
 void Platform::render(){
 	FixedPathEntity::render();
 }
+
+void Platform::handleCollision(Entity & e){
+	e.handleCollision(*this);
+}

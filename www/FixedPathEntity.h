@@ -7,7 +7,6 @@
 class Sprite;
 class Texture;
 class ShaderProgram;
-// class Collision;
 class BoundingShape;
 class AxisAlignedBoundingBox;
 
@@ -23,11 +22,12 @@ public:
 	void init(Texture & tilesheet, ShaderProgram & shaderProgram);
 	void update(int deltaTime);
 	void render();
-	// virtual void handleCollision(Collision c);
 	void setSpawn(glm::vec2 initPos);
 	void setSize(glm::vec2 size);
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
-	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; } // gets
+	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; }
+
+	virtual void handleCollision(Entity & e) = 0;
 
 protected:
 	glm::vec2 pathStart;
