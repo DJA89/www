@@ -11,9 +11,15 @@ bool Intersection::check(const BoundingShape & bs1, const BoundingShape & bs2){
 }
 
 bool Intersection::check(const AxisAlignedBoundingBox & aabb1, const AxisAlignedBoundingBox & aabb2){
-	// actual code
-	cout << "NOT IMPLEMENTED: AABB-AABB" << endl;
-	return false;
+	// aabb with aabb collision detection
+	glm::vec2 pos1 = aabb1.getPosition();
+	glm::vec2 size1 = aabb1.getSize();
+	glm::vec2 pos2 = aabb2.getPosition();
+	glm::vec2 size2 = aabb2.getSize();
+	return (pos1.x < pos2.x + size2.x &&
+					pos1.x + size1.x > pos2.x &&
+					pos1.y < pos2.y + size2.y &&
+					pos1.y + size1.y > pos2.y);
 }
 
 bool Intersection::check(const AxisAlignedBoundingBox & aabb, const BoundingEllipse & be){
