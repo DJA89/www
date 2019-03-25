@@ -3,10 +3,14 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Platform.h"
+#include "AxisAlignedBoundingBox.h"
 
 Platform::~Platform(){
 	if (sprite != NULL){
 		delete sprite;
+	}
+	if (defaultCollisionBox != NULL){
+		delete defaultCollisionBox;
 	}
 }
 
@@ -20,6 +24,8 @@ void Platform::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	sprite->changeAnimation(0);
 	// correct endpoint so it matches the upper left corner of the platform (and not the bottom right)
 	pathEnd = pathEnd - size; // TODO use collision box to normalize path
+	// set default collision path
+	defaultCollisionBox = new AxisAlignedBoundingBox(this->position, this->size);
 }
 
 void Platform::update(int deltaTime){
@@ -39,6 +45,14 @@ void Platform::update(int deltaTime){
 		velocity = -velocity;
 	}
 	sprite->setPosition(position);
+}
+
+BoundingShape * Platform::getBoundingShape(){
+	if (this->collisionBounds != NULL){
+		return this->collisionBounds;
+	} else {
+		return this->defaultCollisionBox;
+	}
 }
 
 void Platform::render(){

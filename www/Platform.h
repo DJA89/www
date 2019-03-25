@@ -4,6 +4,7 @@
 
 #include "Sprite.h"
 class BoundingShape;
+class AxisAlignedBoundingBox;
 
 // Platform is a Sprite that represents a moving platform in game. As such it has
 // all properties it needs to track its path, movement, carrying the player and collisions.
@@ -26,7 +27,9 @@ public:
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; } // gets corrected in init() to match upper left corner
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
+	BoundingShape * getBoundingShape();
 	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){ this->textureCoordinates = textureCoordinates; this->textureSize = textureSize; }
+
 
 private:
 	Texture tilesheet;
@@ -41,6 +44,7 @@ private:
 	glm::vec2 pathStart;
 	glm::vec2 pathEnd; // in init gets subtracted size (then matches path of bottom left corner)
 	BoundingShape * collisionBounds;
+	AxisAlignedBoundingBox * defaultCollisionBox;
 
 };
 
