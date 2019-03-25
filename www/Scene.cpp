@@ -71,7 +71,7 @@ void Scene::update(int deltaTime)
 		Platform * plat = it->second;
 		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
 			player->handleCollisionWithPlatform(*plat);
-			cout << "PLAYER with platform collision" << endl;
+			// cout << "PLAYER with platform collision" << endl;
 		}
 	}
 	delete playerCollisionBounds;
