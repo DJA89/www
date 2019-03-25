@@ -64,7 +64,7 @@ void Scene::update(int deltaTime)
 	}
 	player->update(deltaTime);
 	// check for collisions between player and platforms
-	// TODO move to player (as pointer variable); later load from xml
+	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->posPlayer, player->sizePlayer);
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * plat = it->second;
