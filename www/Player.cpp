@@ -82,12 +82,13 @@ void Player::initializeSavedState() {
 	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
+bool Player::hasDied(){
+	return dying && (framesSinceDeath > 60);
+}
+
 void Player::update(int deltaTime)
 {
 	if (dying) {
-		if (framesSinceDeath > 60) {
-			loadState();
-		}
 		return;
 	}
 	sprite->update(deltaTime);
@@ -165,7 +166,11 @@ void Player::update(int deltaTime)
 	}
 
 	// check for collisions
-	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
+	glm::ivec2 checkpointPosition;
+	checkpointPosition = map->triggerCheckpoint(posPlayer, sizePlayer, &posPlayer.y, upsidedown, savedState);
+	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
+	}
 	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
 		// detach from platform
 		isStandingOnPlatform = false;
@@ -235,9 +240,11 @@ void Player::playerFalling(int pixels) {
 }
 
 void Player::loadState() {
+	// restoring state
 	tileMapDispl = savedState.getSavedTileMapDispl();
 	posPlayer = savedState.getSavedPosPlayer();
 	upsidedown = savedState.getSavedUpsideDown();
+	// player specific init
 	posPlayer.x -= 8;
 	if (upsidedown) {
 		sprite->changeAnimation(STAND_RIGHTU);

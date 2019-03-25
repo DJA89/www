@@ -43,7 +43,7 @@ void Scene::init()
 	player->init(glm::ivec2(0, 0), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
-	player->initializeSavedState();
+	saveGame();
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH/2 - 1), float(SCREEN_HEIGHT/2 - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -61,6 +61,9 @@ void Scene::loadLevel(string levelName){
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	if(player->hasDied()){
+		loadGame();
+	}
 	// update all moving entities: platforms, player, ...
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		it->second->update(deltaTime);
@@ -101,6 +104,16 @@ void Scene::update(int deltaTime)
 		player->setTileMap(map);
 		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
 	}
+}
+
+// completely saves game (fully restoreable)
+void Scene::saveGame(){
+	player->initializeSavedState();
+}
+
+// completely restores game to last save
+void Scene::loadGame(){
+	player->loadState();
 }
 
 void Scene::render()

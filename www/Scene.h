@@ -27,6 +27,8 @@ public:
 
 private:
 	void initShaders();
+	void saveGame();
+	void loadGame();
 
 public:
 	ShaderProgram texProgram;

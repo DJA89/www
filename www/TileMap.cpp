@@ -394,8 +394,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	return false;
 }
 
-
-bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
+glm::ivec2 TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const {
 	int x0, y0, x1, y1, y0disp, y1disp;
 
 	x0 = pos.x / tileSize;
@@ -415,18 +414,32 @@ bool TileMap::triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
 			if (map[y*mapSize.x + x] == 595) {
-				bool savedUpsidedown = false;
-				// checking if tile above checkpoint is collidable
-				if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[(y - 1)*mapSize.x + x]) != std::end(non_collision_tiles))) {
-					savedUpsidedown = true;
+				// (x,y) is a checkpoint
+				// TODO check if this makes sense
+				if (checkpointValid(x, y, upsidedown)){
+					return glm::ivec2(x*tileSize, y*tileSize);
+				} else {
+					// if no ground in falling direction under checkpoint
+					// => don't collide with it (=> don't save checkpoint)
+					return glm::ivec2(0, 0); // TODO does this make sense?
 				}
-
-				savedState.update(glm::ivec2(0, 0), glm::ivec2(x*16, y*16), savedUpsidedown);
-				return true;
 			}
 		}
 	}
-	return false;
+	return glm::ivec2(0, 0);
+}
+
+//TODO is this function really necessary? is it just agains glitches/floating checkpoints, or am I missing something?
+bool TileMap::checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const {
+	int yGround;
+	if (upsidedown){
+		yGround = yCheckpoint - 1;
+	} else {
+		yGround = yCheckpoint + 1;
+	}
+	// check if ground below/above checkpoint is collidable (player stops there when respawning)
+	bool isGroundCollidable = std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[yGround*mapSize.x + xCheckpoint]) == std::end(non_collision_tiles); // check if ground is NOT non_collision
+	return isGroundCollidable;
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {

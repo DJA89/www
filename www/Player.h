@@ -24,6 +24,7 @@ public:
 	void loadState();
 	void playerFalling(int);
 	void initializeSavedState();
+	bool hasDied();
 
 	void handleCollisionWithPlatform(Platform & platform);
 
