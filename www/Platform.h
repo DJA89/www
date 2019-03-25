@@ -29,6 +29,7 @@ public:
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
 	BoundingShape * getBoundingShape();
 	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){ this->textureCoordinates = textureCoordinates; this->textureSize = textureSize; }
+	float getVelocity() const { return velocity; }
 
 
 private:

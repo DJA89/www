@@ -7,6 +7,7 @@
 #include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Intersection.h"
+#include "Platform.h"
 
 // initial player position
 #define INIT_PLAYER_X_TILES 2
@@ -69,6 +70,7 @@ void Scene::update(int deltaTime)
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * plat = it->second;
 		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
+			player->handleCollisionWithPlatform(*plat);
 			cout << "PLAYER with platform collision" << endl;
 		}
 	}

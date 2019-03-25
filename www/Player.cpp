@@ -89,7 +89,6 @@ void Player::update(int deltaTime)
 		}
 		return;
 	}
-	int playerMovementSpeed = 2;
 	sprite->update(deltaTime);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
@@ -278,4 +277,8 @@ void Player::setPosition(const glm::vec2 &pos)
 {
 	posPlayer = pos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+}
+
+void Player::handleCollisionWithPlatform(Platform & platform) {
+	standingOn = &platform;
 }

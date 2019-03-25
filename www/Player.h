@@ -25,16 +25,20 @@ public:
 	void playerFalling(int);
 	void initializeSavedState();
 
+	void handleCollisionWithPlatform(Platform & platform);
+
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
 
 private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
+	int playerMovementSpeed = 2;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	SavedState savedState;
 	bool renderInDeath();
+	Platform * standingOn;
 
 };
 
