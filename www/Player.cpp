@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include "Player.h"
 #include "Game.h"
+#include "BoundingShape.h"
 
 #define FALL_STEP 6
 #define SPACEBAR 32
@@ -280,5 +281,35 @@ void Player::setPosition(const glm::vec2 &pos)
 }
 
 void Player::handleCollisionWithPlatform(Platform & platform) {
-	standingOn = &platform;
+	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
+	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
+	glm::vec2 playerBoundsCenter = (posPlayer_f + sizePlayer_f)/2.f;
+	BoundingShape * platBound = platform.getBoundingShape();
+	glm::vec2 platformBoundsCenter = (platBound->getPosition() + platBound->getSize())/2.f;
+	if (platBound->getPosition().x <= playerBoundsCenter.x && playerBoundsCenter.x <= platBound->getPosition().x + platBound->getSize().x){
+		// is above or below platform (center of player inside platform x-range)
+		if (posPlayer_f.y < platBound->getPosition().y){
+			// is below
+			posPlayer_f.y = platBound->getPosition().y + platBound->getSize().y;
+		} else if (posPlayer_f.y > platBound->getPosition().y){
+			// is above
+			posPlayer_f.y = platBound->getPosition().y - sizePlayer_f.y;
+		} else { // let's just hope we never get here
+			cout << "ERROR: player was neither below, nor above platform" << endl;
+		}
+		standingOn = &platform; // stand on platform
+	} else {
+		// is next to platform, so just pull out
+		if (posPlayer_f.x < platBound->getPosition().x){
+			// is left
+			posPlayer_f.x = platBound->getPosition().x - sizePlayer_f.x;
+		} else if (posPlayer_f.x > platBound->getPosition().x){
+			// is right
+			posPlayer_f.x = platBound->getPosition().x + platBound->getSize().x;
+		} else { // let's just hope we never get here
+			cout << "ERROR: player was neither left, nor right of platform" << endl;
+		}
+	}
+	posPlayer = (glm::ivec2) posPlayer_f;
+	sizePlayer = (glm::ivec2) sizePlayer_f;
 }

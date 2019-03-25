@@ -27,7 +27,7 @@ public:
 
 	void handleCollisionWithPlatform(Platform & platform);
 
-	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
+	glm::ivec2 tileMapDispl, posPlayer, sizePlayer; // TODO change to glm::vec2
 
 private:
 	Texture spritesheet;

@@ -16,6 +16,7 @@ public:
 	virtual bool intersects(const BoundingEllipse & ellipse) const = 0;
 	virtual bool intersects(const AxisAlignedBoundingBox & box) const = 0;
 	glm::vec2 getPosition() const { return position; }
+	void setPosition(glm::vec2 newPosition) { position = newPosition; }
 	glm::vec2 getSize() const { return size; }
 
 protected:

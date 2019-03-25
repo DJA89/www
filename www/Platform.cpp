@@ -45,6 +45,7 @@ void Platform::update(int deltaTime){
 		velocity = -velocity;
 	}
 	sprite->setPosition(position);
+	getBoundingShape()->setPosition(position);
 }
 
 BoundingShape * Platform::getBoundingShape(){
