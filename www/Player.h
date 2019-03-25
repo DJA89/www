@@ -38,6 +38,7 @@ private:
 	int framesSinceDeath;
 	SavedState savedState;
 	bool renderInDeath();
+	bool isStandingOnPlatform;
 	Platform * standingOn;
 
 };

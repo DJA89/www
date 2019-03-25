@@ -91,6 +91,7 @@ void Player::update(int deltaTime)
 		return;
 	}
 	sprite->update(deltaTime);
+	// keyboard controls
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
 		if (upsidedown) {
@@ -157,6 +158,13 @@ void Player::update(int deltaTime)
 	else {
 		playerFalling(FALL_STEP);
 	}
+	// if moving on a platform, add platform velocity
+	if (isStandingOnPlatform && standingOn != NULL){
+		posPlayer += standingOn->getVelocity();
+		isStandingOnPlatform = false; // wait for next collision
+	}
+
+	// check for collisions
 	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
 	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
 		dying = true;
@@ -181,7 +189,7 @@ void Player::playerFalling(int pixels) {
 	posPlayer.y += pixels;
 	bool collition = map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
 		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
-	if(collition) {
+	if(collition || isStandingOnPlatform) {
 		if (!actionPressedBeforeCollition) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
 				actionPressedBeforeCollition = true;
@@ -297,7 +305,8 @@ void Player::handleCollisionWithPlatform(Platform & platform) {
 		} else { // let's just hope we never get here
 			cout << "ERROR: player was neither below, nor above platform" << endl;
 		}
-		standingOn = &platform; // stand on platform
+		isStandingOnPlatform = true; // stand on platform
+		standingOn = &platform; // store platform to follow movement
 	} else {
 		// is next to platform, so just pull out
 		if (posPlayer_f.x < platBound->getPosition().x){
