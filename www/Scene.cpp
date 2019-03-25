@@ -4,6 +4,9 @@
 #include "Scene.h"
 #include "Game.h"
 #include "LevelMap.h"
+#include "BoundingShape.h"
+#include "AxisAlignedBoundingBox.h"
+#include "Intersection.h"
 
 // initial player position
 #define INIT_PLAYER_X_TILES 2
@@ -61,10 +64,15 @@ void Scene::update(int deltaTime)
 	}
 	player->update(deltaTime);
 	// check for collisions between player and platforms
+	// TODO move to player (as pointer variable); later load from xml
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->posPlayer, player->sizePlayer);
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * plat = it->second;
-
+		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
+			cout << "PLAYER with platform collision" << endl;
+		}
 	}
+	delete playerCollisionBounds;
 
 	// if player left level => change level and wrap player position around
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
