@@ -167,6 +167,10 @@ void Player::update(int deltaTime)
 	// check for collisions
 	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
 	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
+		// detach from platform
+		isStandingOnPlatform = false;
+		standingOn = NULL;
+		// die
 		dying = true;
 		int currentAnimation = sprite->animation();
 		int newAnimation;
