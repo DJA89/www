@@ -24,14 +24,20 @@ public:
 	void loadState(SavedState &savedState);
 	void playerFalling(int);
 	bool hasDied();
-	void checkForCheckpointCollision(SavedState &savedState);
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
 	void handleCollisionWithPlatform(Platform & platform);
 
-	glm::ivec2 posPlayer, sizePlayer; // TODO change to glm::vec2
+	glm::ivec2 getPosition(){ return posPlayer; }
+	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
+	void setPositionY(int yPosition){ this->posPlayer.y = yPosition; }
+	glm::ivec2 getSize(){ return sizePlayer; }
+	bool getIfUpSideDown(){ return upsidedown; }
+
 
 private:
+	glm::ivec2 posPlayer; // TODO change to glm::vec2
+	glm::ivec2 sizePlayer; // TODO change to glm::vec2
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

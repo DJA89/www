@@ -394,13 +394,13 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	return false;
 }
 
-glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const {
+glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
 	int x0, y0, x1, y1, y0disp, y1disp;
 
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
 	// don't collide on empty space above spider
-	// TODO replace with AABB
+	// TODO replace with BoundingShape
 	if (upsidedown) { // don't collide on empty space above spider
 		y0disp = 0;
 		y1disp = -7;

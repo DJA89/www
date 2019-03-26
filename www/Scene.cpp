@@ -70,10 +70,10 @@ void Scene::update(int deltaTime)
 		it->second->update(deltaTime);
 	}
 	player->update(deltaTime);
-	player->checkForCheckpointCollision(savedState);
+	checkForCheckpointCollision();
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->posPlayer, player->sizePlayer);
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->getPosition(), player->getSize());
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * plat = it->second;
 		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
@@ -86,26 +86,39 @@ void Scene::update(int deltaTime)
 	// update tilemap
 	// if player left level => change level and wrap player position around
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
-	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
+	if (player->getPosition().x + player->getSize().x >= maxPos.x){
 		string nextLevelName = levelMap->nameOfNextLevel(RIGHT);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
-		player->posPlayer.x = 0;
-	} else if (player->posPlayer.x < 0){
+		player->setPositionX(0);
+	} else if (player->getPosition().x < 0){
 		string nextLevelName = levelMap->nameOfNextLevel(LEFT);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
-		player->posPlayer.x = maxPos.x - player->sizePlayer.x;
-	} else if (player->posPlayer.y + player->sizePlayer.y >= maxPos.y){
+		player->setPositionX(maxPos.x - player->getSize().x);
+	} else if (player->getPosition().y + player->getSize().y >= maxPos.y){
 		string nextLevelName = levelMap->nameOfNextLevel(DOWN);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
-		player->posPlayer.y = 0;
-	} else if (player->posPlayer.y < 0){
+		player->setPositionY(0);
+	} else if (player->getPosition().y < 0){
 		string nextLevelName = levelMap->nameOfNextLevel(UP);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
-		player->posPlayer.y = maxPos.y - player->sizePlayer.y;
+		player->setPositionY(maxPos.y - player->getSize().y);
+	}
+}
+
+void Scene::checkForCheckpointCollision(){
+	glm::ivec2 playerPosition = player->getPosition();
+	glm::ivec2 playerSize = player->getSize();
+	bool upsidedown = player->getIfUpSideDown();
+	glm::ivec2 checkpointPosition;
+	checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
+	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		glm::ivec2 saveStatePos = map->getNormalizedCheckpointPosition(checkpointPosition);
+		bool saveStateDir = map->isCheckpointUpsideDown(checkpointPosition);
+		savedState.update(saveStatePos, saveStateDir);
 	}
 }
 
