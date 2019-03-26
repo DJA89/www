@@ -35,7 +35,7 @@ public:
 	ShaderProgram texProgram;
 
 private:
-	LevelMap *levelMap;
+	LevelMap levelMap;
 	TileMap *map;
 	Player *player;
 	SavedState savedState;
