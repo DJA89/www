@@ -6,7 +6,7 @@
 using namespace std;
 
 bool BoundingEllipse::intersects(const BoundingShape & shape) const {
-	shape.intersects(*this);
+	return shape.intersects(*this);
 }
 
 bool BoundingEllipse::intersects(const BoundingEllipse & ellipse) const {

@@ -12,8 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
+    <ClInclude Include="AxisAlignedBoundingBox.h" />
+    <ClInclude Include="BoundingEllipse.h" />
+    <ClInclude Include="BoundingShape.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="FixedPathEntity.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Intersection.h" />
     <ClInclude Include="LevelMap.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SavedState.h" />
     <ClInclude Include="Scene.h" />
@@ -22,12 +29,20 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
+    <ClInclude Include="TileType.h" />
     <ClInclude Include="tinyxml2.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AxisAlignedBoundingBox.cpp" />
+    <ClCompile Include="BoundingEllipse.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="FixedPathEntity.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="LevelMap.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SavedState.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -36,7 +51,9 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />
+    <ClCompile Include="TileType.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D73BA0F4-6AEB-4367-841A-6EAC808CE43D}</ProjectGuid>
