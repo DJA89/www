@@ -77,10 +77,6 @@ void Player::init(ShaderProgram &shaderProgram)
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
-void Player::initializeSavedState(SavedState &savedState) {
-	savedState.init(glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
-}
-
 bool Player::hasDied(){
 	return dying && (framesSinceDeath > 60);
 }
@@ -189,11 +185,32 @@ void Player::update(int deltaTime)
 }
 
 void Player::checkForCheckpointCollision(SavedState &savedState){
-	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
+	// TODO move to Scene
+	glm::ivec2 checkpointPosition;checkpointPosition = map->returnCheckPointIfCollision(posPlayer, sizePlayer, &posPlayer.y, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(checkpointPosition, map->isCheckpointUpsideDown(checkpointPosition));
+		savedState.update(map->getNormalizedCheckpointPosition(checkpointPosition), map->isCheckpointUpsideDown(checkpointPosition));
 	}
+}
+
+// center means in the middle of the player touching the floor/ceiling it is standing on
+void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
+	// player specific restoring
+	int xCenter = normalizedCheckpointPosition.x;
+	int yCenter = normalizedCheckpointPosition.y;
+	int xPos, yPos;
+	if (upsidedown) {
+		xPos = xCenter - sizePlayer.x/2;
+		yPos = yCenter;
+		sprite->changeAnimation(STAND_RIGHTU);
+	} else {
+		xPos = xCenter - sizePlayer.x/2;
+		yPos = yCenter - sizePlayer.y;
+		sprite->changeAnimation(STAND_RIGHT);
+	}
+	framesSinceDeath = 0;
+	dying = false;
+	this->upsidedown = upsidedown;
+	setPosition(glm::ivec2(xPos, yPos));
 }
 
 void Player::playerFalling(int pixels) {
@@ -242,20 +259,10 @@ void Player::playerFalling(int pixels) {
 }
 
 void Player::loadState(SavedState &savedState) {
-	// restoring state
-	posPlayer = savedState.getSavedPosPlayer();
-	upsidedown = savedState.getSavedUpsideDown();
-	// player specific init
-	posPlayer.x -= 8;
-	if (upsidedown) {
-		sprite->changeAnimation(STAND_RIGHTU);
-	} else {
-		sprite->changeAnimation(STAND_RIGHT);
-		posPlayer.y -= 16;
-	}
-	framesSinceDeath = 0;
-	dying = false;
-	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+	// TODO move to Scene
+	glm::ivec2 normalizedCheckpointPosition = savedState.getSavedPosPlayer();
+	bool upsidedown = savedState.getSavedUpsideDown();
+	restorePlayerPosition(upsidedown, normalizedCheckpointPosition);
 }
 
 void Player::render()

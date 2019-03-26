@@ -422,6 +422,17 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	return glm::ivec2(0, 0); // no collision with checkpoints found
 }
 
+// x-centered, y touching surface (floor/ceiling) of checkpoint
+glm::ivec2 TileMap::getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition){
+	int x = checkpointPosition.x;
+	int y = checkpointPosition.y;
+	if (isCheckpointUpsideDown(checkpointPosition)){
+		return glm::ivec2(x + tileSize/2, y);
+	} else {
+		return glm::ivec2(x + tileSize/2, y + tileSize);
+	}
+}
+
 bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
 	int x = checkpointPosition.x / tileSize;
 	int y = checkpointPosition.y / tileSize;

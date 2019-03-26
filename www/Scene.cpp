@@ -111,7 +111,6 @@ void Scene::update(int deltaTime)
 
 // completely saves game (fully restoreable)
 void Scene::saveGame(){
-	player->initializeSavedState(savedState);
 }
 
 // completely restores game to last save
