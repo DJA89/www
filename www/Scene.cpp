@@ -61,6 +61,7 @@ void Scene::loadLevel(string levelName){
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	// update player
 	if(player->hasDied()){
 		loadGame();
 	}
@@ -69,6 +70,7 @@ void Scene::update(int deltaTime)
 		it->second->update(deltaTime);
 	}
 	player->update(deltaTime);
+	player->checkForCheckpointCollision(savedState);
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->posPlayer, player->sizePlayer);
@@ -81,6 +83,7 @@ void Scene::update(int deltaTime)
 	}
 	delete playerCollisionBounds;
 
+	// update tilemap
 	// if player left level => change level and wrap player position around
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
 	if (player->posPlayer.x + player->sizePlayer.x >= maxPos.x){
@@ -108,12 +111,12 @@ void Scene::update(int deltaTime)
 
 // completely saves game (fully restoreable)
 void Scene::saveGame(){
-	player->initializeSavedState();
+	player->initializeSavedState(savedState);
 }
 
 // completely restores game to last save
 void Scene::loadGame(){
-	player->loadState();
+	player->loadState(savedState);
 }
 
 void Scene::render()

@@ -21,10 +21,11 @@ public:
 
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	void loadState();
+	void loadState(SavedState &savedState);
 	void playerFalling(int);
-	void initializeSavedState();
+	void initializeSavedState(SavedState &savedState);
 	bool hasDied();
+	void checkForCheckpointCollision(SavedState &savedState);
 
 	void handleCollisionWithPlatform(Platform & platform);
 
@@ -37,7 +38,6 @@ private:
 	int playerMovementSpeed = 2;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
-	SavedState savedState;
 	bool renderInDeath();
 	bool isStandingOnPlatform;
 	Platform * standingOn;

@@ -37,6 +37,7 @@ private:
 	LevelMap *levelMap;
 	TileMap *map;
 	Player *player;
+	SavedState savedState;
 	float currentTime;
 	glm::mat4 projection;
 };

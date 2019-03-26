@@ -78,7 +78,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
-void Player::initializeSavedState() {
+void Player::initializeSavedState(SavedState &savedState) {
 	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
@@ -166,11 +166,6 @@ void Player::update(int deltaTime)
 	}
 
 	// check for collisions
-	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->triggerCheckpoint(posPlayer, sizePlayer, &posPlayer.y, upsidedown, savedState);
-	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
-	}
 	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
 		// detach from platform
 		isStandingOnPlatform = false;
@@ -192,6 +187,14 @@ void Player::update(int deltaTime)
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+}
+
+void Player::checkForCheckpointCollision(SavedState &savedState){
+	glm::ivec2 checkpointPosition;
+	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
+	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
+	}
 }
 
 void Player::playerFalling(int pixels) {
@@ -239,7 +242,7 @@ void Player::playerFalling(int pixels) {
 	}
 }
 
-void Player::loadState() {
+void Player::loadState(SavedState &savedState) {
 	// restoring state
 	tileMapDispl = savedState.getSavedTileMapDispl();
 	posPlayer = savedState.getSavedPosPlayer();
