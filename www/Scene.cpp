@@ -43,7 +43,7 @@ void Scene::init()
 	player->init(texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
-	saveGame();
+	// saveGame(); // TODO set initialPos & checkpoint in tiled => load in TileMap
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH/2 - 1), float(SCREEN_HEIGHT/2 - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -110,25 +110,30 @@ void Scene::update(int deltaTime)
 }
 
 void Scene::checkForCheckpointCollision(){
+	// TODO store checkpoint in checkpoint class (or TileMap class)
+	// TODO => move saving to saveGame() and call if collision
 	glm::ivec2 playerPosition = player->getPosition();
 	glm::ivec2 playerSize = player->getSize();
 	bool upsidedown = player->getIfUpSideDown();
-	glm::ivec2 checkpointPosition;
-	checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
+	glm::ivec2 checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		glm::ivec2 saveStatePos = map->getNormalizedCheckpointPosition(checkpointPosition);
-		bool saveStateDir = map->isCheckpointUpsideDown(checkpointPosition);
-		savedState.update(saveStatePos, saveStateDir);
+		// TODO move method calls into saveGame
+		saveGame(
+			map->getNormalizedCheckpointPosition(checkpointPosition),
+			map->isCheckpointUpsideDown(checkpointPosition));
 	}
 }
 
-// completely saves game (fully restoreable)
-void Scene::saveGame(){
+// normalized: the player will be spawned shifted left by half its length
+void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
+	savedState.update(normalizedPosition, isUpsideDown);
 }
 
 // completely restores game to last save
 void Scene::loadGame(){
-	player->loadState(savedState);
+	bool upsidedown = savedState.getSavedUpsideDown();
+	glm::ivec2 normalizedPosition = savedState.getSavedPosPlayer();
+	player->restorePlayerPosition(upsidedown, normalizedPosition);
 }
 
 void Scene::render()
