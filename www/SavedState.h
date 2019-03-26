@@ -9,14 +9,12 @@ class SavedState
 {
 
 public:
-	void init(glm::ivec2 savedPosPlayer, bool savedUpsideDown);
-	void update(glm::ivec2 newSavedPosPlayer, bool newSavedUpsideDown);
-	glm::ivec2 getSavedTileMapDispl();
-	glm::ivec2 getSavedPosPlayer();
-	bool getSavedUpsideDown();
+	void save(glm::ivec2 newSavedPlayerPosition, bool newSavedUpsideDown);
+	glm::ivec2 getSavedPlayerPosition(){ return savedPlayerPosition; };
+	bool getSavedUpsideDown(){ return savedUpsideDown; };
 
 private:
-	glm::ivec2 savedPosPlayer;
+	glm::ivec2 savedPlayerPosition;
 	bool savedUpsideDown;
 };
 
