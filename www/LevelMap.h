@@ -8,7 +8,7 @@ using namespace std;
 
 // Class LevelMap manages the layout of the game levels
 
-enum direction { RIGHT, LEFT, UP, DOWN };
+enum direction { RIGHT, LEFT, UP, DOWN }; // TODO move to common place
 
 class LevelMap
 {
@@ -17,15 +17,15 @@ public:
 	LevelMap();
 	~LevelMap();
 	string nameOfNextLevel(direction nextLevelIs);
+	int getCurrentScreen();
+	void setCurrentScreen(int newCurrentScreen);
+	string nameOfCurrentLevel();
 
 private:
 	bool loadLevelMap(const string &fileName);
 
-public:
-	int currentLevelMapIdx; // for map array
-	int currentLevelFileID; // for level file
-
 private:
+	int currentLevelMapIdx; // for map array
 	glm::ivec2 size;
 	int *map;
 };

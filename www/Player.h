@@ -15,26 +15,37 @@ class Player
 {
 
 public:
-	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void init(ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
 
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	void loadState();
 	void playerFalling(int);
-	void initializeSavedState();
+	bool hasDied();
+	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
-	glm::ivec2 tileMapDispl, posPlayer, sizePlayer;
+	void handleCollisionWithPlatform(Platform & platform);
+
+	glm::ivec2 getPosition(){ return posPlayer; }
+	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
+	void setPositionY(int yPosition){ this->posPlayer.y = yPosition; }
+	glm::ivec2 getSize(){ return sizePlayer; }
+	bool getIfUpSideDown(){ return upsidedown; }
+
 
 private:
+	glm::ivec2 posPlayer; // TODO change to glm::vec2
+	glm::ivec2 sizePlayer; // TODO change to glm::vec2
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
+	int playerMovementSpeed = 2;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
-	SavedState savedState;
 	bool renderInDeath();
+	bool isStandingOnPlatform;
+	Platform * standingOn;
 
 };
 

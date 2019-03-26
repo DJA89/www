@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include "Player.h"
 #include "Game.h"
+#include "BoundingShape.h"
 
 #define FALL_STEP 6
 #define SPACEBAR 32
@@ -15,7 +16,7 @@ enum PlayerAnims
 };
 
 
-void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
+void Player::init(ShaderProgram &shaderProgram)
 {
 	upsidedown = false;
 	actionPressedBeforeCollition = false;
@@ -72,25 +73,21 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->setAnimationSpeed(DEATH_RIGHTU, 8);
 		sprite->addKeyframe(DEATH_RIGHTU, glm::vec2(0.75f, 0.75f));
 
-	sprite->changeAnimation(0);
-	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->changeAnimation(STAND_RIGHT);
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
-void Player::initializeSavedState() {
-	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
+bool Player::hasDied(){
+	return dying && (framesSinceDeath > 60);
 }
 
 void Player::update(int deltaTime)
 {
 	if (dying) {
-		if (framesSinceDeath > 60) {
-			loadState();
-		}
 		return;
 	}
-	int playerMovementSpeed = 2;
 	sprite->update(deltaTime);
+	// keyboard controls
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
 		if (upsidedown) {
@@ -157,8 +154,18 @@ void Player::update(int deltaTime)
 	else {
 		playerFalling(FALL_STEP);
 	}
-	map->triggerCheckpoint(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown, savedState);
-	if (map->triggerDeath(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown)) {
+	// if moving on a platform, add platform velocity
+	if (isStandingOnPlatform && standingOn != NULL){
+		posPlayer += standingOn->getVelocity();
+		isStandingOnPlatform = false; // wait for next collision
+	}
+
+	// check for collisions
+	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
+		// detach from platform
+		isStandingOnPlatform = false;
+		standingOn = NULL;
+		// die
 		dying = true;
 		int currentAnimation = sprite->animation();
 		int newAnimation;
@@ -174,14 +181,35 @@ void Player::update(int deltaTime)
 		sprite->changeAnimation(newAnimation);
 	}
 
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+}
+
+// center means in the middle of the player touching the floor/ceiling it is standing on
+void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
+	// player specific restoring
+	int xCenter = normalizedCheckpointPosition.x;
+	int yCenter = normalizedCheckpointPosition.y;
+	int xPos, yPos;
+	if (upsidedown) {
+		xPos = xCenter - sizePlayer.x/2;
+		yPos = yCenter;
+		sprite->changeAnimation(STAND_RIGHTU);
+	} else {
+		xPos = xCenter - sizePlayer.x/2;
+		yPos = yCenter - sizePlayer.y;
+		sprite->changeAnimation(STAND_RIGHT);
+	}
+	framesSinceDeath = 0;
+	dying = false;
+	this->upsidedown = upsidedown;
+	setPosition(glm::ivec2(xPos, yPos));
 }
 
 void Player::playerFalling(int pixels) {
 	posPlayer.y += pixels;
 	bool collition = map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
 		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
-	if(collition) {
+	if(collition || isStandingOnPlatform) {
 		if (!actionPressedBeforeCollition) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
 				actionPressedBeforeCollition = true;
@@ -220,22 +248,6 @@ void Player::playerFalling(int pixels) {
 			}
 		}
 	}
-}
-
-void Player::loadState() {
-	tileMapDispl = savedState.getSavedTileMapDispl();
-	posPlayer = savedState.getSavedPosPlayer();
-	upsidedown = savedState.getSavedUpsideDown();
-	posPlayer.x -= 8;
-	if (upsidedown) {
-		sprite->changeAnimation(STAND_RIGHTU);
-	} else {
-		sprite->changeAnimation(STAND_RIGHT);
-		posPlayer.y -= 16;
-	}
-	framesSinceDeath = 0;
-	dying = false;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
 void Player::render()
@@ -277,5 +289,39 @@ void Player::setTileMap(TileMap *tileMap)
 void Player::setPosition(const glm::vec2 &pos)
 {
 	posPlayer = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+}
+
+void Player::handleCollisionWithPlatform(Platform & platform) {
+	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
+	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
+	BoundingShape * platBound = platform.getBoundingShape();
+	float minimalStandingSurface = sizePlayer_f.x/4.f;
+	if (posPlayer_f.x + sizePlayer_f.x - platBound->getPosition().x >= minimalStandingSurface){
+		// can stand on platform
+		if (posPlayer_f.y < platBound->getPosition().y){
+			// is above
+			posPlayer_f.y = platBound->getPosition().y - sizePlayer_f.y;
+		} else if (posPlayer_f.y > platBound->getPosition().y){
+			// is below
+			posPlayer_f.y = platBound->getPosition().y + platBound->getSize().y;
+		} else { // let's just hope we never get here
+			cout << "ERROR: player was neither below, nor above platform" << endl;
+		}
+		isStandingOnPlatform = true; // stand on platform
+		standingOn = &platform; // store platform to follow movement
+	} else {
+		// is next to platform, so just pull out
+		if (posPlayer_f.x < platBound->getPosition().x){
+			// is left
+			posPlayer_f.x = platBound->getPosition().x - sizePlayer_f.x;
+		} else if (posPlayer_f.x > platBound->getPosition().x){
+			// is right
+			posPlayer_f.x = platBound->getPosition().x + platBound->getSize().x;
+		} else { // let's just hope we never get here
+			cout << "ERROR: player was neither left, nor right of platform" << endl;
+		}
+	}
+	posPlayer = (glm::ivec2) posPlayer_f;
+	sizePlayer = (glm::ivec2) sizePlayer_f;
 }

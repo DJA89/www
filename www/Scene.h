@@ -23,18 +23,22 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
-	void changeToLevel(int levelID);
+	void loadLevel(string levelName);
 
 private:
 	void initShaders();
+	void saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown);
+	void loadGame();
+	void checkForCheckpointCollision();
 
 public:
 	ShaderProgram texProgram;
 
 private:
-	LevelMap *levelMap;
+	LevelMap levelMap;
 	TileMap *map;
 	Player *player;
+	SavedState savedState;
 	float currentTime;
 	glm::mat4 projection;
 };

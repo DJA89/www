@@ -3,9 +3,12 @@
 
 
 #include <glm/glm.hpp>
+#include <unordered_map>
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "SavedState.h"
+#include "TileType.h"
+#include "Platform.h"
 
 #define LEVEL_DIR string("levels/")
 
@@ -21,9 +24,9 @@ class TileMap
 
 public:
 	// Tile maps can only be created inside an OpenGL context
-	static TileMap *createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	static TileMap *createTileMap(const string &levelFile, ShaderProgram &program);
 
-	TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	TileMap(const string &levelFile, ShaderProgram &program);
 	~TileMap();
 
 	void render() const;
@@ -35,30 +38,34 @@ public:
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-	bool triggerCheckpoint(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown, SavedState &savedState) const;
-	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const;
+	glm::ivec2 returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
+	bool isCheckpointUpsideDown(glm::ivec2 checkpointPosition);
+	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
+	glm::ivec2 getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition);
+	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 
 private:
 	bool loadLevel(const string &levelFile);
 	bool loadLevelTmx(const string &levelFile);
 	bool loadLevelTxt(const string &levelFile);
-	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
+	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
+	std::unordered_map<int, Platform *> platforms;
+	Texture tilesheet;
 
 private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
 	int tileSize, blockSize;
-	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
+	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
 	const static int non_collision_tiles[4];
 	const static int death_tiles[2];
-	int *levelMap;
 
 };
 
