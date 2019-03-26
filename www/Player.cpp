@@ -16,7 +16,7 @@ enum PlayerAnims
 };
 
 
-void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
+void Player::init(ShaderProgram &shaderProgram)
 {
 	upsidedown = false;
 	actionPressedBeforeCollition = false;
@@ -73,13 +73,12 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->setAnimationSpeed(DEATH_RIGHTU, 8);
 		sprite->addKeyframe(DEATH_RIGHTU, glm::vec2(0.75f, 0.75f));
 
-	sprite->changeAnimation(0);
-	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->changeAnimation(STAND_RIGHT);
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
 void Player::initializeSavedState(SavedState &savedState) {
-	savedState.init(tileMapDispl, glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
+	savedState.init(glm::ivec2(posPlayer.x + 8, posPlayer.y + 16), upsidedown);
 }
 
 bool Player::hasDied(){
@@ -186,14 +185,14 @@ void Player::update(int deltaTime)
 		sprite->changeAnimation(newAnimation);
 	}
 
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
 void Player::checkForCheckpointCollision(SavedState &savedState){
 	glm::ivec2 checkpointPosition;
 	checkpointPosition = map->returnCheckPointIfCollision(posPlayer, glm::ivec2(32, 32), &posPlayer.y, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		savedState.update(tileMapDispl, checkpointPosition, upsidedown);
+		savedState.update(checkpointPosition, map->isCheckpointUpsideDown(checkpointPosition));
 	}
 }
 
@@ -244,7 +243,6 @@ void Player::playerFalling(int pixels) {
 
 void Player::loadState(SavedState &savedState) {
 	// restoring state
-	tileMapDispl = savedState.getSavedTileMapDispl();
 	posPlayer = savedState.getSavedPosPlayer();
 	upsidedown = savedState.getSavedUpsideDown();
 	// player specific init
@@ -257,7 +255,7 @@ void Player::loadState(SavedState &savedState) {
 	}
 	framesSinceDeath = 0;
 	dying = false;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
 void Player::render()
@@ -299,7 +297,7 @@ void Player::setTileMap(TileMap *tileMap)
 void Player::setPosition(const glm::vec2 &pos)
 {
 	posPlayer = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
 void Player::handleCollisionWithPlatform(Platform & platform) {

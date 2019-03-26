@@ -10,7 +10,7 @@
 #include "Platform.h"
 
 // initial player position
-#define INIT_PLAYER_X_TILES 2
+#define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
 #define INIT_PLAYER_Y_TILES 10
 
 
@@ -40,7 +40,7 @@ void Scene::init()
 	loadLevel(mapName);
 	// player
 	player = new Player();
-	player->init(glm::ivec2(0, 0), texProgram);
+	player->init(texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
 	saveGame();
@@ -50,7 +50,7 @@ void Scene::init()
 
 void Scene::loadLevel(string levelName){
 	// tilemap
-	map = TileMap::createTileMap(levelName, glm::vec2(0, 0), texProgram);
+	map = TileMap::createTileMap(levelName, texProgram);
 	// platforms
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * p = it->second;

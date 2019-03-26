@@ -24,9 +24,9 @@ class TileMap
 
 public:
 	// Tile maps can only be created inside an OpenGL context
-	static TileMap *createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	static TileMap *createTileMap(const string &levelFile, ShaderProgram &program);
 
-	TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	TileMap(const string &levelFile, ShaderProgram &program);
 	~TileMap();
 
 	void render() const;
@@ -39,6 +39,7 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	glm::ivec2 returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool upsidedown) const;
+	bool isCheckpointUpsideDown(glm::ivec2 checkpointPosition);
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
 	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 
@@ -46,7 +47,7 @@ private:
 	bool loadLevel(const string &levelFile);
 	bool loadLevelTmx(const string &levelFile);
 	bool loadLevelTxt(const string &levelFile);
-	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
+	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
 
 public:

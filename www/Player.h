@@ -15,7 +15,7 @@ class Player
 {
 
 public:
-	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void init(ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
 
@@ -29,7 +29,7 @@ public:
 
 	void handleCollisionWithPlatform(Platform & platform);
 
-	glm::ivec2 tileMapDispl, posPlayer, sizePlayer; // TODO change to glm::vec2
+	glm::ivec2 posPlayer, sizePlayer; // TODO change to glm::vec2
 
 private:
 	Texture spritesheet;

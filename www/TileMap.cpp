@@ -17,17 +17,17 @@ namespace xml = tinyxml2;
 const int TileMap::non_collision_tiles[4] = {0, 140, 465, 595};
 const int TileMap::death_tiles[2] = {140, 465};
 
-TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
+TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
 {
-	TileMap *map = new TileMap(levelFile, minCoords, program);
+	TileMap *map = new TileMap(levelFile, program);
 	return map;
 }
 
 
-TileMap::TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
+TileMap::TileMap(const string &levelFile, ShaderProgram &program)
 {
 	loadLevel(levelFile);
-	prepareArrays(minCoords, program);
+	prepareArrays(program);
 }
 
 TileMap::~TileMap()
@@ -260,7 +260,7 @@ bool TileMap::loadLevelTxt(const string &levelFile)
 	return true;
 }
 
-void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
+void TileMap::prepareArrays(ShaderProgram &program)
 {
 	int tile, nTiles = 0;
 	glm::vec2 posTile, texCoordTile[2], halfTexel;
@@ -276,7 +276,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 			{
 				// Non-empty tile
 				nTiles++;
-				posTile = glm::vec2(minCoords.x + i * tileSize, minCoords.y + j * tileSize);
+				posTile = glm::vec2(i * tileSize, j * tileSize);
 				// TODO extract: duplicate of this code in loadLevelTmx()
 				texCoordTile[0] = glm::vec2(float((tile-1)%tilesheetSize.x) / tilesheetSize.x, float((tile-1)/tilesheetSize.x) / tilesheetSize.y);
 				texCoordTile[1] = texCoordTile[0] + tileTexSize;
@@ -401,7 +401,7 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	x1 = (pos.x + size.x - 1) / tileSize;
 	// don't collide on empty space above spider
 	// TODO replace with AABB
-	if (upsidedown) {
+	if (upsidedown) { // don't collide on empty space above spider
 		y0disp = 0;
 		y1disp = -7;
 	}
@@ -413,33 +413,22 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
-			if (map[y*mapSize.x + x] == 595) {
+			if (map[y*mapSize.x + x] == 595) { // only floor checkpoint
 				// (x,y) is a checkpoint
-				// TODO check if this makes sense
-				if (checkpointValid(x, y, upsidedown)){
-					return glm::ivec2(x*tileSize, y*tileSize);
-				} else {
-					// if no solid ground in falling direction under checkpoint
-					// => don't collide with it (=> don't save checkpoint)
-					return glm::ivec2(0, 0); // TODO does this make sense?
-				}
+				return glm::ivec2(x*tileSize, y*tileSize);
 			}
 		}
 	}
 	return glm::ivec2(0, 0); // no collision with checkpoints found
 }
 
-//TODO is this function really necessary? is it just agains glitches/floating checkpoints, or am I missing something?
-bool TileMap::checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const {
-	int yGround;
-	if (upsidedown){
-		yGround = yCheckpoint - 1;
-	} else {
-		yGround = yCheckpoint + 1;
+bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
+	int x = checkpointPosition.x / tileSize;
+	int y = checkpointPosition.y / tileSize;
+	if (map[y*mapSize.x + x] == 595){ // floor checkpoint
+		return false; // floor
 	}
-	// check if ground below/above checkpoint is collidable/solid (player stops there when respawning)
-	bool isGroundCollidable = std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[yGround*mapSize.x + xCheckpoint]) == std::end(non_collision_tiles); // check if ground is NOT non_collision
-	return isGroundCollidable;
+	return false; // in case of doubt assume floor
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
