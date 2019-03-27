@@ -186,7 +186,12 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
 					plat->setTextureBounds(textureCoords, tileTexSize - halfTexel);
 					// add bounding shape to platform
+					for (auto it = tileTypeByID.begin(); it != tileTypeByID.end(); ++it){
+						cout << it->first << endl;
+					}
+					cout << "platform tileID = " << tileID << endl;
 					if (tileTypeByID.count(tileID) == 1){ // custom collision bounds
+						cout << "Platform has bounding box" << endl;
 						plat->setBoundingShape(tileTypeByID[tileID]->collisionBounds);
 					}
 				} else if (objectAttribs.at(2) == "path"){
