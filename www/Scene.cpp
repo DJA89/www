@@ -63,6 +63,7 @@ void Scene::loadLevel(string levelName){
 
 void Scene::endGame() {
 	sound.releaseSound(soundSample);
+	player->endGame();
 }
 
 void Scene::update(int deltaTime)
