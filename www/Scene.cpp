@@ -149,12 +149,16 @@ void Scene::loadGame(){
 	// TODO improvement: store normalizedPosition and upsidedown in a PlayerState class and currentLevel in a LevelState class
 	// levelmap
 	int currentScreen = savedState.getSavedScreen();
-	// TODO move tilemap management to levelmap
-	levelMap.setCurrentScreen(currentScreen);
-	// map
-	if (map != NULL) delete map; // destroy current map
-	string levelName = levelMap.nameOfCurrentLevel();
-	loadLevel(levelName);
+	if (levelMap.getCurrentScreen() != currentScreen) {
+		// TODO move tilemap management to levelmap
+		levelMap.setCurrentScreen(currentScreen);
+		// map
+		if (map != NULL) delete map; // destroy current map
+		string levelName = levelMap.nameOfCurrentLevel();
+
+		loadLevel(levelName);
+	}
+
 	// player related
 	player->setTileMap(map);
 	bool upsidedown = savedState.getSavedUpsideDown();
