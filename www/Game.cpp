@@ -25,8 +25,10 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	if(key == 27) // Escape code
+	if (key == 27) { // Escape code
+		scene.endGame();
 		bPlay = false;
+	}
 	keys[key] = true;
 }
 
