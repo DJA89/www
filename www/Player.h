@@ -43,7 +43,7 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-	int playerMovementSpeed = 2;
+	int playerMovementSpeed = 4;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	bool renderInDeath();
