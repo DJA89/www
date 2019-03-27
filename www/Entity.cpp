@@ -22,6 +22,8 @@ void Entity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	// velocity and direction
 	velocity = 0;
 	direction = glm::vec2(1, 0); // to right
+	// default bounding box
+	defaultCollisionBox = new AxisAlignedBoundingBox(glm::vec2(0, 0), this->size);
 }
 
 void Entity::update(int deltaTime){
@@ -41,10 +43,6 @@ BoundingShape * Entity::getBoundingShape(){
 	if (this->collisionBounds != NULL){
 		return this->collisionBounds;
 	} else {
-		// set default collision path
-		if (defaultCollisionBox == NULL){
-			defaultCollisionBox = new AxisAlignedBoundingBox(this->position, this->size);
-		}
 		return this->defaultCollisionBox;
 	}
 }
