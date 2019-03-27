@@ -53,7 +53,7 @@ private:
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
-	std::unordered_map<int, FixedPathEntity *> platforms;
+	std::unordered_map<int, FixedPathEntity *> entities;
 	Texture tilesheet;
 
 private:

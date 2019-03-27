@@ -336,3 +336,26 @@ void Player::handleCollisionWithPlatform(FixedPathEntity & platform) {
 void Player::endGame() {
 	sound.releaseSound(soundSample);
 }
+
+void Player::handleCollisionWithDeath(FixedPathEntity & enemy) {
+	dying = true;
+	int currentAnimation = sprite->animation();
+	int newAnimation;
+	if (currentAnimation == MOVE_LEFT || currentAnimation == STAND_LEFT) {
+		newAnimation = DEATH_LEFT;
+	}
+	else if (currentAnimation == MOVE_RIGHT || currentAnimation == STAND_RIGHT) {
+		newAnimation = DEATH_RIGHT;
+	}
+	else if (currentAnimation == MOVE_RIGHTU || currentAnimation == STAND_RIGHTU) {
+		newAnimation = DEATH_RIGHTU;
+	}
+	else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
+		newAnimation = DEATH_LEFTU;
+	}
+	sprite->changeAnimation(newAnimation);
+}
+
+bool Player::isDying() {
+	return dying;
+}

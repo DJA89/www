@@ -19,11 +19,12 @@ class FixedPathEntity: public Entity
 {
 
 public:
-	void init(Texture & tilesheet, ShaderProgram & shaderProgram, bool ImEnemy = false);
+	void init(Texture & tilesheet, ShaderProgram & shaderProgram);
 	void update(int deltaTime);
 	void render();
 	void setSpawn(glm::vec2 initPos);
 	void setSize(glm::vec2 size);
+	void setEnemy();
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; }
 

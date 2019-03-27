@@ -35,10 +35,10 @@ TileMap::~TileMap()
 		delete map;
 
 	// remove all platforms
-	for (auto it = platforms.begin(); it != platforms.cend(); ++it ){
+	for (auto it = entities.begin(); it != entities.cend(); ++it ){
 		delete it->second;
 	}
-	platforms.clear();
+	entities.clear();
 }
 
 
@@ -160,39 +160,42 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			int height = stoi(object->Attribute("height"));
 
 			vector<string> objectAttribs = Utils::split(objectName, '_');
-			if (objectAttribs.at(0) == "Platform"){ // platform vs ...
+			if (objectAttribs.at(0) == "Platform" || objectAttribs.at(0) == "Enemy"){//  || objectAttribs.at(0) == "Enemy") { // platform vs ...
 				int ID = stoi(objectAttribs.at(1));
 
 				// check if there is already a platform with this ID
-				FixedPathEntity *plat;
-				if (platforms.count(ID) == 1){
-					plat = platforms[ID]; // exists, add new data to it
+				FixedPathEntity *ent;
+				if (entities.count(ID) == 1){
+					ent = entities[ID]; // exists, add new data to it
 				} else {
-					plat = new FixedPathEntity(); // else create new and store
-					plat->setID(ID);
-					platforms[ID] = plat;
+					ent = new FixedPathEntity(); // else create new and store
+					ent->setID(ID);
+					entities[ID] = ent;
 				}
 				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
 					int tileID = stoi(object->Attribute("gid"));
-					plat->setTileID(tileID); // tile idx in spritesheet
+					if (objectAttribs.at(0) == "Enemy") {
+						ent->setEnemy();
+					}
+					ent->setTileID(tileID); // tile idx in spritesheet
 					// position is bottom left => correct to top left
 					// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
-					plat->setSpawn(glm::vec2(xPos, yPos - height));
-					plat->setSize(glm::vec2(width, height));
+					ent->setSpawn(glm::vec2(xPos, yPos - height));
+					ent->setSize(glm::vec2(width, height));
 					// add texture coordinates of tile
 					// TODO extract: duplicate of this code in prepareArrays()
 					glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
 					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
-					plat->setTextureBounds(textureCoords, tileTexSize - halfTexel);
+					ent->setTextureBounds(textureCoords, tileTexSize - halfTexel);
 					// add bounding shape to platform
 					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 						// custom collision bounds
-						plat->setBoundingShape(tileTypeByID[tileID - 1]->collisionBounds);
+						ent->setBoundingShape(tileTypeByID[tileID - 1]->collisionBounds);
 					}
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform
-					plat->setPathStart(glm::vec2(xPos, yPos));
-					plat->setPathEnd(glm::vec2(xPos+width, yPos+height));
+					ent->setPathStart(glm::vec2(xPos, yPos));
+					ent->setPathEnd(glm::vec2(xPos+width, yPos+height));
 				}
 			}
 			object = object->NextSiblingElement("object");
@@ -374,6 +377,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = (pos.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
+		int aux = map[y*mapSize.x + x];
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
 			*posY = tileSize * (y + 1);
