@@ -27,7 +27,7 @@ void FixedPathEntity::update(int deltaTime){
 	}
 	// update sprite and bounds
 	sprite->setPosition(position);
-	this->getBoundingShape()->setPosition(position);
+	this->getBoundingShape()->recalculateFromEntityPosition(position);
 	sprite->update(deltaTime);
 }
 

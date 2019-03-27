@@ -9,7 +9,7 @@ class BoundingEllipse: public BoundingShape
 {
 
 public:
-	BoundingEllipse(glm::vec2 position, glm::vec2 size) : BoundingShape(position, size) {};
+	BoundingEllipse(glm::vec2 positionInTile, glm::vec2 size) : BoundingShape(positionInTile, size) {};
 	bool intersects(const BoundingShape & shape) const;
 	bool intersects(const BoundingEllipse & ellipse) const;
 	bool intersects(const AxisAlignedBoundingBox & box) const;

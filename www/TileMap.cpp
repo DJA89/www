@@ -130,15 +130,15 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		int width = stoi(object->Attribute("width"));
 		int height = stoi(object->Attribute("height"));
 		// store in objects
-		glm::vec2 position = glm::vec2(xPos, yPos);
+		glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
 		glm::vec2 size = glm::vec2(width, height);
 		BoundingShape * bs;
 		if (object->FirstChildElement("ellipse") != NULL){
 			// is an ellipse
-			bs = new BoundingEllipse(position, size);
+			bs = new BoundingEllipse(positionInTile, size);
 		} else {
 			// is normal rectangle
-			bs = new AxisAlignedBoundingBox(position, size);
+			bs = new AxisAlignedBoundingBox(positionInTile, size);
 		}
 		TileType * tileType = new TileType(tileID, bs);
 		tileTypeByID[tileID] = tileType;

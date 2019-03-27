@@ -24,6 +24,7 @@ void Entity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	direction = glm::vec2(1, 0); // to right
 	// default bounding box
 	defaultCollisionBox = new AxisAlignedBoundingBox(glm::vec2(0, 0), this->size);
+	getBoundingShape()->recalculateFromEntityPosition(this->position);
 }
 
 void Entity::update(int deltaTime){
@@ -31,7 +32,7 @@ void Entity::update(int deltaTime){
 	position += velocity * glm::normalize(direction);
 	// update sprite and bounds
 	sprite->setPosition(position);
-	getBoundingShape()->setPosition(position);
+	getBoundingShape()->recalculateFromEntityPosition(position);
 	sprite->update(deltaTime);
 }
 
@@ -39,7 +40,7 @@ void Entity::render(){
 	sprite->render();
 }
 
-BoundingShape * Entity::getBoundingShape(){
+BoundingShape * Entity::getBoundingShape() const {
 	if (this->collisionBounds != NULL){
 		return this->collisionBounds;
 	} else {

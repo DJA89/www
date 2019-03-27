@@ -26,8 +26,10 @@ public:
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
 	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){ this->textureCoordinates = textureCoordinates; this->textureSize = textureSize; }
 	void setPosition(glm::vec2 initPos){ this->position = initPos; }
+	glm::vec2 getPosition() const { return this->position; }
 	void setSize(glm::vec2 size){ this->size = size; }
-	BoundingShape * getBoundingShape();
+	glm::vec2 getSize() const { return this->size; }
+	BoundingShape * getBoundingShape() const;
 	float getVelocity() const { return velocity; }
 	void setID(int ID){ this->ID = ID; }
 	int getID(){ return this->ID; }
@@ -36,7 +38,7 @@ public:
 
 protected:
 	// physical
-	glm::vec2 position; // bottom left
+	glm::vec2 position; // top left
 	glm::vec2 size;
 	float velocity; // TODO change to glm::vec2
 	glm::vec2 direction; // moving direction (length 1)
