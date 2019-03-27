@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include "SavedState.h"
+#include "SoundSystem.h"
 
 
 // Player is basically a Sprite that represents the player. As such it has
@@ -32,6 +33,8 @@ public:
 	void setPositionY(int yPosition){ this->posPlayer.y = yPosition; }
 	glm::ivec2 getSize(){ return sizePlayer; }
 	bool getIfUpSideDown(){ return upsidedown; }
+	void endGame();
+
 
 
 private:
@@ -46,7 +49,8 @@ private:
 	bool renderInDeath();
 	bool isStandingOnPlatform;
 	Platform * standingOn;
-
+	SoundSystemClass sound;
+	SoundClass soundSample;
 };
 
 

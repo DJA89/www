@@ -75,6 +75,11 @@ void Player::init(ShaderProgram &shaderProgram)
 
 	sprite->changeAnimation(STAND_RIGHT);
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+
+
+	SoundSystemClass sound = SoundSystemClass();
+
+	sound.createSound(&soundSample, "sounds/jump.mp3");
 }
 
 bool Player::hasDied(){
@@ -214,6 +219,7 @@ void Player::playerFalling(int pixels) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
 				actionPressedBeforeCollition = true;
 				upsidedown = !upsidedown;
+				sound.playSound(soundSample, false);
 				switch (sprite->animation()) {
 				case MOVE_LEFT:
 					sprite->changeAnimation(MOVE_LEFTU);
@@ -324,4 +330,8 @@ void Player::handleCollisionWithPlatform(Platform & platform) {
 	}
 	posPlayer = (glm::ivec2) posPlayer_f;
 	sizePlayer = (glm::ivec2) sizePlayer_f;
+}
+
+void Player::endGame() {
+	sound.releaseSound(soundSample);
 }
