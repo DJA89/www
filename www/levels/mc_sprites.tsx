@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.2" tiledversion="1.2.3" name="minecraft_sprites_with_alpha" tilewidth="16" tileheight="16" tilecount="800" columns="40">
  <image source="../images/minecraft_sprites_with_alpha.png" width="640" height="320"/>
+ <tile id="57">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="4" width="16" height="8"/>
+  </objectgroup>
+ </tile>
  <tile id="139">
   <objectgroup draworder="index">
    <object id="1" x="0" y="9" width="16" height="7"/>

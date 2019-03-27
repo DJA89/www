@@ -130,15 +130,15 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		int width = stoi(object->Attribute("width"));
 		int height = stoi(object->Attribute("height"));
 		// store in objects
-		glm::vec2 position = glm::vec2(xPos, yPos);
+		glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
 		glm::vec2 size = glm::vec2(width, height);
 		BoundingShape * bs;
 		if (object->FirstChildElement("ellipse") != NULL){
 			// is an ellipse
-			bs = new BoundingEllipse(position, size);
+			bs = new BoundingEllipse(positionInTile, size);
 		} else {
 			// is normal rectangle
-			bs = new AxisAlignedBoundingBox(position, size);
+			bs = new AxisAlignedBoundingBox(positionInTile, size);
 		}
 		TileType * tileType = new TileType(tileID, bs);
 		tileTypeByID[tileID] = tileType;
@@ -186,8 +186,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
 					plat->setTextureBounds(textureCoords, tileTexSize - halfTexel);
 					// add bounding shape to platform
-					if (tileTypeByID.count(tileID) == 1){ // custom collision bounds
-						plat->setBoundingShape(tileTypeByID[tileID]->collisionBounds);
+					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+						// custom collision bounds
+						plat->setBoundingShape(tileTypeByID[tileID - 1]->collisionBounds);
 					}
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform
@@ -317,9 +318,9 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 {
 	int x, y0, y1;
 
-	x = min(pos.x / tileSize, mapSize.x);
-	y0 = min(pos.y / tileSize, mapSize.y);
-	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y);
+	x = min(pos.x / tileSize, mapSize.x-1);
+	y0 = min(pos.y / tileSize, mapSize.y-1);
+	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
@@ -327,7 +328,6 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -335,18 +335,16 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 {
 	int x, y0, y1;
 
-	x = min((pos.x + size.x - 1) / tileSize, mapSize.x);
-	y0 = min(pos.y / tileSize, mapSize.y);
-	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y);
+	x = min((pos.x + size.x - 1) / tileSize, mapSize.x-1);
+	y0 = min(pos.y / tileSize, mapSize.y-1);
+	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
 			return true;
 		}
-
 	}
-
 	return false;
 }
 
@@ -361,14 +359,10 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
-			if(*posY - tileSize * y + size.y <= 6)
-			{
-				*posY = tileSize * y - size.y;
-				return true;
-			}
+			*posY = tileSize * y - size.y;
+			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -383,14 +377,10 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
-			if(*posY - tileSize * y >= 10)
-			{
-				*posY = tileSize * (y + 1);
-			}
+			*posY = tileSize * (y + 1);
 			return true;
 		}
 	}
-
 	return false;
 }
 

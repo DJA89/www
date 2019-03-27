@@ -10,17 +10,18 @@ class BoundingShape
 {
 
 public:
-	BoundingShape(glm::vec2 position, glm::vec2 size) :
-		position(position), size(size) {};
+	BoundingShape(glm::vec2 positionInTile, glm::vec2 size) :
+		positionInTile(positionInTile), size(size) {};
 	virtual bool intersects(const BoundingShape & shape) const = 0;
 	virtual bool intersects(const BoundingEllipse & ellipse) const = 0;
 	virtual bool intersects(const AxisAlignedBoundingBox & box) const = 0;
 	glm::vec2 getPosition() const { return position; }
-	void setPosition(glm::vec2 newPosition) { position = newPosition; }
+	void recalculateFromEntityPosition(glm::vec2 newPosition) { position = newPosition + positionInTile; }
 	glm::vec2 getSize() const { return size; }
 
 protected:
-	glm::vec2 position; // top left
+	glm::vec2 positionInTile; // from tile top left
+	glm::vec2 position = glm::vec2(0, 0); // top left
 	glm::vec2 size; // for ellipse: containing rectangle
 };
 

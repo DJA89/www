@@ -330,6 +330,7 @@ void Player::handleCollisionWithPlatform(Platform & platform) {
 	}
 	posPlayer = (glm::ivec2) posPlayer_f;
 	sizePlayer = (glm::ivec2) sizePlayer_f;
+	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
 void Player::endGame() {

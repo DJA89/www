@@ -81,7 +81,8 @@ void Scene::update(int deltaTime)
 	checkForCheckpointCollision();
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(player->getPosition(), player->getSize());
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
+	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
 		Platform * plat = it->second;
 		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
