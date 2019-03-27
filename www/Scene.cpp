@@ -43,6 +43,12 @@ void Scene::init()
 	// saveGame(); // TODO set initialPos & checkpoint in tiled => load in TileMap
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH/2 - 1), float(SCREEN_HEIGHT/2 - 1), 0.f);
 	currentTime = 0.0f;
+	SoundSystemClass sound = SoundSystemClass();
+
+	sound.createSound(&soundSample, "sounds/music.mp3");
+
+	sound.playSound(soundSample, true);
+
 }
 
 void Scene::loadLevel(string levelName){
@@ -53,6 +59,10 @@ void Scene::loadLevel(string levelName){
 		Platform * p = it->second;
 		p->init(map->tilesheet, texProgram);
 	}
+}
+
+void Scene::endGame() {
+	sound.releaseSound(soundSample);
 }
 
 void Scene::update(int deltaTime)

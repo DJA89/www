@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "LevelMap.h"
+#include "SoundSystem.h"
 
 
 // Scene contains all the entities of our game.
@@ -24,6 +25,7 @@ public:
 	void update(int deltaTime);
 	void render();
 	void loadLevel(string levelName);
+	void endGame();
 
 private:
 	void initShaders();
@@ -41,6 +43,8 @@ private:
 	SavedState savedState;
 	float currentTime;
 	glm::mat4 projection;
+	SoundSystemClass sound;
+	SoundClass soundSample;
 };
 
 
