@@ -362,11 +362,11 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
-			if(*posY - tileSize * y + size.y <= 6)
-			{
-				*posY = tileSize * y - size.y;
-				return true;
-			}
+			// if(*posY - tileSize * y + size.y <= 6)
+			// {
+			*posY = tileSize * y - size.y;
+			return true;
+			// }
 		}
 	}
 
@@ -384,10 +384,11 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	{
 		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
 		{
-			if(*posY - tileSize * y >= 10)
-			{
-				*posY = tileSize * (y + 1);
-			}
+			*posY = tileSize * (y + 1);
+			// if(*posY - tileSize * y >= 10)
+			// {
+			// 	*posY = tileSize * (y + 1);
+			// }
 			return true;
 		}
 	}
