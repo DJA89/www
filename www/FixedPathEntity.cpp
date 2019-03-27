@@ -2,13 +2,14 @@
 #include "BoundingShape.h"
 #include "Sprite.h"
 
-void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
+void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram, bool ImEnemy){
 	Entity::init(tilesheet, shaderProgram);
 	// correct endpoint so it matches the upper left corner of the platform (and not the bottom right)
 	this->pathEnd = this->pathEnd - this->size; // TODO use collision box to normalize path
 	// velocity and direction
 	velocity = 1.f;
 	direction = glm::vec2(1, 0); // to right
+	this->ImEnemy = ImEnemy;
 }
 
 void FixedPathEntity::update(int deltaTime){
@@ -43,4 +44,8 @@ void FixedPathEntity::setSpawn(glm::vec2 initPos){
 void FixedPathEntity::setSize(glm::vec2 size){
 	// Entity::size = size;
 	this->size = size;
+}
+
+void FixedPathEntity::handleCollision(Entity & e) {
+	e.handleCollision(*this);
 }

@@ -9,7 +9,6 @@
 #include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "BoundingEllipse.h"
-#include "Platform.h"
 #include "Utils.h"
 
 using namespace std;
@@ -165,11 +164,11 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				int ID = stoi(objectAttribs.at(1));
 
 				// check if there is already a platform with this ID
-				Platform *plat;
+				FixedPathEntity *plat;
 				if (platforms.count(ID) == 1){
 					plat = platforms[ID]; // exists, add new data to it
 				} else {
-					plat = new Platform(); // else create new and store
+					plat = new FixedPathEntity(); // else create new and store
 					plat->setID(ID);
 					platforms[ID] = plat;
 				}

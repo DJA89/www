@@ -20,7 +20,6 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="LevelMap.h" />
-    <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SavedState.h" />
     <ClInclude Include="Scene.h" />
@@ -43,7 +42,6 @@
     <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="LevelMap.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SavedState.cpp" />
     <ClCompile Include="Scene.cpp" />

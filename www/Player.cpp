@@ -298,7 +298,7 @@ void Player::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
-void Player::handleCollisionWithPlatform(Platform & platform) {
+void Player::handleCollisionWithPlatform(FixedPathEntity & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
 	BoundingShape * platBound = platform.getBoundingShape();

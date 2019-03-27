@@ -7,7 +7,6 @@
 #include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Intersection.h"
-#include "Platform.h"
 
 // initial player position
 #define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
@@ -56,7 +55,7 @@ void Scene::loadLevel(string levelName){
 	map = TileMap::createTileMap(levelName, texProgram);
 	// platforms
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
-		Platform * p = it->second;
+		FixedPathEntity * p = it->second;
 		p->init(map->tilesheet, texProgram);
 	}
 }
@@ -84,9 +83,14 @@ void Scene::update(int deltaTime)
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
 	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
-		Platform * plat = it->second;
+		FixedPathEntity * plat = it->second;
 		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
-			player->handleCollisionWithPlatform(*plat);
+			if (plat->IsEnemy()) {
+
+			}
+			else {
+				player->handleCollisionWithPlatform(*plat);
+			}
 			// cout << "PLAYER with platform collision" << endl;
 		}
 	}
