@@ -82,6 +82,10 @@ void Player::init(ShaderProgram &shaderProgram)
 	sound.createSound(&soundSample, "sounds/jump.mp3");
 }
 
+bool Player::isDying() {
+	return dying;
+}
+
 bool Player::hasDied(){
 	return dying && (framesSinceDeath > 60);
 }

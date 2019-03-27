@@ -73,9 +73,12 @@ void Scene::update(int deltaTime)
 		loadGame();
 	}
 	// update all moving entities: platforms, player, ...
-	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
-		it->second->update(deltaTime);
+	if(!player->isDying()) {
+		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+			it->second->update(deltaTime);
+		}
 	}
+
 	player->update(deltaTime);
 	checkForCheckpointCollision();
 	// check for collisions between player and platforms
