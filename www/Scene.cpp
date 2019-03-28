@@ -7,7 +7,6 @@
 #include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Intersection.h"
-#include "Platform.h"
 
 // initial player position
 #define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
@@ -55,8 +54,8 @@ void Scene::loadLevel(string levelName){
 	// tilemap
 	map = TileMap::createTileMap(levelName, texProgram);
 	// platforms
-	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
-		Platform * p = it->second;
+	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
+		FixedPathEntity * p = it->second;
 		p->init(map->tilesheet, texProgram);
 	}
 }
@@ -74,7 +73,7 @@ void Scene::update(int deltaTime)
 		loadGame();
 	}
 	// update all moving entities: platforms, player, ...
-	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
 		it->second->update(deltaTime);
 	}
 	player->update(deltaTime);
@@ -82,12 +81,18 @@ void Scene::update(int deltaTime)
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
-	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
-	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
-		Platform * plat = it->second;
-		if (Intersection::check(*(plat->getBoundingShape()), *playerCollisionBounds)){
-			player->handleCollisionWithPlatform(*plat);
-			// cout << "PLAYER with platform collision" << endl;
+	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
+		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+			FixedPathEntity * ent = it->second;
+			if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
+				if (ent->IsEnemy()) {
+					player->handleCollisionWithDeath(*ent);
+				}
+				else {
+					player->handleCollisionWithPlatform(*ent);
+				}
+				// cout << "PLAYER with platform collision" << endl;
+			}
 		}
 	}
 	delete playerCollisionBounds;
@@ -169,7 +174,7 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); // TODO remove
 	// render map, all platforms and player
 	map->render();
-	for (auto it = map->platforms.begin(); it != map->platforms.end(); ++it){
+	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
 		it->second->render();
 	}
 	player->render();

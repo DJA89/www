@@ -8,7 +8,7 @@
 #include "ShaderProgram.h"
 #include "SavedState.h"
 #include "TileType.h"
-#include "Platform.h"
+#include "FixedPathEntity.h"
 
 #define LEVEL_DIR string("levels/")
 
@@ -53,7 +53,7 @@ private:
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
-	std::unordered_map<int, Platform *> platforms;
+	std::unordered_map<int, FixedPathEntity *> entities;
 	Texture tilesheet;
 
 private:

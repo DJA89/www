@@ -24,14 +24,21 @@ public:
 	void render();
 	void setSpawn(glm::vec2 initPos);
 	void setSize(glm::vec2 size);
+	void setEnemy();
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; }
 
-	virtual void handleCollision(Entity & e) = 0;
+	void setTileID(int tileID) { this->tileID = tileID; }
+	void handleCollision(Entity & e);
+	bool IsEnemy() { return this->ImEnemy; }
 
 protected:
 	glm::vec2 pathStart;
 	glm::vec2 pathEnd; // in init gets subtracted size (then matches path of bottom left corner)
+
+private:
+	int tileID; // index in stylesheet
+	bool ImEnemy;
 
 };
 

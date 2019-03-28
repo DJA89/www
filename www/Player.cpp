@@ -298,7 +298,7 @@ void Player::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
-void Player::handleCollisionWithPlatform(Platform & platform) {
+void Player::handleCollisionWithPlatform(FixedPathEntity & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
 	BoundingShape * platBound = platform.getBoundingShape();
@@ -338,4 +338,27 @@ void Player::handleCollisionWithPlatform(Platform & platform) {
 
 void Player::endGame() {
 	sound.releaseSound(soundSample);
+}
+
+void Player::handleCollisionWithDeath(FixedPathEntity & enemy) {
+	dying = true;
+	int currentAnimation = sprite->animation();
+	int newAnimation;
+	if (currentAnimation == MOVE_LEFT || currentAnimation == STAND_LEFT) {
+		newAnimation = DEATH_LEFT;
+	}
+	else if (currentAnimation == MOVE_RIGHT || currentAnimation == STAND_RIGHT) {
+		newAnimation = DEATH_RIGHT;
+	}
+	else if (currentAnimation == MOVE_RIGHTU || currentAnimation == STAND_RIGHTU) {
+		newAnimation = DEATH_RIGHTU;
+	}
+	else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
+		newAnimation = DEATH_LEFTU;
+	}
+	sprite->changeAnimation(newAnimation);
+}
+
+bool Player::isDying() {
+	return dying;
 }

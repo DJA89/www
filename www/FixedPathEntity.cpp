@@ -11,6 +11,10 @@ void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	direction = glm::vec2(1, 0); // to right
 }
 
+void FixedPathEntity::setEnemy() {
+	ImEnemy = true;
+}
+
 void FixedPathEntity::update(int deltaTime){
 	// move
 	position += velocity * glm::normalize(direction);
@@ -43,4 +47,8 @@ void FixedPathEntity::setSpawn(glm::vec2 initPos){
 void FixedPathEntity::setSize(glm::vec2 size){
 	// Entity::size = size;
 	this->size = size;
+}
+
+void FixedPathEntity::handleCollision(Entity & e) {
+	e.handleCollision(*this);
 }
