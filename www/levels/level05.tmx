@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="10">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="34">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="1" name="Tile Layer 1" width="20" height="15">
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,
-2,2,2,2,2,2,2,2,281,462,2,2,2,2,2,2,2,2,2,2,
-0,0,0,0,0,0,0,0,464,463,0,0,0,0,0,0,0,2,2,2,
+2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
-0,0,0,0,0,281,462,0,0,0,0,0,0,0,0,0,0,2,2,2,
-2,2,2,2,2,464,463,2,2,2,2,0,0,2,0,0,0,2,2,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
+2,2,2,2,2,0,0,2,2,2,2,0,0,2,0,0,0,2,2,2,
 2,2,2,2,2,0,0,2,2,2,2,0,0,2,0,0,0,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,2,2,2,
@@ -21,13 +21,29 @@
 </data>
  </layer>
  <objectgroup id="2" name="Object Layer 1">
-  <object id="1" name="Enemy_4_spawn" gid="463" x="192" y="96.087" width="16" height="16"/>
-  <object id="2" name="Enemy_2_spawn" gid="462" x="192" y="80" width="16" height="16"/>
-  <object id="3" name="Enemy_3_spawn" gid="464" x="176.087" y="96.087" width="16" height="16"/>
-  <object id="4" name="Enemy_1_spawn" gid="281" x="176" y="80" width="16" height="16"/>
-  <object id="5" name="Enemy_1_path" x="144" y="64" width="84" height="16"/>
-  <object id="7" name="Enemy_2_path" x="160" y="64" width="84" height="16"/>
-  <object id="8" name="Enemy_3_path" x="144" y="80" width="84" height="16"/>
-  <object id="9" name="Enemy_4_path" x="160" y="80" width="84" height="16"/>
+  <object id="1" name="Enemy_4_spawn" gid="463" x="192" y="80" width="16" height="16"/>
+  <object id="2" name="Enemy_2_spawn" gid="462" x="192" y="64" width="16" height="16"/>
+  <object id="3" name="Enemy_3_spawn" gid="464" x="176" y="80" width="16" height="16"/>
+  <object id="4" name="Enemy_1_spawn" gid="281" x="176" y="64" width="16" height="16"/>
+  <object id="5" name="Enemy_1_path" x="176" y="48" width="16" height="64"/>
+  <object id="7" name="Enemy_2_path" x="192" y="48" width="16" height="64"/>
+  <object id="8" name="Enemy_3_path" x="176" y="64" width="16" height="64"/>
+  <object id="9" name="Enemy_4_path" x="192" y="64" width="16" height="64"/>
+  <object id="18" name="Enemy_8_spawn" gid="463" x="144" y="48" width="16" height="16"/>
+  <object id="19" name="Enemy_6_spawn" gid="462" x="144" y="32" width="16" height="16"/>
+  <object id="20" name="Enemy_7_spawn" gid="464" x="128" y="48" width="16" height="16"/>
+  <object id="21" name="Enemy_5_spawn" gid="281" x="128" y="32" width="16" height="16"/>
+  <object id="22" name="Enemy_5_path" x="128" y="16" width="16" height="64"/>
+  <object id="23" name="Enemy_6_path" x="144" y="16" width="16" height="64"/>
+  <object id="24" name="Enemy_7_path" x="128" y="32" width="16" height="64"/>
+  <object id="25" name="Enemy_8_path" x="144" y="32" width="16" height="64"/>
+  <object id="26" name="Enemy_12_spawn" gid="463" x="96" y="80" width="16" height="16"/>
+  <object id="27" name="Enemy_10_spawn" gid="462" x="96" y="64" width="16" height="16"/>
+  <object id="28" name="Enemy_11_spawn" gid="464" x="80" y="80" width="16" height="16"/>
+  <object id="29" name="Enemy_9_spawn" gid="281" x="80" y="64" width="16" height="16"/>
+  <object id="30" name="Enemy_9_path" x="80" y="48" width="16" height="64"/>
+  <object id="31" name="Enemy_10_path" x="96" y="48" width="16" height="64"/>
+  <object id="32" name="Enemy_11_path" x="80" y="64" width="16" height="64"/>
+  <object id="33" name="Enemy_12_path" x="96" y="64" width="16" height="64"/>
  </objectgroup>
 </map>

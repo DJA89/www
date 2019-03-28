@@ -8,7 +8,7 @@ void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	this->pathEnd = this->pathEnd - this->size; // TODO use collision box to normalize path
 	// velocity and direction
 	velocity = 1.f;
-	direction = glm::vec2(1, 0); // to right
+	direction = pathEnd - pathStart; // to right
 }
 
 void FixedPathEntity::setEnemy() {
