@@ -187,8 +187,11 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					plat->setTextureBounds(textureCoords, tileTexSize - halfTexel);
 					// add bounding shape to platform
 					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
-						// custom collision bounds
-						plat->setBoundingShape(tileTypeByID[tileID - 1]->collisionBounds);
+						// custom collision bounds (rescaled to fit multi-tile)
+						BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+						BoundingShape * copyTileBounds = tileBounds->clone();
+						copyTileBounds->rescale(plat->getSize() / float(tileSize));
+						plat->setBoundingShape(copyTileBounds);
 					}
 				} else if (objectAttribs.at(2) == "path"){
 					// path of platform

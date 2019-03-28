@@ -44,6 +44,7 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	int playerMovementSpeed = 4;
+	float minimalStandingFraction = 0.5f; // of sizePlayer.x
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	bool renderInDeath();
