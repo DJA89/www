@@ -302,8 +302,11 @@ void Player::handleCollisionWithPlatform(Platform & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
 	BoundingShape * platBound = platform.getBoundingShape();
-	float minimalStandingSurface = sizePlayer_f.x/4.f;
-	if (posPlayer_f.x + sizePlayer_f.x - platBound->getPosition().x >= minimalStandingSurface){
+	float leftPlayerFoot = posPlayer_f.x;
+	float rightPlayerFoot = posPlayer_f.x + sizePlayer_f.x;
+	float leftPlatformBorder = platBound->getPosition().x;
+	float rightPlatformBorder = platBound->getPosition().x + platBound->getSize().x;
+	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minimalStandingFraction * sizePlayer_f.x){
 		// can stand on platform
 		if (posPlayer_f.y < platBound->getPosition().y){
 			// is above
