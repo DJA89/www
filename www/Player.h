@@ -36,7 +36,6 @@ public:
 	glm::ivec2 getSize(){ return sizePlayer; }
 	bool getIfUpSideDown(){ return upsidedown; }
 	void endGame();
-	bool isDying();
 
 
 

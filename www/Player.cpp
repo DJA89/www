@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Game.h"
 #include "BoundingShape.h"
+#include <algorithm>
 
 #define FALL_STEP 6
 #define SPACEBAR 32
@@ -361,8 +362,4 @@ void Player::handleCollisionWithDeath(FixedPathEntity & enemy) {
 		newAnimation = DEATH_LEFTU;
 	}
 	sprite->changeAnimation(newAnimation);
-}
-
-bool Player::isDying() {
-	return dying;
 }

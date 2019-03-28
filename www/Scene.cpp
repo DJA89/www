@@ -84,17 +84,20 @@ void Scene::update(int deltaTime)
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
-	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
-		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
-			FixedPathEntity * ent = it->second;
-			if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
-				if (ent->IsEnemy()) {
-					player->handleCollisionWithDeath(*ent);
+	if (!player->isDying()) {
+		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
+			for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+				FixedPathEntity * ent = it->second;
+				if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
+					if (ent->IsEnemy()) {
+						player->handleCollisionWithDeath(*ent);
+						break;
+					}
+					else {
+						player->handleCollisionWithPlatform(*ent);
+					}
+					// cout << "PLAYER with platform collision" << endl;
 				}
-				else {
-					player->handleCollisionWithPlatform(*ent);
-				}
-				// cout << "PLAYER with platform collision" << endl;
 			}
 		}
 	}
