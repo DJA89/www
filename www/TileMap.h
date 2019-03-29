@@ -67,7 +67,7 @@ private:
 	glm::vec2 tileTexSize;
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
-	const static int non_collision_tiles[7];
+	const static int non_collision_tiles[3];
 	const static int death_tiles[2];
 
 };
