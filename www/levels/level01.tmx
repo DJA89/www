@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="22">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="1" name="Tile Layer 1" width="20" height="15">
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-2,2,0,0,0,0,0,0,0,466,0,0,2,2,2,2,2,2,2,2,
 2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,
 2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,
 2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,
-2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,
+2,2,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,
 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -20,9 +20,9 @@
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 </data>
  </layer>
- <objectgroup id="3" name="Object Layer 1">
-  <object id="11" name="Platform_1_path" x="32" y="144" width="176" height="16"/>
-  <object id="13" name="Platform_1_spawn" gid="58" x="156" y="160" width="32" height="16"/>
+ <objectgroup id="3" name="cb_101_ll">
   <object id="19" name="Checkpoint" gid="592" x="64" y="192" width="16" height="16"/>
+  <object id="22" name="cb_100_rr" gid="8" x="32" y="144" width="48" height="16"/>
+  <object id="23" name="cb_101_ll" gid="8" x="112" y="104" width="80" height="16"/>
  </objectgroup>
 </map>

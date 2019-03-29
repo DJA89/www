@@ -23,6 +23,7 @@ void Player::init(ShaderProgram &shaderProgram)
 	actionPressedBeforeCollition = false;
 	dying = false;
 	framesSinceDeath = 0;
+	collidingWithWall = false;
 
 	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -111,9 +112,30 @@ void Player::update(int deltaTime)
 			}
 		}
 		posPlayer.x -= playerMovementSpeed;
-		if(map->collisionMoveLeft(posPlayer, sizePlayer))
-		{
-			posPlayer.x += playerMovementSpeed;
+		if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+			if (isStandingOnPlatform && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
+				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+				float vel = cb->getVelocity(upsidedown);
+				if (vel > 0) {
+					posPlayer.x += vel;
+					if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+						float tileSize = map->getTileSize();
+						int aux = ((posPlayer.x) / tileSize);
+						int aux2 = tileSize * (aux + 1);
+						posPlayer.x = aux2 - vel;
+					}
+					else {
+						posPlayer.x -= vel;
+					}
+					collidingWithWall = true;
+				}
+				else {
+					posPlayer.x += playerMovementSpeed;
+				}
+			}
+			else {
+				posPlayer.x += playerMovementSpeed;
+			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
 			}
@@ -135,9 +157,30 @@ void Player::update(int deltaTime)
 			}
 		}
 		posPlayer.x += playerMovementSpeed;
-		if(map->collisionMoveRight(posPlayer, sizePlayer))
-		{
-			posPlayer.x -= playerMovementSpeed;
+		if (map->collisionMoveRight(posPlayer, sizePlayer)) {
+			if (isStandingOnPlatform && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
+				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+				float vel = cb->getVelocity(upsidedown);
+				if (vel < 0) {
+					posPlayer.x += vel;
+					if (map->collisionMoveRight(posPlayer, sizePlayer)) {
+						float tileSize = map->getTileSize();
+						int aux = (((posPlayer.x + sizePlayer.x - 1) / tileSize) - 2);
+						int aux2 = tileSize * aux;
+						posPlayer.x = aux2 - vel;
+					}
+					else {
+						posPlayer.x -= vel;
+					}
+					collidingWithWall = true;
+				}
+				else {
+					posPlayer.x -= playerMovementSpeed;
+				}
+			}
+			else {
+				posPlayer.x -= playerMovementSpeed;
+			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_RIGHTU);
 			}
@@ -166,7 +209,13 @@ void Player::update(int deltaTime)
 	}
 	// if moving on a platform, add platform velocity
 	if (isStandingOnPlatform && standingOn != NULL){
-		posPlayer += standingOn->getVelocity();
+		if (dynamic_cast<ConveyorBelt*>(standingOn)) {
+			ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+			posPlayer.x += cb->getVelocity(upsidedown);
+		}
+		else {
+			posPlayer.x += standingOn->getVelocity();
+		}
 		isStandingOnPlatform = false; // wait for next collision
 	}
 
@@ -196,8 +245,10 @@ void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpo
 
 void Player::playerFalling(int pixels) {
 	posPlayer.y += pixels;
-	bool collition = map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
+
+	bool collition = collidingWithWall || map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
 		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
+	collidingWithWall = false;
 	if(collition || isStandingOnPlatform) {
 		if (!actionPressedBeforeCollition) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
@@ -282,7 +333,7 @@ void Player::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
-void Player::handleCollisionWithPlatform(FixedPathEntity & platform) {
+void Player::handleCollisionWithPlatform(Entity & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
 	BoundingShape * platBound = platform.getBoundingShape();
@@ -290,7 +341,14 @@ void Player::handleCollisionWithPlatform(FixedPathEntity & platform) {
 	float rightPlayerFoot = posPlayer_f.x + sizePlayer_f.x;
 	float leftPlatformBorder = platBound->getPosition().x;
 	float rightPlatformBorder = platBound->getPosition().x + platBound->getSize().x;
-	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minimalStandingFraction * sizePlayer_f.x){
+	float minStanding;
+	if (dynamic_cast<ConveyorBelt*> (&platform)) {
+		minStanding = minimalStandingFractionConveyorBelt;
+	}
+	else {
+		minStanding = minimalStandingFractionPlatform;
+	}
+	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minStanding * sizePlayer_f.x){
 		// can stand on platform
 		if (posPlayer_f.y < platBound->getPosition().y){
 			// is above

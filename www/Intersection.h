@@ -17,6 +17,7 @@ public:
 	static bool check(const AxisAlignedBoundingBox & aabb, const BoundingEllipse & be);
 	static bool check(const BoundingEllipse & be, const AxisAlignedBoundingBox & aabb);
 	static bool check(const BoundingEllipse & be1, const BoundingEllipse & be2);
+	static bool check(const glm::vec2 & ps1, const glm::vec2 & ps2);
 
 private:
 };

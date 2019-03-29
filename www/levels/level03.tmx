@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="5">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="14">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="1" name="Tile Layer 1" width="20" height="15">
   <data encoding="csv">
@@ -15,7 +15,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
-2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 </data>
@@ -24,5 +24,10 @@
   <object id="1" name="Enemy_1_spawn" gid="553" x="196" y="72" width="16" height="16"/>
   <object id="2" name="Enemy_1_path" x="140" y="56" width="124" height="16"/>
   <object id="4" name="Checkpoint" gid="592" x="160" y="192" width="16" height="16"/>
+  <object id="5" name="cbf_203" gid="8" x="240" y="208" width="32" height="16"/>
+  <object id="6" name="cb_101_rn" gid="8" x="160" y="208" width="80" height="16"/>
+  <object id="7" name="cb_200_nl" gid="8" x="240" y="144" width="32" height="16"/>
+  <object id="8" name="cbf_202" gid="2" x="128" y="208" width="32" height="16"/>
+  <object id="9" name="cb_100_nl" gid="8" x="164" y="144" width="76" height="16"/>
  </objectgroup>
 </map>

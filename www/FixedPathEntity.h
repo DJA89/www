@@ -24,7 +24,7 @@ public:
 	void render();
 	void setSpawn(glm::vec2 initPos);
 	void setSize(glm::vec2 size);
-	void setEnemy();
+	void setEnemy(bool amEnemy);
 	void setPathStart(glm::vec2 pathStart){ this->pathStart = pathStart; }
 	void setPathEnd(glm::vec2 pathEnd){ this->pathEnd = pathEnd; }
 

@@ -75,7 +75,13 @@
     <ClCompile Include="SoundSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ConveyorBelt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Checkpoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathTile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,7 +149,13 @@
     <ClInclude Include="SoundSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConveyorBelt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Checkpoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathTile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
