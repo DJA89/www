@@ -13,7 +13,7 @@
 
 using namespace std;
 namespace xml = tinyxml2;
-const int TileMap::non_collision_tiles[5] = {0, 140, 465, 595, 594};
+const int TileMap::non_collision_tiles[7] = {0, 140, 465, 592, 593, 594, 595};
 const int TileMap::death_tiles[2] = {140, 465};
 
 TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
@@ -409,8 +409,11 @@ glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm
 	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
 	for (int x = x0; x <= x1; x++) {
 		for (int y = y0; y <= y1; y++) {
-			if (map[y*mapSize.x + x] == 595 ||
-			map[y*mapSize.x + x] == 594) { // floor or ceiling checkpoint
+			// if is floor or ceiling checkpoint (unsaved or saved)
+			if (map[y*mapSize.x + x] == 592 ||
+				map[y*mapSize.x + x] == 593 ||
+				map[y*mapSize.x + x] == 594 ||
+				map[y*mapSize.x + x] == 595) {
 				// (x,y) is a checkpoint
 				return glm::ivec2(x*tileSize, y*tileSize);
 			}
@@ -433,9 +436,9 @@ glm::ivec2 TileMap::getNormalizedCheckpointPosition(glm::ivec2 checkpointPositio
 bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
 	int x = checkpointPosition.x / tileSize;
 	int y = checkpointPosition.y / tileSize;
-	if (map[y*mapSize.x + x] == 595){ // floor checkpoint
+	if (map[y*mapSize.x + x] == 595 || map[y*mapSize.x + x] == 593){ // floor checkpoint
 		return false; // floor
-	} else if (map[y*mapSize.x + x] == 594){ // ceiling checkpoint
+	} else if (map[y*mapSize.x + x] == 594 || map[y*mapSize.x + x] == 592){ // ceiling checkpoint
 		return true;
 	}
 	return false; // in case of doubt assume floor
