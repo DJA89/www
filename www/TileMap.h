@@ -10,6 +10,8 @@
 #include "TileType.h"
 #include "FixedPathEntity.h"
 
+class Checkpoint;
+
 #define LEVEL_DIR string("levels/")
 
 
@@ -38,11 +40,11 @@ public:
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-	glm::ivec2 returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
-	bool isCheckpointUpsideDown(glm::ivec2 checkpointPosition);
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
-	glm::ivec2 getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition);
 	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
+	glm::vec2 getHalfTexel();
+	glm::vec2 getTextureCoordsForTileID(int tileID);
+	glm::vec2 getCorrectedTileTextureSize(); // size - halfTexel
 
 private:
 	bool loadLevel(const string &levelFile);
@@ -54,6 +56,7 @@ private:
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, FixedPathEntity *> entities;
+	std::unordered_map<int, Checkpoint *> checkpoints;
 	Texture tilesheet;
 
 private:
@@ -64,7 +67,7 @@ private:
 	glm::vec2 tileTexSize;
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
-	const static int non_collision_tiles[4];
+	const static int non_collision_tiles[7];
 	const static int death_tiles[2];
 
 };

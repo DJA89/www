@@ -9,6 +9,8 @@
 #include "LevelMap.h"
 #include "SoundSystem.h"
 
+class Checkpoint;
+
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -31,7 +33,7 @@ private:
 	void initShaders();
 	void saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown);
 	void loadGame();
-	void checkForCheckpointCollision();
+	void handleCheckpointCollision(Checkpoint * cp);
 
 public:
 	ShaderProgram texProgram;

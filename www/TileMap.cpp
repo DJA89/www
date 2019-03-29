@@ -10,10 +10,11 @@
 #include "AxisAlignedBoundingBox.h"
 #include "BoundingEllipse.h"
 #include "Utils.h"
+#include "Checkpoint.h"
 
 using namespace std;
 namespace xml = tinyxml2;
-const int TileMap::non_collision_tiles[4] = {0, 140, 465, 595};
+const int TileMap::non_collision_tiles[7] = {0, 140, 465, 592, 593, 594, 595};
 const int TileMap::death_tiles[2] = {140, 465};
 
 TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
@@ -34,13 +35,17 @@ TileMap::~TileMap()
 	if(map != NULL)
 		delete map;
 
-	// remove all platforms
+	// remove all FixedPathEntities
 	for (auto it = entities.begin(); it != entities.cend(); ++it ){
 		delete it->second;
 	}
 	entities.clear();
+	// remove all checkpoints
+	for (auto it = checkpoints.begin(); it != checkpoints.cend(); ++it ){
+		delete it->second;
+	}
+	checkpoints.clear();
 }
-
 
 void TileMap::render() const
 {
@@ -146,21 +151,49 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	}
 	tile = NULL; // not needed anymore
 
-	// extract platforms in object layer
+	// extract entities in object layer
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
 	if (objectgroup){
 		const xml::XMLElement* object;
 		// for each object found
 		object = objectgroup->FirstChildElement("object");
 		while (object){
-			string objectName = object->Attribute("name");
 			int xPos = stoi(object->Attribute("x"));
 			int yPos = stoi(object->Attribute("y"));
 			int width = stoi(object->Attribute("width"));
 			int height = stoi(object->Attribute("height"));
+			if (object->Attribute("name") == NULL){
+				// object has no name
+				cerr << "ERROR: Object with ID=" << object->Attribute("id") << " in the levelmap has no Name. Objects without name cannot be loaded." << endl;
+				object = object->NextSiblingElement("object"); // skip object
+				continue;
+			}
+			string objectName = object->Attribute("name");
 
 			vector<string> objectAttribs = Utils::split(objectName, '_');
-			if (objectAttribs.at(0) == "Platform" || objectAttribs.at(0) == "Enemy"){//  || objectAttribs.at(0) == "Enemy") { // platform vs ...
+			if (objectAttribs.at(0) == "Checkpoint"){
+				Checkpoint * newCheckPoint = new Checkpoint();
+
+				int ID = stoi(object->Attribute("id"));
+				int tileID = stoi(object->Attribute("gid"));
+				newCheckPoint->setTileID(tileID); // tile idx in spritesheet
+				// position is bottom left => correct to top left
+				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
+				newCheckPoint->setPosition(glm::vec2(xPos, yPos - height));
+				newCheckPoint->setSize(glm::vec2(width, height));
+				// add texture coordinates of tile
+				glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
+				newCheckPoint->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+				// add bounding shape to platform
+				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+					// custom collision bounds (rescaled to fit multi-tile)
+					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+					BoundingShape * copyTileBounds = tileBounds->clone();
+					copyTileBounds->rescale(newCheckPoint->getSize() / float(tileSize));
+					newCheckPoint->setBoundingShape(copyTileBounds);
+				}
+				checkpoints[ID] = newCheckPoint;
+			} else if (objectAttribs.at(0) == "Platform" || objectAttribs.at(0) == "Enemy"){//  || objectAttribs.at(0) == "Enemy") { // platform vs ...
 				int ID = stoi(objectAttribs.at(1));
 
 				// check if there is already a platform with this ID
@@ -184,9 +217,8 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					ent->setSize(glm::vec2(width, height));
 					// add texture coordinates of tile
 					// TODO extract: duplicate of this code in prepareArrays()
-					glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
-					ent->setTextureBounds(textureCoords, tileTexSize - halfTexel);
+					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
+					ent->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape to platform
 					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 						// custom collision bounds (rescaled to fit multi-tile)
@@ -206,6 +238,18 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	}
 
 	return true;
+}
+
+glm::vec2 TileMap::getHalfTexel(){
+	return glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
+}
+
+glm::vec2 TileMap::getTextureCoordsForTileID(int tileID){
+	return glm::vec2(float((tileID-1) % tilesheetSize.x) / tilesheetSize.x, float((tileID-1) / tilesheetSize.x) / tilesheetSize.y);
+}
+
+glm::vec2 TileMap::getCorrectedTileTextureSize(){ // size - halfTexel
+	return this->tileTexSize - getHalfTexel();
 }
 
 bool TileMap::isNumber(const string &toCheck){
@@ -269,10 +313,9 @@ bool TileMap::loadLevelTxt(const string &levelFile)
 void TileMap::prepareArrays(ShaderProgram &program)
 {
 	int tile, nTiles = 0;
-	glm::vec2 posTile, texCoordTile[2], halfTexel;
+	glm::vec2 posTile, texCoordTile[2];
 	vector<float> vertices;
 
-	halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
 	for(int j=0; j<mapSize.y; j++)
 	{
 		for(int i=0; i<mapSize.x; i++)
@@ -283,11 +326,10 @@ void TileMap::prepareArrays(ShaderProgram &program)
 				// Non-empty tile
 				nTiles++;
 				posTile = glm::vec2(i * tileSize, j * tileSize);
-				// TODO extract: duplicate of this code in loadLevelTmx()
-				texCoordTile[0] = glm::vec2(float((tile-1)%tilesheetSize.x) / tilesheetSize.x, float((tile-1)/tilesheetSize.x) / tilesheetSize.y);
+				texCoordTile[0] = getTextureCoordsForTileID(tile);
 				texCoordTile[1] = texCoordTile[0] + tileTexSize;
-				//texCoordTile[0] += halfTexel;
-				texCoordTile[1] -= halfTexel;
+				//texCoordTile[0] += getHalfTexel();
+				texCoordTile[1] -= getHalfTexel();
 				// First triangle
 				vertices.push_back(posTile.x); vertices.push_back(posTile.y);
 				vertices.push_back(texCoordTile[0].x); vertices.push_back(texCoordTile[0].y);
@@ -388,54 +430,6 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 		}
 	}
 	return false;
-}
-
-glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
-	int x0, y0, x1, y1, y0disp, y1disp;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	// don't collide on empty space above spider
-	// TODO replace with BoundingShape
-	if (upsidedown) { // don't collide on empty space above spider
-		y0disp = 0;
-		y1disp = -7;
-	}
-	else {
-		y0disp = 7;
-		y1disp = 0;
-	}
-	y0 = (pos.y - 1 + y0disp) / tileSize;
-	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
-	for (int x = x0; x <= x1; x++) {
-		for (int y = y0; y <= y1; y++) {
-			if (map[y*mapSize.x + x] == 595) { // only floor checkpoint
-				// (x,y) is a checkpoint
-				return glm::ivec2(x*tileSize, y*tileSize);
-			}
-		}
-	}
-	return glm::ivec2(0, 0); // no collision with checkpoints found
-}
-
-// x-centered, y touching surface (floor/ceiling) of checkpoint
-glm::ivec2 TileMap::getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition){
-	int x = checkpointPosition.x;
-	int y = checkpointPosition.y;
-	if (isCheckpointUpsideDown(checkpointPosition)){
-		return glm::ivec2(x + tileSize/2, y);
-	} else {
-		return glm::ivec2(x + tileSize/2, y + tileSize);
-	}
-}
-
-bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
-	int x = checkpointPosition.x / tileSize;
-	int y = checkpointPosition.y / tileSize;
-	if (map[y*mapSize.x + x] == 595){ // floor checkpoint
-		return false; // floor
-	}
-	return false; // in case of doubt assume floor
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {

@@ -11,6 +11,11 @@ Entity::~Entity(){
 	}
 }
 
+void Entity::setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){
+	this->textureCoordinates = textureCoordinates;
+	this->textureSize = textureSize;
+}
+
 void Entity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	sprite = Sprite::createSprite(this->size, textureSize, &tilesheet, &shaderProgram);
 	sprite->setPosition(position);

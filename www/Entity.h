@@ -24,7 +24,7 @@ public:
 	void update(int deltaTime);
 	void render();
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
-	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize){ this->textureCoordinates = textureCoordinates; this->textureSize = textureSize; }
+	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize);
 	void setPosition(glm::vec2 initPos){ this->position = initPos; }
 	glm::vec2 getPosition() const { return this->position; }
 	void setSize(glm::vec2 size){ this->size = size; }
