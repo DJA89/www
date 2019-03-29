@@ -40,10 +40,7 @@ public:
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-	glm::ivec2 returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
-	bool isCheckpointUpsideDown(glm::ivec2 checkpointPosition);
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
-	glm::ivec2 getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition);
 	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 
 private:

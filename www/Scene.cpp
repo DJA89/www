@@ -148,20 +148,28 @@ void Scene::update(int deltaTime)
 void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// TODO store checkpoint in checkpoint class (or TileMap class)
 	// TODO => move saving to saveGame() and call if collision
+	// player data
 	glm::ivec2 playerPosition = player->getPosition();
 	glm::ivec2 playerSize = player->getSize();
 	bool upsidedown = player->getIfUpSideDown();
+	// checkpoint data
 	glm::vec2 checkpointPosition = cp->getPosition();
+	glm::vec2 checkpointSize = cp->getSize();
 	int checkpointTileID = cp->getTileID();
+	// get if checkpoint upsidedown
+	bool isCheckpointUpsideDown = (checkpointTileID == 593 || checkpointTileID == 595);
+	// compute normalized checkpoint position
+	glm::ivec2 normalizedCheckpointPosition;
+	if (isCheckpointUpsideDown){
+			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y);
+		} else {
+			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
+		}
 	// change checkpoint image to activated
 	// TODO change checkpoint tile
 
 	// TODO move method calls into saveGame
-	saveGame(
-		map->getNormalizedCheckpointPosition(checkpointPosition),
-		// is upsidedown
-		(checkpointTileID == 593 || checkpointTileID == 595));
-		cout << "checkpoint collision" << endl;
+	saveGame(normalizedCheckpointPosition, isCheckpointUpsideDown);
 }
 
 // normalized: the player will be spawned shifted left by half its length

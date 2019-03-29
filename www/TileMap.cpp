@@ -152,18 +152,24 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	}
 	tile = NULL; // not needed anymore
 
-	// extract platforms in object layer
+	// extract entities in object layer
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
 	if (objectgroup){
 		const xml::XMLElement* object;
 		// for each object found
 		object = objectgroup->FirstChildElement("object");
 		while (object){
-			string objectName = object->Attribute("name");
 			int xPos = stoi(object->Attribute("x"));
 			int yPos = stoi(object->Attribute("y"));
 			int width = stoi(object->Attribute("width"));
 			int height = stoi(object->Attribute("height"));
+			if (object->Attribute("name") == NULL){
+				// object has no name
+				cerr << "ERROR: Object with ID=" << object->Attribute("id") << " in the levelmap has no Name. Objects without name cannot be loaded." << endl;
+				object = object->NextSiblingElement("object"); // skip object
+				continue;
+			}
+			string objectName = object->Attribute("name");
 
 			vector<string> objectAttribs = Utils::split(objectName, '_');
 			if (objectAttribs.at(0) == "Checkpoint"){
@@ -418,60 +424,6 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 		}
 	}
 	return false;
-}
-
-glm::ivec2 TileMap::returnCheckPointIfCollision(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
-	int x0, y0, x1, y1, y0disp, y1disp;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	// don't collide on empty space above spider
-	// TODO replace with BoundingShape
-	if (upsidedown) { // don't collide on empty space above spider
-		y0disp = 0;
-		y1disp = -7;
-	}
-	else {
-		y0disp = 7;
-		y1disp = 0;
-	}
-	y0 = (pos.y - 1 + y0disp) / tileSize;
-	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
-	for (int x = x0; x <= x1; x++) {
-		for (int y = y0; y <= y1; y++) {
-			// if is floor or ceiling checkpoint (unsaved or saved)
-			if (map[y*mapSize.x + x] == 592 ||
-				map[y*mapSize.x + x] == 593 ||
-				map[y*mapSize.x + x] == 594 ||
-				map[y*mapSize.x + x] == 595) {
-				// (x,y) is a checkpoint
-				return glm::ivec2(x*tileSize, y*tileSize);
-			}
-		}
-	}
-	return glm::ivec2(0, 0); // no collision with checkpoints found
-}
-
-// x-centered, y touching surface (floor/ceiling) of checkpoint
-glm::ivec2 TileMap::getNormalizedCheckpointPosition(glm::ivec2 checkpointPosition){
-	int x = checkpointPosition.x;
-	int y = checkpointPosition.y;
-	if (isCheckpointUpsideDown(checkpointPosition)){
-		return glm::ivec2(x + tileSize/2, y);
-	} else {
-		return glm::ivec2(x + tileSize/2, y + tileSize);
-	}
-}
-
-bool TileMap::isCheckpointUpsideDown(glm::ivec2 checkpointPosition){
-	int x = checkpointPosition.x / tileSize;
-	int y = checkpointPosition.y / tileSize;
-	if (map[y*mapSize.x + x] == 595 || map[y*mapSize.x + x] == 593){ // floor checkpoint
-		return false; // floor
-	} else if (map[y*mapSize.x + x] == 594 || map[y*mapSize.x + x] == 592){ // ceiling checkpoint
-		return true;
-	}
-	return false; // in case of doubt assume floor
 }
 
 bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
