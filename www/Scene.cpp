@@ -165,12 +165,26 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 		} else {
 			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
-	// change checkpoint image to activated
-	if (checkpointTileID == 592 || checkpointTileID == 593){
+	// change checkpoint image from spider web to egg
+	if (checkpointTileID == 592 || checkpointTileID == 593){ // spider web
 		int newTileID = cp->getTileID() + 2;
 		cp->setTileID(newTileID); // spider web => egg
 		glm::vec2 newTextureCoords = map->getTextureCoordsForTileID(newTileID);
 		cp->changeTexture(newTextureCoords);
+		// change last checkpoint back to spider web
+		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
+			Checkpoint * other = it->second;
+			if (other != cp){
+				int otherTileID = other->getTileID();
+				if (otherTileID == 594 || otherTileID == 595){ // egg
+					// change egg back to spider web
+					int newOtherTileID = otherTileID - 2;
+					other->setTileID(newOtherTileID); // egg => spider web
+					glm::vec2 newOtherTextureCoords = map->getTextureCoordsForTileID(newOtherTileID);
+					other->changeTexture(newOtherTextureCoords);
+				}
+			}
+		}
 	}
 	// TODO move method calls into saveGame
 	saveGame(normalizedCheckpointPosition, isCheckpointUpsideDown);
