@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="3">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
- <layer name="Tile Layer 1" width="20" height="15">
+ <layer id="1" name="Tile Layer 1" width="20" height="15">
   <data encoding="csv">
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
@@ -20,4 +20,7 @@
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2
 </data>
  </layer>
+ <objectgroup id="2" name="Object Layer 1">
+  <object id="2" name="cb_100_rr" gid="8" x="64" y="96" width="80" height="16"/>
+ </objectgroup>
 </map>

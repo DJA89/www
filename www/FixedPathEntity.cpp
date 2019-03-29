@@ -11,8 +11,8 @@ void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	direction = pathEnd - pathStart; // to right
 }
 
-void FixedPathEntity::setEnemy() {
-	ImEnemy = true;
+void FixedPathEntity::setEnemy(bool amEnemy) {
+	ImEnemy = amEnemy;
 }
 
 void FixedPathEntity::update(int deltaTime){
