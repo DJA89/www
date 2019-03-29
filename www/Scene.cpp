@@ -167,7 +167,10 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 		}
 	// change checkpoint image to activated
 	if (checkpointTileID == 592 || checkpointTileID == 593){
-		cp->setTileID(cp->getTileID() + 2); // spider web => egg
+		int newTileID = cp->getTileID() + 2;
+		cp->setTileID(newTileID); // spider web => egg
+		glm::vec2 newTextureCoords = map->getTextureCoordsForTileID(newTileID);
+		cp->changeTexture(newTextureCoords);
 	}
 	// TODO move method calls into saveGame
 	saveGame(normalizedCheckpointPosition, isCheckpointUpsideDown);

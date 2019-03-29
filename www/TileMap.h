@@ -42,6 +42,9 @@ public:
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
 	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
+	glm::vec2 getHalfTexel();
+	glm::vec2 getTextureCoordsForTileID(int tileID);
+	glm::vec2 getCorrectedTileTextureSize(); // size - halfTexel
 
 private:
 	bool loadLevel(const string &levelFile);
@@ -49,8 +52,6 @@ private:
 	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
-	glm::vec2 getHalfTexel();
-	glm::vec2 getTextureCoordsForTileID(int tileID);
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;

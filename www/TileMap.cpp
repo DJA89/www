@@ -47,7 +47,6 @@ TileMap::~TileMap()
 	checkpoints.clear();
 }
 
-
 void TileMap::render() const
 {
 	glEnable(GL_TEXTURE_2D);
@@ -184,7 +183,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				newCheckPoint->setSize(glm::vec2(width, height));
 				// add texture coordinates of tile
 				glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
-				newCheckPoint->setTextureBounds(textureCoords, tileTexSize - getHalfTexel());
+				newCheckPoint->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 				// add bounding shape to platform
 				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 					// custom collision bounds (rescaled to fit multi-tile)
@@ -219,7 +218,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					// add texture coordinates of tile
 					// TODO extract: duplicate of this code in prepareArrays()
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
-					ent->setTextureBounds(textureCoords, tileTexSize - getHalfTexel());
+					ent->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape to platform
 					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 						// custom collision bounds (rescaled to fit multi-tile)
@@ -247,6 +246,10 @@ glm::vec2 TileMap::getHalfTexel(){
 
 glm::vec2 TileMap::getTextureCoordsForTileID(int tileID){
 	return glm::vec2(float((tileID-1) % tilesheetSize.x) / tilesheetSize.x, float((tileID-1) / tilesheetSize.x) / tilesheetSize.y);
+}
+
+glm::vec2 TileMap::getCorrectedTileTextureSize(){ // size - halfTexel
+	return this->tileTexSize - getHalfTexel();
 }
 
 bool TileMap::isNumber(const string &toCheck){

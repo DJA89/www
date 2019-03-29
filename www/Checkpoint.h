@@ -23,6 +23,7 @@ public:
 	void setTileID(int tileID) { this->tileID = tileID; }
 	int getTileID() { return this->tileID; }
 	void handleCollision(Entity & e);
+	void changeTexture(glm::vec2 newTextureCoords);
 
 private:
 	int tileID; // index in stylesheet
