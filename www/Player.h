@@ -24,6 +24,7 @@ public:
 	void setPosition(const glm::vec2 &pos);
 	void playerFalling(int);
 	bool hasDied();
+	bool isDying();
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
 	void handleCollisionWithPlatform(FixedPathEntity & platform);
@@ -35,7 +36,6 @@ public:
 	glm::ivec2 getSize(){ return sizePlayer; }
 	bool getIfUpSideDown(){ return upsidedown; }
 	void endGame();
-	bool isDying();
 
 
 

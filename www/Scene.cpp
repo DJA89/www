@@ -73,25 +73,31 @@ void Scene::update(int deltaTime)
 		loadGame();
 	}
 	// update all moving entities: platforms, player, ...
-	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
-		it->second->update(deltaTime);
+	if(!player->isDying()) {
+		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+			it->second->update(deltaTime);
+		}
 	}
+
 	player->update(deltaTime);
 	checkForCheckpointCollision();
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
-	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
-		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
-			FixedPathEntity * ent = it->second;
-			if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
-				if (ent->IsEnemy()) {
-					player->handleCollisionWithDeath(*ent);
+	if (!player->isDying()) {
+		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
+			for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+				FixedPathEntity * ent = it->second;
+				if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
+					if (ent->IsEnemy()) {
+						player->handleCollisionWithDeath(*ent);
+						break;
+					}
+					else {
+						player->handleCollisionWithPlatform(*ent);
+					}
+					// cout << "PLAYER with platform collision" << endl;
 				}
-				else {
-					player->handleCollisionWithPlatform(*ent);
-				}
-				// cout << "PLAYER with platform collision" << endl;
 			}
 		}
 	}
@@ -149,12 +155,16 @@ void Scene::loadGame(){
 	// TODO improvement: store normalizedPosition and upsidedown in a PlayerState class and currentLevel in a LevelState class
 	// levelmap
 	int currentScreen = savedState.getSavedScreen();
-	// TODO move tilemap management to levelmap
-	levelMap.setCurrentScreen(currentScreen);
-	// map
-	if (map != NULL) delete map; // destroy current map
-	string levelName = levelMap.nameOfCurrentLevel();
-	loadLevel(levelName);
+	if (levelMap.getCurrentScreen() != currentScreen) {
+		// TODO move tilemap management to levelmap
+		levelMap.setCurrentScreen(currentScreen);
+		// map
+		if (map != NULL) delete map; // destroy current map
+		string levelName = levelMap.nameOfCurrentLevel();
+
+		loadLevel(levelName);
+	}
+
 	// player related
 	player->setTileMap(map);
 	bool upsidedown = savedState.getSavedUpsideDown();
