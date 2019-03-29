@@ -14,7 +14,7 @@
 
 using namespace std;
 namespace xml = tinyxml2;
-const int TileMap::non_collision_tiles[7] = {0, 140, 465, 592, 593, 594, 595};
+const int TileMap::non_collision_tiles[3] = {0, 140, 465};
 const int TileMap::death_tiles[2] = {140, 465};
 
 TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
