@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="34">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="35">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="1" name="Tile Layer 1" width="20" height="15">
   <data encoding="csv">
@@ -13,7 +13,7 @@
 2,2,2,2,2,0,0,2,2,2,2,0,0,2,0,0,0,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,2,2,2,
-2,2,2,2,0,0,0,0,0,0,0,595,0,0,0,0,0,2,2,2,
+2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
 2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,
@@ -45,5 +45,6 @@
   <object id="31" name="Enemy_10_path" x="96" y="48" width="16" height="64"/>
   <object id="32" name="Enemy_11_path" x="80" y="64" width="16" height="64"/>
   <object id="33" name="Enemy_12_path" x="96" y="64" width="16" height="64"/>
+  <object id="34" name="Checkpoint" gid="593" x="160" y="176" width="16" height="16"/>
  </objectgroup>
 </map>

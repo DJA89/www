@@ -24,6 +24,5 @@
   <object id="11" name="Platform_1_path" x="32" y="144" width="176" height="16"/>
   <object id="13" name="Platform_1_spawn" gid="58" x="156" y="160" width="32" height="16"/>
   <object id="19" name="Checkpoint" gid="592" x="64" y="192" width="16" height="16"/>
-  <object id="21" name="Checkpoint" gid="593" x="96" y="64" width="16" height="16"/>
  </objectgroup>
 </map>
