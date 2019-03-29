@@ -10,6 +10,7 @@
 #include "AxisAlignedBoundingBox.h"
 #include "BoundingEllipse.h"
 #include "Utils.h"
+#include "Checkpoint.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -34,11 +35,16 @@ TileMap::~TileMap()
 	if(map != NULL)
 		delete map;
 
-	// remove all platforms
+	// remove all FixedPathEntities
 	for (auto it = entities.begin(); it != entities.cend(); ++it ){
 		delete it->second;
 	}
 	entities.clear();
+	// remove all checkpoints
+	for (auto it = checkpoints.begin(); it != checkpoints.cend(); ++it ){
+		delete it->second;
+	}
+	checkpoints.clear();
 }
 
 
@@ -160,7 +166,31 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			int height = stoi(object->Attribute("height"));
 
 			vector<string> objectAttribs = Utils::split(objectName, '_');
-			if (objectAttribs.at(0) == "Platform" || objectAttribs.at(0) == "Enemy"){//  || objectAttribs.at(0) == "Enemy") { // platform vs ...
+			if (objectAttribs.at(0) == "Checkpoint"){
+				Checkpoint * newCheckPoint = new Checkpoint();
+
+				int ID = stoi(object->Attribute("id"));
+				int tileID = stoi(object->Attribute("gid"));
+				newCheckPoint->setTileID(tileID); // tile idx in spritesheet
+				// position is bottom left => correct to top left
+				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
+				newCheckPoint->setPosition(glm::vec2(xPos, yPos - height));
+				newCheckPoint->setSize(glm::vec2(width, height));
+				// add texture coordinates of tile
+				// TODO extract: duplicate of this code in prepareArrays()
+				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
+				glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
+				newCheckPoint->setTextureBounds(textureCoords, tileTexSize - halfTexel);
+				// add bounding shape to platform
+				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+					// custom collision bounds (rescaled to fit multi-tile)
+					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+					BoundingShape * copyTileBounds = tileBounds->clone();
+					copyTileBounds->rescale(newCheckPoint->getSize() / float(tileSize));
+					newCheckPoint->setBoundingShape(copyTileBounds);
+				}
+				checkpoints[ID] = newCheckPoint;
+			} else if (objectAttribs.at(0) == "Platform" || objectAttribs.at(0) == "Enemy"){//  || objectAttribs.at(0) == "Enemy") { // platform vs ...
 				int ID = stoi(objectAttribs.at(1));
 
 				// check if there is already a platform with this ID

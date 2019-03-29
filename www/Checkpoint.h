@@ -21,6 +21,7 @@ public:
 	void render();
 
 	void setTileID(int tileID) { this->tileID = tileID; }
+	int getTileID() { return this->tileID; }
 	void handleCollision(Entity & e);
 
 private:

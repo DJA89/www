@@ -10,6 +10,8 @@
 #include "TileType.h"
 #include "FixedPathEntity.h"
 
+class Checkpoint;
+
 #define LEVEL_DIR string("levels/")
 
 
@@ -54,6 +56,7 @@ private:
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, FixedPathEntity *> entities;
+	std::unordered_map<int, Checkpoint *> checkpoints;
 	Texture tilesheet;
 
 private:

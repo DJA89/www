@@ -7,6 +7,7 @@
 #include "BoundingShape.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Intersection.h"
+#include "Checkpoint.h"
 
 // initial player position
 #define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
@@ -58,6 +59,11 @@ void Scene::loadLevel(string levelName){
 		FixedPathEntity * p = it->second;
 		p->init(map->tilesheet, texProgram);
 	}
+	// checkpoints
+	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
+		Checkpoint * c = it->second;
+		c->init(map->tilesheet, texProgram);
+	}
 }
 
 void Scene::endGame() {
@@ -77,15 +83,18 @@ void Scene::update(int deltaTime)
 		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 			it->second->update(deltaTime);
 		}
+		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
+			it->second->update(deltaTime);
+		}
 	}
 
 	player->update(deltaTime);
-	checkForCheckpointCollision();
 	// check for collisions between player and platforms
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
 	if (!player->isDying()) {
 		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
+			// FixedPathEntities
 			for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 				FixedPathEntity * ent = it->second;
 				if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
@@ -97,6 +106,13 @@ void Scene::update(int deltaTime)
 						player->handleCollisionWithPlatform(*ent);
 					}
 					// cout << "PLAYER with platform collision" << endl;
+				}
+			}
+			// checkpoints
+			for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
+				Checkpoint * cp = it->second;
+				if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
+					handleCheckpointCollision(cp);
 				}
 			}
 		}
@@ -129,21 +145,23 @@ void Scene::update(int deltaTime)
 	}
 }
 
-void Scene::checkForCheckpointCollision(){
+void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// TODO store checkpoint in checkpoint class (or TileMap class)
 	// TODO => move saving to saveGame() and call if collision
 	glm::ivec2 playerPosition = player->getPosition();
 	glm::ivec2 playerSize = player->getSize();
 	bool upsidedown = player->getIfUpSideDown();
-	glm::ivec2 checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
-	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
-		// change checkpoint image to activated
-		// TODO change checkpoint tile
-		// TODO move method calls into saveGame
-		saveGame(
-			map->getNormalizedCheckpointPosition(checkpointPosition),
-			map->isCheckpointUpsideDown(checkpointPosition));
-	}
+	glm::vec2 checkpointPosition = cp->getPosition();
+	int checkpointTileID = cp->getTileID();
+	// change checkpoint image to activated
+	// TODO change checkpoint tile
+
+	// TODO move method calls into saveGame
+	saveGame(
+		map->getNormalizedCheckpointPosition(checkpointPosition),
+		// is upsidedown
+		(checkpointTileID == 593 || checkpointTileID == 595));
+		cout << "checkpoint collision" << endl;
 }
 
 // normalized: the player will be spawned shifted left by half its length
@@ -186,6 +204,9 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); // TODO remove
 	// render map, all platforms and player
 	map->render();
+	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
+		it->second->render();
+	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
 		it->second->render();
 	}
