@@ -137,6 +137,8 @@ void Scene::checkForCheckpointCollision(){
 	bool upsidedown = player->getIfUpSideDown();
 	glm::ivec2 checkpointPosition = map->returnCheckPointIfCollision(playerPosition, playerSize, upsidedown);
 	if (checkpointPosition != glm::ivec2(0, 0)){ // (0,0) means no collision
+		// change checkpoint image to activated
+		// TODO change checkpoint tile
 		// TODO move method calls into saveGame
 		saveGame(
 			map->getNormalizedCheckpointPosition(checkpointPosition),
