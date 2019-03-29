@@ -27,8 +27,9 @@ public:
 	bool isDying();
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
-	void handleCollisionWithPlatform(FixedPathEntity & platform);
+	void handleCollisionWithPlatform(Entity & platform);
 	void handleCollisionWithDeath(FixedPathEntity & platform);
+	//void handleCollisionWithCB(ConveyorBelt & cb);
 
 	glm::ivec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
@@ -46,12 +47,13 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	int playerMovementSpeed = 4;
-	float minimalStandingFraction = 0.5f; // of sizePlayer.x
+	float minimalStandingFractionPlatform = 0.5f; // of sizePlayer.x
+	float minimalStandingFractionConveyorBelt = 0.05f;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	bool renderInDeath();
 	bool isStandingOnPlatform;
-	FixedPathEntity * standingOn;
+	Entity * standingOn;
 	SoundSystemClass sound;
 	SoundClass soundSample;
 };

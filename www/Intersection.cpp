@@ -37,3 +37,7 @@ bool Intersection::check(const BoundingEllipse & be1, const BoundingEllipse & be
 	cout << "NOT IMPLEMENTED: ellipse-ellipse" << endl;
 	return false;
 }
+
+bool Intersection::check(const glm::vec2 & ps1, const glm::vec2 & ps2) {
+	return false;
+}

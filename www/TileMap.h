@@ -9,6 +9,7 @@
 #include "SavedState.h"
 #include "TileType.h"
 #include "FixedPathEntity.h"
+#include "ConveyorBelt.h"
 
 class Checkpoint;
 
@@ -55,7 +56,8 @@ private:
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
-	std::unordered_map<int, FixedPathEntity *> entities;
+	std::unordered_map<int, Entity *> entities;
+	std::unordered_map<int, ConveyorBelt *> cbfs;
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	Texture tilesheet;
 
