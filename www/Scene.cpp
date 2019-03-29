@@ -166,8 +166,9 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
 	// change checkpoint image to activated
-	// TODO change checkpoint tile
-
+	if (checkpointTileID == 592 || checkpointTileID == 593){
+		cp->setTileID(cp->getTileID() + 2); // spider web => egg
+	}
 	// TODO move method calls into saveGame
 	saveGame(normalizedCheckpointPosition, isCheckpointUpsideDown);
 }

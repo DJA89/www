@@ -183,10 +183,8 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				newCheckPoint->setPosition(glm::vec2(xPos, yPos - height));
 				newCheckPoint->setSize(glm::vec2(width, height));
 				// add texture coordinates of tile
-				// TODO extract: duplicate of this code in prepareArrays()
-				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-				glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
-				newCheckPoint->setTextureBounds(textureCoords, tileTexSize - halfTexel);
+				glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
+				newCheckPoint->setTextureBounds(textureCoords, tileTexSize - getHalfTexel());
 				// add bounding shape to platform
 				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 					// custom collision bounds (rescaled to fit multi-tile)
@@ -220,9 +218,8 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					ent->setSize(glm::vec2(width, height));
 					// add texture coordinates of tile
 					// TODO extract: duplicate of this code in prepareArrays()
-					glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-					glm::vec2 textureCoords = glm::vec2(float((tileID-1)%tilesheetSize.x) / tilesheetSize.x, float((tileID-1)/tilesheetSize.x) / tilesheetSize.y);
-					ent->setTextureBounds(textureCoords, tileTexSize - halfTexel);
+					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
+					ent->setTextureBounds(textureCoords, tileTexSize - getHalfTexel());
 					// add bounding shape to platform
 					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
 						// custom collision bounds (rescaled to fit multi-tile)
@@ -242,6 +239,14 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	}
 
 	return true;
+}
+
+glm::vec2 TileMap::getHalfTexel(){
+	return glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
+}
+
+glm::vec2 TileMap::getTextureCoordsForTileID(int tileID){
+	return glm::vec2(float((tileID-1) % tilesheetSize.x) / tilesheetSize.x, float((tileID-1) / tilesheetSize.x) / tilesheetSize.y);
 }
 
 bool TileMap::isNumber(const string &toCheck){
@@ -305,10 +310,9 @@ bool TileMap::loadLevelTxt(const string &levelFile)
 void TileMap::prepareArrays(ShaderProgram &program)
 {
 	int tile, nTiles = 0;
-	glm::vec2 posTile, texCoordTile[2], halfTexel;
+	glm::vec2 posTile, texCoordTile[2];
 	vector<float> vertices;
 
-	halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
 	for(int j=0; j<mapSize.y; j++)
 	{
 		for(int i=0; i<mapSize.x; i++)
@@ -319,11 +323,10 @@ void TileMap::prepareArrays(ShaderProgram &program)
 				// Non-empty tile
 				nTiles++;
 				posTile = glm::vec2(i * tileSize, j * tileSize);
-				// TODO extract: duplicate of this code in loadLevelTmx()
-				texCoordTile[0] = glm::vec2(float((tile-1)%tilesheetSize.x) / tilesheetSize.x, float((tile-1)/tilesheetSize.x) / tilesheetSize.y);
+				texCoordTile[0] = getTextureCoordsForTileID(tile);
 				texCoordTile[1] = texCoordTile[0] + tileTexSize;
-				//texCoordTile[0] += halfTexel;
-				texCoordTile[1] -= halfTexel;
+				//texCoordTile[0] += getHalfTexel();
+				texCoordTile[1] -= getHalfTexel();
 				// First triangle
 				vertices.push_back(posTile.x); vertices.push_back(posTile.y);
 				vertices.push_back(texCoordTile[0].x); vertices.push_back(texCoordTile[0].y);

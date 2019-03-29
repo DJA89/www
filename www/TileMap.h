@@ -49,6 +49,8 @@ private:
 	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
+	glm::vec2 getHalfTexel();
+	glm::vec2 getTextureCoordsForTileID(int tileID);
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
