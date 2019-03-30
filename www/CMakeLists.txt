@@ -10,6 +10,9 @@ execute_process(COMMAND ln -s ../sounds)
 
 set(appName Bubble)
 
+# use for debugging with gdb
+set(CMAKE_BUILD_TYPE Debug)
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
@@ -30,6 +33,6 @@ link_directories(${GLUT_LIBRARY_DIRS})
 link_directories(${GLEW_LIBRARY_DIRS})
 link_directories(${SOIL_LIBRARY_DIRS})
 
-add_executable(${appName} Checkpoint.h Checkpoint.cpp SoundSystem.h SoundSystem.cpp Entity.h Entity.cpp FixedPathEntity.h FixedPathEntity.cpp AxisAlignedBoundingBox.h AxisAlignedBoundingBox.cpp BoundingShape.h BoundingEllipse.h BoundingEllipse.cpp Intersection.h Intersection.cpp TileType.h TileType.cpp Utils.h Utils.cpp SavedState.h SavedState.cpp LevelMap.h LevelMap.cpp lib/tinyxml2.h lib/tinyxml2.cpp Player.h Player.cpp AnimKeyframes.h Sprite.h Sprite.cpp TileMap.h TileMap.cpp Texture.h Texture.cpp Scene.h Scene.cpp Shader.h Shader.cpp ShaderProgram.h ShaderProgram.cpp Game.h Game.cpp main.cpp)
+add_executable(${appName} DeathTile.h DeathTile.cpp Checkpoint.h Checkpoint.cpp SoundSystem.h SoundSystem.cpp Entity.h Entity.cpp FixedPathEntity.h FixedPathEntity.cpp AxisAlignedBoundingBox.h AxisAlignedBoundingBox.cpp BoundingShape.h BoundingEllipse.h BoundingEllipse.cpp Intersection.h Intersection.cpp TileType.h TileType.cpp Utils.h Utils.cpp SavedState.h SavedState.cpp LevelMap.h LevelMap.cpp lib/tinyxml2.h lib/tinyxml2.cpp Player.h Player.cpp AnimKeyframes.h Sprite.h Sprite.cpp TileMap.h TileMap.cpp Texture.h Texture.cpp Scene.h Scene.cpp Shader.h Shader.cpp ShaderProgram.h ShaderProgram.cpp Game.h Game.cpp main.cpp)
 
 target_link_libraries(${appName} fmod ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${SOIL_LIBRARIES} ${FREETYPE_LIBRARIES}) # ${GLM_LIBRARIES}

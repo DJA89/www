@@ -3,16 +3,25 @@
 
 
 #include <glm/glm.hpp>
+#include <vector>
 #include <unordered_map>
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "SavedState.h"
 #include "TileType.h"
 #include "FixedPathEntity.h"
+#include "DeathTile.h"
 
 class Checkpoint;
 
 #define LEVEL_DIR string("levels/")
+
+// hardcoded tile IDs (like in tilesheet)
+#define EMPTY_TILE 0
+#define CHECKPOINT_UNSAVED_FLOOR 591
+#define CHECKPOINT_UNSAVED_CEILING 592
+#define CHECKPOINT_SAVED_FLOOR 593
+#define CHECKPOINT_SAVED_CEILING 594
 
 
 // Class Tilemap is capable of loading a tile map from a text file in a very
@@ -41,7 +50,6 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
-	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 	glm::vec2 getHalfTexel();
 	glm::vec2 getTextureCoordsForTileID(int tileID);
 	glm::vec2 getCorrectedTileTextureSize(); // size - halfTexel
@@ -52,11 +60,14 @@ private:
 	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
+	bool tileIsCollidable(int tileID) const;
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, FixedPathEntity *> entities;
 	std::unordered_map<int, Checkpoint *> checkpoints;
+	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
+	vector<DeathTile *> flames;
 	Texture tilesheet;
 
 private:
@@ -65,10 +76,10 @@ private:
 	GLint posLocation, texCoordLocation;
 	int tileSize, blockSize;
 	glm::vec2 tileTexSize;
+	int tileIDOffset; // map is offset with this value
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
-	const static int non_collision_tiles[3];
-	const static int death_tiles[2];
+	const static int non_collision_tiles[1];
 
 };
 

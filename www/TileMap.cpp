@@ -14,8 +14,9 @@
 
 using namespace std;
 namespace xml = tinyxml2;
-const int TileMap::non_collision_tiles[3] = {0, 140, 465};
-const int TileMap::death_tiles[2] = {140, 465};
+
+// non collidable tiles (which are not entities)
+const int TileMap::non_collision_tiles[1] = {EMPTY_TILE};
 
 TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
 {
@@ -45,6 +46,16 @@ TileMap::~TileMap()
 		delete it->second;
 	}
 	checkpoints.clear();
+	// remove all animated tiles
+	for (auto it = animatedTiles.begin(); it != animatedTiles.cend(); ++it ){
+		delete it->second;
+	}
+	animatedTiles.clear();
+	// remove all flames
+	for (auto it = flames.begin(); it != flames.cend(); ++it ){
+		delete *it; // first => because vector
+	}
+	flames.clear();
 }
 
 void TileMap::render() const
@@ -84,6 +95,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tileSize = atoi(mapConf->Attribute("tilewidth"));
 	blockSize = tileSize; // TODO differentiate???
 
+	// get tileID offset used for levelmap (levelMap-ID = spritesheet-ID + offset)
+	tileIDOffset = stoi(mapConf->FirstChildElement("tileset")->Attribute("firstgid"));
+
 	// get tilesheet name and config
 	string tileSetTmxName = mapConf->FirstChildElement("tileset")->Attribute("source");
 	xml::XMLDocument tileSetTmx;
@@ -102,26 +116,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tilesheet.setMinFilter(GL_NEAREST); // Pixelated look
 	tilesheet.setMagFilter(GL_NEAREST); // Pixelated look
 
-	// extract tilemap data
-	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
-	map = new int[mapSize.x * mapSize.y];
-	string row;
-	getline(tiles, row); // skip empty line
-	for (int j = 0; j < mapSize.y; j++){
-		getline(tiles, row); // for each row
-		istringstream ss(row);
-		for (int i = 0; i < mapSize.x; i++){
-			string tileID;
-			getline(ss, tileID, ','); // split into tiles
-			if (isNumber(tileID)){
-				// INFO: 0 means empty, texture tiles start with 1
-				map[j*mapSize.x + i] = stoi(tileID);
-			} else {
-			}
-		}
-	}
-
-	// load collision bounding-shapes for tiles
+	// load collision bounding-shapes for tiles (tilesheet => no offset)
 	const xml::XMLElement * tile;
 	// for each tile found
 	tile = tileSetConf->FirstChildElement("tile");
@@ -146,12 +141,67 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		}
 		TileType * tileType = new TileType(tileID, bs);
 		tileTypeByID[tileID] = tileType;
+		// has animations
+		if (tile->FirstChildElement("animation") != NULL){
+			const xml::XMLElement * frame = tile->FirstChildElement("animation")->FirstChildElement("frame");
+			vector<int> * frames = new vector<int>();
+			while(frame){
+				int frameTileID = stoi(frame->Attribute("tileid"));
+				frames->push_back(frameTileID);
+				// next frame
+				frame = frame->NextSiblingElement("frame");
+			}
+			animatedTiles[tileID] = frames;
+		}
 		// next iteration
 		tile = tile->NextSiblingElement("tile");
 	}
 	tile = NULL; // not needed anymore
 
-	// extract entities in object layer
+	// extract tilemap data (levelmap => offset)
+	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
+	map = new int[mapSize.x * mapSize.y];
+	string row;
+	getline(tiles, row); // skip empty line
+	for (int j = 0; j < mapSize.y; j++){
+		getline(tiles, row); // for each row
+		istringstream ss(row);
+		for (int i = 0; i < mapSize.x; i++){
+			string tileID_s;
+			getline(ss, tileID_s, ','); // split into tiles
+			if (isNumber(tileID_s)){
+				// INFO: 0 means empty, texture tiles start with 1
+				int tileID = stoi(tileID_s) - tileIDOffset; // remove offset
+				if (tileID <= 0){ // tile has tileid=0 or is empty
+					map[j*mapSize.x + i] = 0; // empty tiles => 0
+				} else if (animatedTiles.count(tileID) == 0){ // not animated
+					// add to map
+					map[j*mapSize.x + i] = tileID;
+				} else { // is animated
+					map[j*mapSize.x + i] = 0; // empty
+					// create new Entity (for each *single* tile)
+					DeathTile * newDeathTile = new DeathTile();
+					newDeathTile->setTileID(tileID);
+					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
+					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
+					// set texture
+					// add texture coordinates of tile
+					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
+					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+					// add bounding shape
+					if (tileTypeByID.count(tileID) == 1){ // -1 because IDs start with 1
+						// custom collision bounds (rescaled to fit multi-tile)
+						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
+						BoundingShape * copyTileBounds = tileBounds->clone();
+						newDeathTile->setBoundingShape(copyTileBounds);
+					}
+					flames.push_back(newDeathTile); // store
+				}
+			}
+		}
+	}
+
+	// extract entities in object layer (levelmap => offset)
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
 	if (objectgroup){
 		const xml::XMLElement* object;
@@ -175,7 +225,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				Checkpoint * newCheckPoint = new Checkpoint();
 
 				int ID = stoi(object->Attribute("id"));
-				int tileID = stoi(object->Attribute("gid"));
+				int tileID = stoi(object->Attribute("gid")) - tileIDOffset; // remove offset
 				newCheckPoint->setTileID(tileID); // tile idx in spritesheet
 				// position is bottom left => correct to top left
 				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
@@ -185,9 +235,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
 				newCheckPoint->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 				// add bounding shape to platform
-				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+				if (tileTypeByID.count(tileID) == 1){
 					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+					BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 					BoundingShape * copyTileBounds = tileBounds->clone();
 					copyTileBounds->rescale(newCheckPoint->getSize() / float(tileSize));
 					newCheckPoint->setBoundingShape(copyTileBounds);
@@ -206,7 +256,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					entities[ID] = ent;
 				}
 				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
-					int tileID = stoi(object->Attribute("gid"));
+					int tileID = stoi(object->Attribute("gid")) - tileIDOffset; // remove offset
 					if (objectAttribs.at(0) == "Enemy") {
 						ent->setEnemy();
 					}
@@ -220,9 +270,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
 					ent->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape to platform
-					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+					if (tileTypeByID.count(tileID) == 1){
 						// custom collision bounds (rescaled to fit multi-tile)
-						BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 						BoundingShape * copyTileBounds = tileBounds->clone();
 						copyTileBounds->rescale(ent->getSize() / float(tileSize));
 						ent->setBoundingShape(copyTileBounds);
@@ -245,7 +295,7 @@ glm::vec2 TileMap::getHalfTexel(){
 }
 
 glm::vec2 TileMap::getTextureCoordsForTileID(int tileID){
-	return glm::vec2(float((tileID-1) % tilesheetSize.x) / tilesheetSize.x, float((tileID-1) / tilesheetSize.x) / tilesheetSize.y);
+	return glm::vec2(float(tileID % tilesheetSize.x) / tilesheetSize.x, float(tileID / tilesheetSize.x) / tilesheetSize.y);
 }
 
 glm::vec2 TileMap::getCorrectedTileTextureSize(){ // size - halfTexel
@@ -361,6 +411,14 @@ void TileMap::prepareArrays(ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
+bool TileMap::tileIsCollidable(int tileID) const {
+	// if find runs to end (doesnt find) in non_collision_tiles => collidable
+	return (std::find(std::begin(non_collision_tiles),
+	                  std::end(non_collision_tiles),
+	                  tileID)
+	        == std::end(non_collision_tiles));
+}
+
 bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
@@ -370,11 +428,11 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			return true;
 		}
 	}
+	// no collision with collidable tile
 	return false;
 }
 
@@ -387,8 +445,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			return true;
 		}
 	}
@@ -404,8 +461,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			*posY = tileSize * y - size.y;
 			return true;
 		}
@@ -422,36 +478,9 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = (pos.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		int aux = map[y*mapSize.x + x];
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			*posY = tileSize * (y + 1);
 			return true;
-		}
-	}
-	return false;
-}
-
-bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
-	int x0, y0, x1, y1, y0disp, y1disp;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	if (upsidedown) {
-		y0disp = 0;
-		y1disp = -7;
-	}
-	else {
-		y0disp = 7;
-		y1disp = 0;
-	}
-	y0 = (pos.y - 1 + y0disp) / tileSize;
-	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
-	for (int x = x0; x <= x1; x++) {
-		for (int y = y0; y <= y1; y++) {
-			if ((std::find(std::begin(death_tiles), std::end(death_tiles), map[y*mapSize.x + x]) != std::end(death_tiles))) {
-				return true;
-			}
 		}
 	}
 	return false;

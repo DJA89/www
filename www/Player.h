@@ -28,7 +28,7 @@ public:
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
 	void handleCollisionWithPlatform(FixedPathEntity & platform);
-	void handleCollisionWithDeath(FixedPathEntity & platform);
+	void handleCollisionWithDeath(Entity & e);
 
 	glm::ivec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }

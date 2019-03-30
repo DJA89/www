@@ -64,6 +64,25 @@ void Scene::loadLevel(string levelName){
 		Checkpoint * c = it->second;
 		c->init(map->tilesheet, texProgram);
 	}
+	// flames
+	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
+		DeathTile * d = *it;
+		d->init(map->tilesheet, texProgram);
+		// animations can be added ONLY after init call (sprite must exist)
+		int tileID = d->getTileID();
+		vector<int> * frameIDs = map->animatedTiles[tileID];
+		if (frameIDs != NULL){ // has animations
+			int animationNumber = frameIDs->size();
+			d->setNumberAnimations(animationNumber);
+			// add all animations
+			for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
+				int frameTileID = *it;
+				d->addAnimation(map->getTextureCoordsForTileID(frameTileID));
+			}
+		} else {
+			cout << tileID << endl;
+		}
+	}
 }
 
 void Scene::endGame() {
@@ -86,10 +105,13 @@ void Scene::update(int deltaTime)
 		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 			it->second->update(deltaTime);
 		}
+		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+			(*it)->update(deltaTime);
+		}
 	}
 
 	player->update(deltaTime);
-	// check for collisions between player and platforms
+	// check for collisions between player and entities
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
 	if (!player->isDying()) {
@@ -113,6 +135,13 @@ void Scene::update(int deltaTime)
 				Checkpoint * cp = it->second;
 				if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
 					handleCheckpointCollision(cp);
+				}
+			}
+			// flames
+			for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+				DeathTile * dt = *it;
+				if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
+					player->handleCollisionWithDeath(*dt);
 				}
 			}
 		}
@@ -157,7 +186,7 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	glm::vec2 checkpointSize = cp->getSize();
 	int checkpointTileID = cp->getTileID();
 	// get if checkpoint upsidedown
-	bool isCheckpointUpsideDown = (checkpointTileID == 593 || checkpointTileID == 595);
+	bool isCheckpointUpsideDown = (checkpointTileID == CHECKPOINT_UNSAVED_CEILING || checkpointTileID == CHECKPOINT_SAVED_CEILING);
 	// compute normalized checkpoint position
 	glm::ivec2 normalizedCheckpointPosition;
 	if (isCheckpointUpsideDown){
@@ -165,9 +194,14 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 		} else {
 			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
-	// change checkpoint image from spider web to egg
-	if (checkpointTileID == 592 || checkpointTileID == 593){ // spider web
-		int newTileID = cp->getTileID() + 2;
+	// change checkpoint image from unsaved to saved
+	if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR || checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
+		int newTileID;
+		if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR){
+			newTileID = CHECKPOINT_SAVED_FLOOR;
+		} else if (checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
+			newTileID = CHECKPOINT_SAVED_CEILING;
+		}
 		cp->setTileID(newTileID); // spider web => egg
 		glm::vec2 newTextureCoords = map->getTextureCoordsForTileID(newTileID);
 		cp->changeTexture(newTextureCoords);
@@ -176,9 +210,14 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 			Checkpoint * other = it->second;
 			if (other != cp){
 				int otherTileID = other->getTileID();
-				if (otherTileID == 594 || otherTileID == 595){ // egg
-					// change egg back to spider web
-					int newOtherTileID = otherTileID - 2;
+				if (otherTileID == CHECKPOINT_SAVED_FLOOR || otherTileID == CHECKPOINT_SAVED_CEILING){
+					// change saved back to unsaved
+					int newOtherTileID;
+					if (otherTileID == CHECKPOINT_SAVED_FLOOR){
+						newOtherTileID = CHECKPOINT_UNSAVED_FLOOR;
+					} else if (otherTileID == CHECKPOINT_SAVED_CEILING){
+						newOtherTileID = CHECKPOINT_UNSAVED_CEILING;
+					}
 					other->setTileID(newOtherTileID); // egg => spider web
 					glm::vec2 newOtherTextureCoords = map->getTextureCoordsForTileID(newOtherTileID);
 					other->changeTexture(newOtherTextureCoords);
@@ -232,6 +271,9 @@ void Scene::render()
 	map->render();
 	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
 		it->second->render();
+	}
+	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
+		(*it)->render();
 	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
 		it->second->render();
