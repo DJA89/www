@@ -68,6 +68,16 @@ void Scene::loadLevel(string levelName){
 	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
 		DeathTile * d = *it;
 		d->init(map->tilesheet, texProgram);
+		// animations can be added ONLY after init call (sprite must exist)
+		int tileID = d->getTileID();
+		vector<int> * frameIDs = map->animatedTiles[tileID];
+		int animationNumber = frameIDs->size();
+		d->setNumberAnimations(animationNumber);
+		// add all animations
+		for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
+			int frameTileID = *it;
+			d->addAnimation(map->getTextureCoordsForTileID(frameTileID));
+		}
 	}
 }
 

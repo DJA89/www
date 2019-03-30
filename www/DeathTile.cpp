@@ -17,9 +17,17 @@ void DeathTile::handleCollision(Entity & e) {
 	e.handleCollision(*this);
 }
 
-void DeathTile::changeTexture(glm::vec2 newTextureCoords){
-	sprite->setNumberAnimations(1);
-	sprite->setAnimationSpeed(0, 8);
-	sprite->addKeyframe(0, newTextureCoords);
-	sprite->changeAnimation(0);
+void DeathTile::setTextureSize(glm::vec2 textureSize){
+	this->textureSize = textureSize;
+}
+
+void DeathTile::setNumberAnimations(int numberAnimations){
+	sprite->setNumberAnimations(numberAnimations);
+	animationCount = 0; // see addAnimation
+}
+
+void DeathTile::addAnimation(glm::vec2 newTextureCoords){
+	sprite->setAnimationSpeed(this->animationCount, 8);
+	sprite->addKeyframe(this->animationCount, newTextureCoords);
+	sprite->changeAnimation(this->animationCount);
 }

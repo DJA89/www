@@ -168,7 +168,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			if (isNumber(tileID)){
 				// INFO: 0 means empty, texture tiles start with 1
 				int tileID_i = stoi(tileID);
-				if (animatedTiles.count(tileID_i) == 0){ // not animated
+				if (animatedTiles.count(tileID_i-1) == 0){ // not animated
 					// add to map
 					map[j*mapSize.x + i] = tileID_i;
 				} else { // is animated
@@ -178,9 +178,17 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					newDeathTile->setTileID(tileID_i);
 					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
 					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
+					// set texture
 					// add texture coordinates of tile
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID_i);
 					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+					// add bounding shape
+					if (tileTypeByID.count(tileID_i-1) == 1){ // -1 because IDs start with 1
+						// custom collision bounds (rescaled to fit multi-tile)
+						BoundingShape * tileBounds = tileTypeByID[tileID_i-1]->collisionBounds;
+						BoundingShape * copyTileBounds = tileBounds->clone();
+						newDeathTile->setBoundingShape(copyTileBounds);
+					}
 					flames.push_back(newDeathTile); // store
 				}
 			}
