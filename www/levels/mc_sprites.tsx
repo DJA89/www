@@ -38,7 +38,7 @@
  </tile>
  <tile id="465">
   <objectgroup draworder="index">
-   <object id="1" x="16" y="0" width="9" height="16" rotation="-270.409"/>
+   <object id="1" x="0" y="0" width="16" height="9"/>
   </objectgroup>
   <animation>
    <frame tileid="465" duration="100"/>
@@ -48,7 +48,7 @@
  </tile>
  <tile id="466">
   <objectgroup draworder="index">
-   <object id="2" x="16" y="0" width="16" height="9" rotation="-270.409"/>
+   <object id="2" x="7" y="0" width="9" height="16"/>
   </objectgroup>
   <animation>
    <frame tileid="466" duration="100"/>
