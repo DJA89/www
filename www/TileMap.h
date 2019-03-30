@@ -57,7 +57,6 @@ public:
 private:
 	bool loadLevel(const string &levelFile);
 	bool loadLevelTmx(const string &levelFile);
-	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
 	bool tileIsCollidable(int tileID) const;
