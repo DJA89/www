@@ -14,11 +14,11 @@ Sprite *Sprite::createSprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInS
 
 Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Texture *spritesheet, ShaderProgram *program)
 {
-	float vertices[24] = {0.f, 0.f, 0.f, 0.f, 
-												quadSize.x, 0.f, sizeInSpritesheet.x, 0.f, 
-												quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y, 
-												0.f, 0.f, 0.f, 0.f, 
-												quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y, 
+	float vertices[24] = {0.f, 0.f, 0.f, 0.f,
+												quadSize.x, 0.f, sizeInSpritesheet.x, 0.f,
+												quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y,
+												0.f, 0.f, 0.f, 0.f,
+												quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y,
 												0.f, quadSize.y, 0.f, sizeInSpritesheet.y};
 
 	glGenVertexArrays(1, &vao);
@@ -87,7 +87,7 @@ void Sprite::addKeyframe(int animId, const glm::vec2 &displacement)
 
 void Sprite::changeAnimation(int animId)
 {
-	if(animId < int(animations.size()))
+	if(0 <= animId && animId < int(animations.size()))
 	{
 		currentAnimation = animId;
 		currentKeyframe = 0;
@@ -105,6 +105,3 @@ void Sprite::setPosition(const glm::vec2 &pos)
 {
 	position = pos;
 }
-
-
-

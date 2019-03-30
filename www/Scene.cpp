@@ -122,7 +122,7 @@ void Scene::update(int deltaTime)
 				if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
 					if (ent->IsEnemy()) {
 						player->handleCollisionWithDeath(*ent);
-						break;
+						break; // can only die once, can we?
 					}
 					else {
 						player->handleCollisionWithPlatform(*ent);
@@ -142,6 +142,7 @@ void Scene::update(int deltaTime)
 				DeathTile * dt = *it;
 				if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
 					player->handleCollisionWithDeath(*dt);
+					break; // can only die once, can we?
 				}
 			}
 		}
