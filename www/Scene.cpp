@@ -111,7 +111,7 @@ void Scene::update(int deltaTime)
 	}
 
 	player->update(deltaTime);
-	// check for collisions between player and platforms
+	// check for collisions between player and entities
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
 	if (!player->isDying()) {

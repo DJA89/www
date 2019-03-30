@@ -14,8 +14,9 @@
 
 using namespace std;
 namespace xml = tinyxml2;
-const int TileMap::non_collision_tiles[3] = {0, 140, 465};
-const int TileMap::death_tiles[2] = {140, 465};
+
+// non collidable tiles (which are not entities)
+const int TileMap::non_collision_tiles[1] = {EMPTY_TILE};
 
 TileMap *TileMap::createTileMap(const string &levelFile, ShaderProgram &program)
 {
@@ -410,6 +411,14 @@ void TileMap::prepareArrays(ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
+bool TileMap::tileIsCollidable(int tileID) const {
+	// if find runs to end (doesnt find) in non_collision_tiles => collidable
+	return (std::find(std::begin(non_collision_tiles),
+	                  std::end(non_collision_tiles),
+	                  tileID)
+	        == std::end(non_collision_tiles));
+}
+
 bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
@@ -419,11 +428,11 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			return true;
 		}
 	}
+	// no collision with collidable tile
 	return false;
 }
 
@@ -436,8 +445,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			return true;
 		}
 	}
@@ -453,8 +461,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			*posY = tileSize * y - size.y;
 			return true;
 		}
@@ -471,36 +478,9 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = (pos.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		int aux = map[y*mapSize.x + x];
-		if (!(std::find(std::begin(non_collision_tiles), std::end(non_collision_tiles), map[y*mapSize.x + x]) != std::end(non_collision_tiles)))
-		{
+		if (tileIsCollidable(map[y*mapSize.x + x])){
 			*posY = tileSize * (y + 1);
 			return true;
-		}
-	}
-	return false;
-}
-
-bool TileMap::triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const {
-	int x0, y0, x1, y1, y0disp, y1disp;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	if (upsidedown) {
-		y0disp = 0;
-		y1disp = -7;
-	}
-	else {
-		y0disp = 7;
-		y1disp = 0;
-	}
-	y0 = (pos.y - 1 + y0disp) / tileSize;
-	y1 = (pos.y + size.y - 1 + y1disp) / tileSize;
-	for (int x = x0; x <= x1; x++) {
-		for (int y = y0; y <= y1; y++) {
-			if ((std::find(std::begin(death_tiles), std::end(death_tiles), map[y*mapSize.x + x]) != std::end(death_tiles))) {
-				return true;
-			}
 		}
 	}
 	return false;

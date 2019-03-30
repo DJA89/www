@@ -170,27 +170,6 @@ void Player::update(int deltaTime)
 		isStandingOnPlatform = false; // wait for next collision
 	}
 
-	// check for collisions
-	if (map->triggerDeath(posPlayer, sizePlayer, upsidedown)) {
-		// detach from platform
-		isStandingOnPlatform = false;
-		standingOn = NULL;
-		// die
-		dying = true;
-		int currentAnimation = sprite->animation();
-		int newAnimation;
-		if (currentAnimation == MOVE_LEFT || currentAnimation == STAND_LEFT) {
-			newAnimation = DEATH_LEFT;
-		} else if (currentAnimation == MOVE_RIGHT || currentAnimation == STAND_RIGHT) {
-			newAnimation = DEATH_RIGHT;
-		} else if (currentAnimation == MOVE_RIGHTU || currentAnimation == STAND_RIGHTU) {
-			newAnimation = DEATH_RIGHTU;
-		} else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
-			newAnimation = DEATH_LEFTU;
-		}
-		sprite->changeAnimation(newAnimation);
-	}
-
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
@@ -346,6 +325,10 @@ void Player::endGame() {
 }
 
 void Player::handleCollisionWithDeath(Entity & e) {
+	// detach from platform
+	isStandingOnPlatform = false;
+	standingOn = NULL;
+	// die
 	dying = true;
 	int currentAnimation = sprite->animation();
 	int newAnimation;

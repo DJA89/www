@@ -17,6 +17,7 @@ class Checkpoint;
 #define LEVEL_DIR string("levels/")
 
 // hardcoded tile IDs (like in tilesheet)
+#define EMPTY_TILE 0
 #define CHECKPOINT_UNSAVED_FLOOR 591
 #define CHECKPOINT_UNSAVED_CEILING 592
 #define CHECKPOINT_SAVED_FLOOR 593
@@ -49,7 +50,6 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
-	bool triggerDeath(const glm::ivec2 &pos, const glm::ivec2 &size, bool upsidedown) const;
 	glm::vec2 getHalfTexel();
 	glm::vec2 getTextureCoordsForTileID(int tileID);
 	glm::vec2 getCorrectedTileTextureSize(); // size - halfTexel
@@ -60,6 +60,7 @@ private:
 	bool loadLevelTxt(const string &levelFile);
 	void prepareArrays(ShaderProgram &program);
 	static bool isNumber(const string &toCheck);
+	bool tileIsCollidable(int tileID) const;
 
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
@@ -78,8 +79,7 @@ private:
 	int tileIDOffset; // map is offset with this value
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
-	const static int non_collision_tiles[3];
-	const static int death_tiles[2];
+	const static int non_collision_tiles[1];
 
 };
 
