@@ -331,7 +331,7 @@ void Player::handleCollisionWithDeath(Entity & e) {
 	// die
 	dying = true;
 	int currentAnimation = sprite->animation();
-	int newAnimation;
+	int newAnimation = currentAnimation; // make sure it is initialized
 	if (currentAnimation == MOVE_LEFT || currentAnimation == STAND_LEFT) {
 		newAnimation = DEATH_LEFT;
 	}
@@ -344,5 +344,6 @@ void Player::handleCollisionWithDeath(Entity & e) {
 	else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
 		newAnimation = DEATH_LEFTU;
 	}
+
 	sprite->changeAnimation(newAnimation);
 }
