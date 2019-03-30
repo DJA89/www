@@ -71,12 +71,16 @@ void Scene::loadLevel(string levelName){
 		// animations can be added ONLY after init call (sprite must exist)
 		int tileID = d->getTileID();
 		vector<int> * frameIDs = map->animatedTiles[tileID];
-		int animationNumber = frameIDs->size();
-		d->setNumberAnimations(animationNumber);
-		// add all animations
-		for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
-			int frameTileID = *it;
-			d->addAnimation(map->getTextureCoordsForTileID(frameTileID));
+		if (frameIDs != NULL){ // has animations
+			int animationNumber = frameIDs->size();
+			d->setNumberAnimations(animationNumber);
+			// add all animations
+			for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
+				int frameTileID = *it;
+				d->addAnimation(map->getTextureCoordsForTileID(frameTileID));
+			}
+		} else {
+			cout << tileID << endl;
 		}
 	}
 }
