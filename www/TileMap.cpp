@@ -64,12 +64,7 @@ void TileMap::free()
 }
 
 bool TileMap::loadLevel(const string & levelFile){
-	// call different functions for tmx and normal (txt) map files
-	if (levelFile.rfind(".tmx") == (levelFile.size()-4)) {
-		return TileMap::loadLevelTmx(levelFile);
-	} else {
-		return TileMap::loadLevelTxt(levelFile);
-	}
+	return TileMap::loadLevelTmx(levelFile);
 }
 
 bool TileMap::loadLevelTmx(const string &levelFile){
@@ -254,60 +249,6 @@ glm::vec2 TileMap::getCorrectedTileTextureSize(){ // size - halfTexel
 
 bool TileMap::isNumber(const string &toCheck){
 	return !toCheck.empty() && toCheck.find_first_not_of("-0123456789") == std::string::npos;
-}
-
-bool TileMap::loadLevelTxt(const string &levelFile)
-{
-	ifstream fin;
-	string line, tilesheetFile;
-	stringstream sstream;
-	string tile;
-
-	fin.open(levelFile.c_str());
-	if(!fin.is_open())
-		return false;
-	getline(fin, line);
-	if(line.compare(0, 7, "TILEMAP") != 0)
-		return false;
-	getline(fin, line);
-	sstream.str(line);
-	sstream >> mapSize.x >> mapSize.y;
-	getline(fin, line);
-	sstream.str(line);
-	sstream >> tileSize >> blockSize;
-	getline(fin, line);
-	sstream.str(line);
-	sstream >> tilesheetFile;
-	tilesheet.loadFromFile(tilesheetFile, TEXTURE_PIXEL_FORMAT_RGBA);
-	tilesheet.setWrapS(GL_CLAMP_TO_EDGE);
-	tilesheet.setWrapT(GL_CLAMP_TO_EDGE);
-	tilesheet.setMinFilter(GL_NEAREST);
-	tilesheet.setMagFilter(GL_NEAREST);
-	getline(fin, line);
-	sstream.str(line);
-	sstream >> tilesheetSize.x >> tilesheetSize.y;
-	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
-
-	map = new int[mapSize.x * mapSize.y];
-	for(int j=0; j<mapSize.y; j++)
-	{
-		int i = 0;
-		getline(fin, line);
-		istringstream ss(line);
-		string token;
-		while(getline(ss, tile, ',')) {
-			if (tile[0] == '\r' || tile[0] == '\n'){
-				;
-			} else if (tile ==  " "){
-				map[j*mapSize.x+i++] = 0;
-			} else {
-				map[j*mapSize.x+i++] = stoi(tile);
-			}
-		}
-	}
-	fin.close();
-
-	return true;
 }
 
 void TileMap::prepareArrays(ShaderProgram &program)
