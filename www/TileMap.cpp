@@ -45,6 +45,11 @@ TileMap::~TileMap()
 		delete it->second;
 	}
 	checkpoints.clear();
+	// remove all animated tiles
+	for (auto it = animatedTiles.begin(); it != animatedTiles.cend(); ++it ){
+		delete it->second;
+	}
+	animatedTiles.clear();
 }
 
 void TileMap::render() const
@@ -127,6 +132,18 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		}
 		TileType * tileType = new TileType(tileID, bs);
 		tileTypeByID[tileID] = tileType;
+		// has animations
+		if (tile->FirstChildElement("animation") != NULL){
+			const xml::XMLElement * frame = tile->FirstChildElement("animation")->FirstChildElement("frame");
+			vector<int> * frames = new vector<int>();
+			while(frame){
+				int frameTileID = stoi(frame->Attribute("tileid"));
+				frames->push_back(frameTileID);
+				// next frame
+				frame = frame->NextSiblingElement("frame");
+			}
+			animatedTiles[tileID] = frames;
+		}
 		// next iteration
 		tile = tile->NextSiblingElement("tile");
 	}

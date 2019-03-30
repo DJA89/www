@@ -3,6 +3,7 @@
 
 
 #include <glm/glm.hpp>
+#include <vector>
 #include <unordered_map>
 #include "Texture.h"
 #include "ShaderProgram.h"
@@ -57,6 +58,7 @@ public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, FixedPathEntity *> entities;
 	std::unordered_map<int, Checkpoint *> checkpoints;
+	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
 	Texture tilesheet;
 
 private:
