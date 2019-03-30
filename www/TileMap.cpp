@@ -102,25 +102,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tilesheet.setMinFilter(GL_NEAREST); // Pixelated look
 	tilesheet.setMagFilter(GL_NEAREST); // Pixelated look
 
-	// extract tilemap data
-	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
-	map = new int[mapSize.x * mapSize.y];
-	string row;
-	getline(tiles, row); // skip empty line
-	for (int j = 0; j < mapSize.y; j++){
-		getline(tiles, row); // for each row
-		istringstream ss(row);
-		for (int i = 0; i < mapSize.x; i++){
-			string tileID;
-			getline(ss, tileID, ','); // split into tiles
-			if (isNumber(tileID)){
-				// INFO: 0 means empty, texture tiles start with 1
-				map[j*mapSize.x + i] = stoi(tileID);
-			} else {
-			}
-		}
-	}
-
 	// load collision bounding-shapes for tiles
 	const xml::XMLElement * tile;
 	// for each tile found
@@ -150,6 +131,25 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		tile = tile->NextSiblingElement("tile");
 	}
 	tile = NULL; // not needed anymore
+
+	// extract tilemap data
+	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
+	map = new int[mapSize.x * mapSize.y];
+	string row;
+	getline(tiles, row); // skip empty line
+	for (int j = 0; j < mapSize.y; j++){
+		getline(tiles, row); // for each row
+		istringstream ss(row);
+		for (int i = 0; i < mapSize.x; i++){
+			string tileID;
+			getline(ss, tileID, ','); // split into tiles
+			if (isNumber(tileID)){
+				// INFO: 0 means empty, texture tiles start with 1
+				map[j*mapSize.x + i] = stoi(tileID);
+			} else {
+			}
+		}
+	}
 
 	// extract entities in object layer
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
