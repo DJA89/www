@@ -16,6 +16,12 @@ class Checkpoint;
 
 #define LEVEL_DIR string("levels/")
 
+// hardcoded tile IDs (like in tilesheet)
+#define CHECKPOINT_UNSAVED_FLOOR 591
+#define CHECKPOINT_UNSAVED_CEILING 592
+#define CHECKPOINT_SAVED_FLOOR 593
+#define CHECKPOINT_SAVED_CEILING 594
+
 
 // Class Tilemap is capable of loading a tile map from a text file in a very
 // simple format (see level01.txt for an example). With this information
@@ -69,6 +75,7 @@ private:
 	GLint posLocation, texCoordLocation;
 	int tileSize, blockSize;
 	glm::vec2 tileTexSize;
+	int tileIDOffset; // map is offset with this value
 	int *map;
 	std::unordered_map<int, TileType*> tileTypeByID; // ID like in level files
 	const static int non_collision_tiles[3];

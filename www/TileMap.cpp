@@ -94,6 +94,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tileSize = atoi(mapConf->Attribute("tilewidth"));
 	blockSize = tileSize; // TODO differentiate???
 
+	// get tileID offset used for levelmap (levelMap-ID = spritesheet-ID + offset)
+	tileIDOffset = stoi(mapConf->FirstChildElement("tileset")->Attribute("firstgid"));
+
 	// get tilesheet name and config
 	string tileSetTmxName = mapConf->FirstChildElement("tileset")->Attribute("source");
 	xml::XMLDocument tileSetTmx;
@@ -112,7 +115,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	tilesheet.setMinFilter(GL_NEAREST); // Pixelated look
 	tilesheet.setMagFilter(GL_NEAREST); // Pixelated look
 
-	// load collision bounding-shapes for tiles
+	// load collision bounding-shapes for tiles (tilesheet => no offset)
 	const xml::XMLElement * tile;
 	// for each tile found
 	tile = tileSetConf->FirstChildElement("tile");
@@ -154,7 +157,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	}
 	tile = NULL; // not needed anymore
 
-	// extract tilemap data
+	// extract tilemap data (levelmap => offset)
 	istringstream tiles (mapConf->FirstChildElement("layer")->FirstChildElement("data")->GetText());
 	map = new int[mapSize.x * mapSize.y];
 	string row;
@@ -163,29 +166,31 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		getline(tiles, row); // for each row
 		istringstream ss(row);
 		for (int i = 0; i < mapSize.x; i++){
-			string tileID;
-			getline(ss, tileID, ','); // split into tiles
-			if (isNumber(tileID)){
+			string tileID_s;
+			getline(ss, tileID_s, ','); // split into tiles
+			if (isNumber(tileID_s)){
 				// INFO: 0 means empty, texture tiles start with 1
-				int tileID_i = stoi(tileID);
-				if (animatedTiles.count(tileID_i-1) == 0){ // not animated
+				int tileID = stoi(tileID_s) - tileIDOffset; // remove offset
+				if (tileID <= 0){ // tile has tileid=0 or is empty
+					map[j*mapSize.x + i] = 0; // empty tiles => 0
+				} else if (animatedTiles.count(tileID) == 0){ // not animated
 					// add to map
-					map[j*mapSize.x + i] = tileID_i;
+					map[j*mapSize.x + i] = tileID;
 				} else { // is animated
 					map[j*mapSize.x + i] = 0; // empty
 					// create new Entity (for each *single* tile)
 					DeathTile * newDeathTile = new DeathTile();
-					newDeathTile->setTileID(tileID_i);
+					newDeathTile->setTileID(tileID);
 					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
 					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
 					// set texture
 					// add texture coordinates of tile
-					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID_i);
+					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
 					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape
-					if (tileTypeByID.count(tileID_i-1) == 1){ // -1 because IDs start with 1
+					if (tileTypeByID.count(tileID) == 1){ // -1 because IDs start with 1
 						// custom collision bounds (rescaled to fit multi-tile)
-						BoundingShape * tileBounds = tileTypeByID[tileID_i-1]->collisionBounds;
+						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 						BoundingShape * copyTileBounds = tileBounds->clone();
 						newDeathTile->setBoundingShape(copyTileBounds);
 					}
@@ -195,7 +200,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 		}
 	}
 
-	// extract entities in object layer
+	// extract entities in object layer (levelmap => offset)
 	const xml::XMLElement* objectgroup = mapConf->FirstChildElement("objectgroup");
 	if (objectgroup){
 		const xml::XMLElement* object;
@@ -219,7 +224,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				Checkpoint * newCheckPoint = new Checkpoint();
 
 				int ID = stoi(object->Attribute("id"));
-				int tileID = stoi(object->Attribute("gid"));
+				int tileID = stoi(object->Attribute("gid")) - tileIDOffset; // remove offset
 				newCheckPoint->setTileID(tileID); // tile idx in spritesheet
 				// position is bottom left => correct to top left
 				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
@@ -229,9 +234,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
 				newCheckPoint->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 				// add bounding shape to platform
-				if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+				if (tileTypeByID.count(tileID) == 1){
 					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+					BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 					BoundingShape * copyTileBounds = tileBounds->clone();
 					copyTileBounds->rescale(newCheckPoint->getSize() / float(tileSize));
 					newCheckPoint->setBoundingShape(copyTileBounds);
@@ -250,7 +255,7 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					entities[ID] = ent;
 				}
 				if (objectAttribs.at(2) == "spawn"){ // spawn vs path
-					int tileID = stoi(object->Attribute("gid"));
+					int tileID = stoi(object->Attribute("gid")) - tileIDOffset; // remove offset
 					if (objectAttribs.at(0) == "Enemy") {
 						ent->setEnemy();
 					}
@@ -264,9 +269,9 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
 					ent->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape to platform
-					if (tileTypeByID.count(tileID - 1) == 1){ // -1 because IDs start with 1
+					if (tileTypeByID.count(tileID) == 1){
 						// custom collision bounds (rescaled to fit multi-tile)
-						BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
+						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 						BoundingShape * copyTileBounds = tileBounds->clone();
 						copyTileBounds->rescale(ent->getSize() / float(tileSize));
 						ent->setBoundingShape(copyTileBounds);
@@ -289,7 +294,7 @@ glm::vec2 TileMap::getHalfTexel(){
 }
 
 glm::vec2 TileMap::getTextureCoordsForTileID(int tileID){
-	return glm::vec2(float((tileID-1) % tilesheetSize.x) / tilesheetSize.x, float((tileID-1) / tilesheetSize.x) / tilesheetSize.y);
+	return glm::vec2(float(tileID % tilesheetSize.x) / tilesheetSize.x, float(tileID / tilesheetSize.x) / tilesheetSize.y);
 }
 
 glm::vec2 TileMap::getCorrectedTileTextureSize(){ // size - halfTexel

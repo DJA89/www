@@ -186,7 +186,7 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	glm::vec2 checkpointSize = cp->getSize();
 	int checkpointTileID = cp->getTileID();
 	// get if checkpoint upsidedown
-	bool isCheckpointUpsideDown = (checkpointTileID == 593 || checkpointTileID == 595);
+	bool isCheckpointUpsideDown = (checkpointTileID == CHECKPOINT_UNSAVED_CEILING || checkpointTileID == CHECKPOINT_SAVED_CEILING);
 	// compute normalized checkpoint position
 	glm::ivec2 normalizedCheckpointPosition;
 	if (isCheckpointUpsideDown){
@@ -194,9 +194,14 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 		} else {
 			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
-	// change checkpoint image from spider web to egg
-	if (checkpointTileID == 592 || checkpointTileID == 593){ // spider web
-		int newTileID = cp->getTileID() + 2;
+	// change checkpoint image from unsaved to saved
+	if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR || checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
+		int newTileID;
+		if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR){
+			newTileID = CHECKPOINT_SAVED_FLOOR;
+		} else if (checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
+			newTileID = CHECKPOINT_SAVED_CEILING;
+		}
 		cp->setTileID(newTileID); // spider web => egg
 		glm::vec2 newTextureCoords = map->getTextureCoordsForTileID(newTileID);
 		cp->changeTexture(newTextureCoords);
@@ -205,9 +210,14 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 			Checkpoint * other = it->second;
 			if (other != cp){
 				int otherTileID = other->getTileID();
-				if (otherTileID == 594 || otherTileID == 595){ // egg
-					// change egg back to spider web
-					int newOtherTileID = otherTileID - 2;
+				if (otherTileID == CHECKPOINT_SAVED_FLOOR || otherTileID == CHECKPOINT_SAVED_CEILING){
+					// change saved back to unsaved
+					int newOtherTileID;
+					if (otherTileID == CHECKPOINT_SAVED_FLOOR){
+						newOtherTileID = CHECKPOINT_UNSAVED_FLOOR;
+					} else if (otherTileID == CHECKPOINT_SAVED_CEILING){
+						newOtherTileID = CHECKPOINT_UNSAVED_CEILING;
+					}
 					other->setTileID(newOtherTileID); // egg => spider web
 					glm::vec2 newOtherTextureCoords = map->getTextureCoordsForTileID(newOtherTileID);
 					other->changeTexture(newOtherTextureCoords);
