@@ -50,6 +50,11 @@ TileMap::~TileMap()
 		delete it->second;
 	}
 	animatedTiles.clear();
+	// remove all flames
+	for (auto it = flames.begin(); it != flames.cend(); ++it ){
+		delete *it; // first => because vector
+	}
+	flames.clear();
 }
 
 void TileMap::render() const
@@ -162,8 +167,22 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 			getline(ss, tileID, ','); // split into tiles
 			if (isNumber(tileID)){
 				// INFO: 0 means empty, texture tiles start with 1
-				map[j*mapSize.x + i] = stoi(tileID);
-			} else {
+				int tileID_i = stoi(tileID);
+				if (animatedTiles.count(tileID_i) == 0){ // not animated
+					// add to map
+					map[j*mapSize.x + i] = tileID_i;
+				} else { // is animated
+					map[j*mapSize.x + i] = 0; // empty
+					// create new Entity (for each *single* tile)
+					DeathTile * newDeathTile = new DeathTile();
+					newDeathTile->setTileID(tileID_i);
+					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
+					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
+					// add texture coordinates of tile
+					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID_i);
+					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+					flames.push_back(newDeathTile); // store
+				}
 			}
 		}
 	}

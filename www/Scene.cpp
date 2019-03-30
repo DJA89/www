@@ -64,6 +64,11 @@ void Scene::loadLevel(string levelName){
 		Checkpoint * c = it->second;
 		c->init(map->tilesheet, texProgram);
 	}
+	// flames
+	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
+		DeathTile * d = *it;
+		d->init(map->tilesheet, texProgram);
+	}
 }
 
 void Scene::endGame() {
@@ -85,6 +90,9 @@ void Scene::update(int deltaTime)
 		}
 		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 			it->second->update(deltaTime);
+		}
+		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+			(*it)->update(deltaTime);
 		}
 	}
 
@@ -113,6 +121,13 @@ void Scene::update(int deltaTime)
 				Checkpoint * cp = it->second;
 				if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
 					handleCheckpointCollision(cp);
+				}
+			}
+			// flames
+			for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+				DeathTile * dt = *it;
+				if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
+					player->handleCollisionWithDeath(*dt);
 				}
 			}
 		}
@@ -232,6 +247,9 @@ void Scene::render()
 	map->render();
 	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
 		it->second->render();
+	}
+	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
+		(*it)->render();
 	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
 		it->second->render();

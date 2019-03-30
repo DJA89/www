@@ -10,6 +10,7 @@
 #include "SavedState.h"
 #include "TileType.h"
 #include "FixedPathEntity.h"
+#include "DeathTile.h"
 
 class Checkpoint;
 
@@ -59,6 +60,7 @@ public:
 	std::unordered_map<int, FixedPathEntity *> entities;
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
+	vector<DeathTile *> flames;
 	Texture tilesheet;
 
 private:

@@ -345,7 +345,7 @@ void Player::endGame() {
 	sound.releaseSound(soundSample);
 }
 
-void Player::handleCollisionWithDeath(FixedPathEntity & enemy) {
+void Player::handleCollisionWithDeath(Entity & e) {
 	dying = true;
 	int currentAnimation = sprite->animation();
 	int newAnimation;
