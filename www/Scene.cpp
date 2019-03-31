@@ -40,7 +40,7 @@ void Scene::init()
 
 	sound.createSound(&soundSample, "sounds/music.mp3");
 
-	//sound.playSound(soundSample, true);
+	sound.playSound(soundSample, true);
 
 }
 
@@ -101,7 +101,7 @@ void Scene::loadLevel(string levelName){
 }
 
 void Scene::endGame() {
-	//sound.releaseSound(soundSample);
+	sound.releaseSound(soundSample);
 	player->endGame();
 }
 

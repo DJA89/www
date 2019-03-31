@@ -7,7 +7,7 @@
 #include "BoundingShape.h"
 #include <algorithm>
 
-#define FALL_STEP 6
+#define FALL_STEP 9
 #define SPACEBAR 32
 #define W_KEY 119
 #define A_KEY 97
