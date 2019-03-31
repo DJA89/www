@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "LevelMap.h"
 #include "SoundSystem.h"
+#include "Menu.h"
 
 class Checkpoint;
 
@@ -34,6 +35,12 @@ private:
 	void saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown);
 	void loadGame();
 	void handleCheckpointCollision(Checkpoint * cp);
+	void initMainGame();
+	void initMenu();
+	void updateMainGame(int deltaTime);
+	int updateMenu();
+	void renderMainGame();
+	void renderMenu();
 
 public:
 	ShaderProgram texProgram;
@@ -42,11 +49,14 @@ private:
 	LevelMap levelMap;
 	TileMap *map;
 	Player *player;
+	Menu *menu;
 	SavedState savedState;
 	float currentTime;
 	glm::mat4 projection;
 	SoundSystemClass sound;
 	SoundClass soundSample;
+	int currentScreen;
+	int enterFrames;
 };
 
 

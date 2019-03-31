@@ -9,6 +9,10 @@
 
 #define FALL_STEP 6
 #define SPACEBAR 32
+#define W_KEY 119
+#define A_KEY 97
+#define S_KEY 115
+#define D_KEY 100
 
 enum PlayerAnims
 {
@@ -98,7 +102,7 @@ void Player::update(int deltaTime)
 	}
 	sprite->update(deltaTime);
 	// keyboard controls
-	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
+	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT) || Game::instance().getKey(A_KEY))
 	{
 		if (upsidedown) {
 			if (sprite->animation() != MOVE_LEFTU) {
@@ -122,7 +126,7 @@ void Player::update(int deltaTime)
 			}
 		}
 	}
-	else if(Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
+	else if(Game::instance().getSpecialKey(GLUT_KEY_RIGHT) || Game::instance().getKey(D_KEY))
 	{
 		if (upsidedown) {
 			if (sprite->animation() != MOVE_RIGHTU) {
@@ -200,7 +204,9 @@ void Player::playerFalling(int pixels) {
 		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
 	if(collition || isStandingOnPlatform) {
 		if (!actionPressedBeforeCollition) {
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR)) {
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR) ||
+				Game::instance().getSpecialKey(GLUT_KEY_DOWN) || Game::instance().getKey(S_KEY) ||
+				Game::instance().getKey(W_KEY)) {
 				actionPressedBeforeCollition = true;
 				upsidedown = !upsidedown;
 				sound.playSound(soundSample, false);
@@ -233,7 +239,9 @@ void Player::playerFalling(int pixels) {
 			}
 		}
 		else {
-			if (!(Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR))) {
+			if (!(Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR) ||
+				Game::instance().getSpecialKey(GLUT_KEY_DOWN) || Game::instance().getKey(S_KEY) ||
+				Game::instance().getKey(W_KEY))) {
 				actionPressedBeforeCollition = false;
 			}
 		}

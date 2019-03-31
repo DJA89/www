@@ -10,9 +10,9 @@
 #include "Checkpoint.h"
 
 // initial player position
-#define INIT_PLAYER_X_TILES 3.5 // spawn on first checkpoint
-#define INIT_PLAYER_Y_TILES 10
-
+#define INIT_PLAYER_X_TILES 7 // spawn on first checkpoint
+#define INIT_PLAYER_Y_TILES 20
+#define RETURN 13
 
 Scene::Scene()
 {
@@ -32,7 +32,28 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
+	initMainGame();
+	initMenu();
 	// map
+	
+	SoundSystemClass sound = SoundSystemClass();
+
+	sound.createSound(&soundSample, "sounds/music.mp3");
+
+	//sound.playSound(soundSample, true);
+
+}
+
+void Scene::initMenu() {
+	menu = new Menu();
+	currentScreen = Menu::MAIN_MENU;
+	menu->init(texProgram);
+	projection = glm::ortho(0.f, float(SCREEN_WIDTH / 4 - 1), float(SCREEN_HEIGHT / 2 - 1), 0.f);
+	currentTime = 0.0f;
+}
+
+void Scene::initMainGame() {
+	currentScreen = Menu::MAIN_GAME;
 	string mapName = LEVEL_DIR + "level01.tmx";
 	loadLevel(mapName);
 	// player
@@ -41,14 +62,8 @@ void Scene::init()
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
 	// saveGame(); // TODO set initialPos & checkpoint in tiled => load in TileMap
-	projection = glm::ortho(0.f, float(SCREEN_WIDTH/2 - 1), float(SCREEN_HEIGHT/2 - 1), 0.f);
+	projection = glm::ortho(0.f, float(SCREEN_WIDTH / 2 - 1), float(SCREEN_HEIGHT / 2 - 1), 0.f);
 	currentTime = 0.0f;
-	SoundSystemClass sound = SoundSystemClass();
-
-	sound.createSound(&soundSample, "sounds/music.mp3");
-
-	sound.playSound(soundSample, true);
-
 }
 
 void Scene::loadLevel(string levelName){
@@ -86,19 +101,48 @@ void Scene::loadLevel(string levelName){
 }
 
 void Scene::endGame() {
-	sound.releaseSound(soundSample);
+	//sound.releaseSound(soundSample);
 	player->endGame();
 }
 
 void Scene::update(int deltaTime)
 {
+	switch (currentScreen)
+	{
+	case Menu::MAIN_MENU:
+		currentScreen = updateMenu();
+		if (currentScreen == Menu::MAIN_GAME) {
+			projection = glm::ortho(0.f, float(SCREEN_WIDTH / 2 - 1), float(SCREEN_HEIGHT / 2 - 1), 0.f);
+			enterFrames = 1;
+		}
+		break;
+	case Menu::MAIN_GAME:
+		if (enterFrames > 20 && Game::instance().getKey(RETURN)) {
+			currentScreen = Menu::MAIN_MENU;
+			//initMenu();
+			projection = glm::ortho(0.f, float(SCREEN_WIDTH / 4 - 1), float(SCREEN_HEIGHT / 2 - 1), 0.f);
+		}
+		else {
+			updateMainGame(deltaTime);
+			if (enterFrames <= 20) {
+				enterFrames++;
+			}
+		}
+	}
+}
+
+int Scene::updateMenu() {
+	return menu->update();
+}
+
+void Scene::updateMainGame(int deltaTime) {
 	currentTime += deltaTime;
 	// update player
-	if(player->hasDied()){
+	if (player->hasDied()) {
 		loadGame();
 	}
 	// update all moving entities: platforms, player, ...
-	if(!player->isDying()) {
+	if (!player->isDying()) {
 		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 			it->second->update(deltaTime);
 		}
@@ -152,22 +196,25 @@ void Scene::update(int deltaTime)
 	// update tilemap
 	// if player left level => change level and wrap player position around
 	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
-	if (player->getPosition().x + player->getSize().x >= maxPos.x){
+	if (player->getPosition().x + player->getSize().x >= maxPos.x) {
 		string nextLevelName = levelMap.nameOfNextLevel(RIGHT);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->setPositionX(0);
-	} else if (player->getPosition().x < 0){
+	}
+	else if (player->getPosition().x < 0) {
 		string nextLevelName = levelMap.nameOfNextLevel(LEFT);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->setPositionX(maxPos.x - player->getSize().x);
-	} else if (player->getPosition().y + player->getSize().y >= maxPos.y){
+	}
+	else if (player->getPosition().y + player->getSize().y >= maxPos.y) {
 		string nextLevelName = levelMap.nameOfNextLevel(DOWN);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
 		player->setPositionY(0);
-	} else if (player->getPosition().y < 0){
+	}
+	else if (player->getPosition().y < 0) {
 		string nextLevelName = levelMap.nameOfNextLevel(UP);
 		loadLevel(nextLevelName);
 		player->setTileMap(map);
@@ -260,6 +307,28 @@ void Scene::loadGame(){
 
 void Scene::render()
 {
+	if (currentScreen == Menu::MAIN_MENU) {
+		renderMenu();
+	}
+	else if (currentScreen == Menu::MAIN_GAME) {
+		renderMainGame();
+	}
+}
+
+
+void Scene::renderMenu() {
+	glm::mat4 modelview;
+
+	texProgram.use();
+	texProgram.setUniformMatrix4f("projection", projection);
+	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	texProgram.setUniformMatrix4f("modelview", modelview);
+	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); // TODO remove
+	menu->render();
+}
+
+void Scene::renderMainGame() {
 	glm::mat4 modelview;
 
 	texProgram.use();
@@ -270,13 +339,13 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); // TODO remove
 	// render map, all platforms and player
 	map->render();
-	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
+	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 		it->second->render();
 	}
-	for (auto it = map->flames.begin(); it != map->flames.end(); ++it){
+	for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
 		(*it)->render();
 	}
-	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
+	for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 		it->second->render();
 	}
 	player->render();
