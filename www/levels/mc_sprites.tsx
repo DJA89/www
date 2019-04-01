@@ -85,11 +85,29 @@
   </objectgroup>
  </tile>
  <tile id="664">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
   <animation>
    <frame tileid="664" duration="100"/>
    <frame tileid="704" duration="100"/>
    <frame tileid="744" duration="100"/>
    <frame tileid="784" duration="100"/>
   </animation>
+ </tile>
+ <tile id="704">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+ </tile>
+ <tile id="744">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+ </tile>
+ <tile id="784">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
  </tile>
 </tileset>

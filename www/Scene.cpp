@@ -215,26 +215,25 @@ void Scene::updateMainGame(int deltaTime) {
 			if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
 				handleCheckpointCollision(cp);
 			}
-			// flames
-			for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
-				DeathTile * dt = *it;
-				if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
-					player->handleCollisionWithDeath(*dt);
-					break; // can only die once, can we?
-				}
+		}
+		// flames
+		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+			DeathTile * dt = *it;
+			if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
+				player->handleCollisionWithDeath(*dt);
+				break; // can only die once, can we?
 			}
-			// conveyor belts
-			for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
-				ConveyorBelt * cb = *it;
-				if (Intersection::check(*(cb->getBoundingShape()), *playerCollisionBounds)) {
-					// TODO customize
-					player->handleCollisionWithDeath(*cb);
-					break; // can only die once, can we?
-				}
+		}
+		// conveyor belts
+		for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
+			ConveyorBelt * cb = *it;
+			if (Intersection::check(*(cb->getBoundingShape()), *playerCollisionBounds)) {
+				// TODO customize
+				player->handleCollisionWithPlatform(*cb);
+				break; // add velocity just once, not for each tile touching
 			}
 		}
 	}
-
 	delete playerCollisionBounds;
 
 	// update tilemap

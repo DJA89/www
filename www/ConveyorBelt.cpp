@@ -1,4 +1,12 @@
 #include "ConveyorBelt.h"
+#include "Sprite.h"
+
+void ConveyorBelt::init(Texture & tilesheet, ShaderProgram & shaderProgram){
+	Entity::init(tilesheet, shaderProgram);
+	// velocity and direction
+	velocity = 2.f;
+	direction = glm::vec2(1.f, 0.f); // TODO set in TileMap
+}
 
 void ConveyorBelt::handleCollision(Entity & e) {
 	e.handleCollision(*this);
@@ -18,6 +26,10 @@ float ConveyorBelt::getVelocity(bool isBelow) const {
 	}
 }
 
+void ConveyorBelt::update(int deltaTime){
+	// don't move
+	sprite->update(deltaTime);
+}
 
 void ConveyorBelt::setAboveVelocity(float velocity) {
 	aboveVelocity = velocity;

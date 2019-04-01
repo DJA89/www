@@ -213,13 +213,13 @@ void Player::update(int deltaTime)
 	}
 	// if moving on a platform, add platform velocity
 	if (isStandingOnPlatform && standingOn != NULL){
-		if (dynamic_cast<ConveyorBelt*>(standingOn)) {
-			ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
-			posPlayer.x += cb->getVelocity(upsidedown);
-		}
-		else {
+		// if (dynamic_cast<ConveyorBelt*>(standingOn)) {
+		// 	ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+		// 	posPlayer.x += cb->getVelocity(upsidedown);
+		// }
+		// else {
 			posPlayer.x += standingOn->getVelocity();
-		}
+		// }
 		isStandingOnPlatform = false; // wait for next collision
 	}
 
