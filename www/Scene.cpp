@@ -35,7 +35,7 @@ void Scene::init()
 	initMainGame();
 	initMenu();
 	// map
-	
+
 	SoundSystemClass sound = SoundSystemClass();
 
 	sound.createSound(&soundSample, "sounds/music.mp3");
