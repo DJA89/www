@@ -16,6 +16,7 @@
     <ClInclude Include="BoundingEllipse.h" />
     <ClInclude Include="BoundingShape.h" />
     <ClInclude Include="Checkpoint.h" />
+    <ClInclude Include="DeathTile.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FixedPathEntity.h" />
     <ClInclude Include="Game.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="BoundingEllipse.cpp" />
     <ClCompile Include="Checkpoint.cpp" />
+    <ClCompile Include="DeathTile.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FixedPathEntity.cpp" />
     <ClCompile Include="Game.cpp" />
