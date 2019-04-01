@@ -7,7 +7,7 @@ void FixedPathEntity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	// correct endpoint so it matches the upper left corner of the platform (and not the bottom right)
 	this->pathEnd = this->pathEnd - this->size; // TODO use collision box to normalize path
 	// velocity and direction
-	velocity = 1.f;
+	velocity = 2.f;
 	direction = pathEnd - pathStart; // to right
 }
 
