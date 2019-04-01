@@ -10,8 +10,8 @@
 #include "Checkpoint.h"
 
 // initial player position
-#define INIT_PLAYER_X_TILES 7 // spawn on first checkpoint
-#define INIT_PLAYER_Y_TILES 20
+#define INIT_PLAYER_X_TILES 8.5 // spawn on first checkpoint
+#define INIT_PLAYER_Y_TILES 22
 #define RETURN 13
 
 Scene::Scene()
