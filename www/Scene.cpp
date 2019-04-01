@@ -89,23 +89,34 @@ void Scene::loadLevel(string levelName){
 		DeathTile * d = *it;
 		d->init(map->tilesheet, texProgram);
 		// animations can be added ONLY after init call (sprite must exist)
-		int tileID = d->getTileID();
-		vector<int> * frameIDs = map->animatedTiles[tileID];
-		if (frameIDs != NULL){ // has animations
-			int animationNumber = frameIDs->size();
-			d->setNumberAnimations(animationNumber);
-			// add all animations
-			for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
-				int frameTileID = *it;
-				d->addAnimation(map->getTextureCoordsForTileID(frameTileID));
-			}
-		} else {
-			cout << tileID << endl;
-		}
+		addAnimationsToEntity(d);
+	}
+	// conveyor belts
+	for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it){
+		ConveyorBelt * cb = *it;
+		cb->init(map->tilesheet, texProgram);
+		// animations can be added ONLY after init call (sprite must exist)
+		addAnimationsToEntity(cb);
+	}
+	for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
+		ConveyorBelt * cbf = it->second;
+		cbf->init(map->tilesheet, texProgram);
+	}
 }
-for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
-	ConveyorBelt * cbf = it->second;
-	cbf->init(map->tilesheet, texProgram);
+
+void Scene::addAnimationsToEntity(Entity * e){
+	int tileID = e->getTileID();
+	vector<int> * frameIDs = map->animatedTiles[tileID];
+	if (frameIDs != NULL){ // has animations
+		int animationNumber = frameIDs->size();
+		e->setNumberAnimations(animationNumber);
+		// add all animations
+		for (auto it = frameIDs->begin(); it != frameIDs->cend(); ++it){
+			int frameTileID = *it;
+			e->addAnimation(map->getTextureCoordsForTileID(frameTileID));
+		}
+	} else {
+		cout << "ERROR: Entity (tileID=" << tileID << ") doesnt have animations" << endl;
 	}
 }
 
@@ -163,6 +174,9 @@ void Scene::updateMainGame(int deltaTime) {
 		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
 			(*it)->update(deltaTime);
 		}
+		for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
+			(*it)->update(deltaTime);
+		}
 		for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
 			it->second->update(deltaTime);
 		}
@@ -206,6 +220,15 @@ void Scene::updateMainGame(int deltaTime) {
 				DeathTile * dt = *it;
 				if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
 					player->handleCollisionWithDeath(*dt);
+					break; // can only die once, can we?
+				}
+			}
+			// conveyor belts
+			for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
+				ConveyorBelt * cb = *it;
+				if (Intersection::check(*(cb->getBoundingShape()), *playerCollisionBounds)) {
+					// TODO customize
+					player->handleCollisionWithDeath(*cb);
 					break; // can only die once, can we?
 				}
 			}
@@ -364,6 +387,9 @@ void Scene::renderMainGame() {
 		it->second->render();
 	}
 	for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
+		(*it)->render();
+	}
+	for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
 		(*it)->render();
 	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {

@@ -52,3 +52,14 @@ BoundingShape * Entity::getBoundingShape() const {
 		return this->defaultCollisionBox;
 	}
 }
+
+void Entity::setNumberAnimations(int numberAnimations){
+	sprite->setNumberAnimations(numberAnimations);
+	animationCount = 0; // see addAnimation
+}
+
+void Entity::addAnimation(glm::vec2 newTextureCoords){
+	sprite->setAnimationSpeed(this->animationCount, 8);
+	sprite->addKeyframe(this->animationCount, newTextureCoords);
+	sprite->changeAnimation(this->animationCount);
+}

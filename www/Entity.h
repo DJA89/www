@@ -35,6 +35,8 @@ public:
 	int getID(){ return this->ID; }
 	void setTileID(int tileID) { this->tileID = tileID; }
 	int getTileID() { return this->tileID; }
+	void setNumberAnimations(int numberAnimations);
+	void addAnimation(glm::vec2 newTextureCoords);
 
 	virtual void handleCollision(Entity & e) = 0;
 
@@ -53,6 +55,7 @@ protected:
 	// quad & texture
 	Sprite * sprite;
 	glm::vec2 textureCoordinates, textureSize; // for tilesheet
+	int animationCount = 0;
 
 };
 
