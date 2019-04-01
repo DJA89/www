@@ -19,6 +19,14 @@ class Checkpoint;
 
 // hardcoded tile IDs (like in tilesheet)
 #define EMPTY_TILE 0
+#define FIRE_FLOOR 464
+#define FIRE_CEILING 465
+#define FIRE_RIGHT 466
+#define FIRE_LEFT 467
+#define WATER_FLOOR_RIGHT 664
+#define WATER_CEILING_RIGHT 665
+#define WATER_FLOOR_LEFT 666
+#define WATER_CEILING_LEFT 667
 #define CHECKPOINT_UNSAVED_FLOOR 591
 #define CHECKPOINT_UNSAVED_CEILING 592
 #define CHECKPOINT_SAVED_FLOOR 593
@@ -69,6 +77,7 @@ public:
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
 	vector<DeathTile *> flames;
+	vector<ConveyorBelt *> conveyorBelts;
 	Texture tilesheet;
 
 private:

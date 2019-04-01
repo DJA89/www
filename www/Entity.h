@@ -33,6 +33,8 @@ public:
 	float getVelocity() const { return velocity; }
 	void setID(int ID){ this->ID = ID; }
 	int getID(){ return this->ID; }
+	void setTileID(int tileID) { this->tileID = tileID; }
+	int getTileID() { return this->tileID; }
 
 	virtual void handleCollision(Entity & e) = 0;
 
@@ -47,6 +49,7 @@ protected:
 	AxisAlignedBoundingBox * defaultCollisionBox;
 	// tiled
 	int ID; // like in object layer of level
+	int tileID; // index in stylesheet
 	// quad & texture
 	Sprite * sprite;
 	glm::vec2 textureCoordinates, textureSize; // for tilesheet

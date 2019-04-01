@@ -84,4 +84,12 @@
    </object>
   </objectgroup>
  </tile>
+ <tile id="664">
+  <animation>
+   <frame tileid="664" duration="100"/>
+   <frame tileid="704" duration="100"/>
+   <frame tileid="744" duration="100"/>
+   <frame tileid="784" duration="100"/>
+  </animation>
+ </tile>
 </tileset>

@@ -56,6 +56,11 @@ TileMap::~TileMap()
 		delete *it; // first => because vector
 	}
 	flames.clear();
+	// remove all conveyor belts
+	for (auto it = conveyorBelts.begin(); it != conveyorBelts.cend(); ++it ){
+		delete *it; // first => because vector
+	}
+	conveyorBelts.clear();
 	for (auto it = cbfs.begin(); it != cbfs.cend(); ++it ){
 		delete it->second;
 	}
@@ -120,29 +125,34 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	// for each tile found
 	tile = tileSetConf->FirstChildElement("tile");
 	while (tile){
-		// extract of xml
+		// extract tile attributes
 		int tileID = stoi(tile->Attribute("id"));
-		const xml::XMLElement * object = tile->FirstChildElement("objectgroup")->FirstChildElement("object");
-		int xPos = stoi(object->Attribute("x"));
-		int yPos = stoi(object->Attribute("y"));
-		int width = stoi(object->Attribute("width"));
-		int height = stoi(object->Attribute("height"));
-		// store in objects
-		glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
-		glm::vec2 size = glm::vec2(width, height);
-		BoundingShape * bs;
-		if (object->FirstChildElement("ellipse") != NULL){
-			// is an ellipse
-			bs = new BoundingEllipse(positionInTile, size);
-		} else {
-			// is normal rectangle
-			bs = new AxisAlignedBoundingBox(positionInTile, size);
+		// load custom collision boxes (if it has)
+		const xml::XMLElement * objectGroup = tile->FirstChildElement("objectgroup");
+		if (objectGroup != NULL) {
+			const xml::XMLElement * object = objectGroup->FirstChildElement("object");
+			int xPos = stoi(object->Attribute("x"));
+			int yPos = stoi(object->Attribute("y"));
+			int width = stoi(object->Attribute("width"));
+			int height = stoi(object->Attribute("height"));
+			// store in objects
+			glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
+			glm::vec2 size = glm::vec2(width, height);
+			BoundingShape * bs;
+			if (object->FirstChildElement("ellipse") != NULL){
+				// is an ellipse
+				bs = new BoundingEllipse(positionInTile, size);
+			} else {
+				// is normal rectangle
+				bs = new AxisAlignedBoundingBox(positionInTile, size);
+			}
+			TileType * tileType = new TileType(tileID, bs);
+			tileTypeByID[tileID] = tileType;
 		}
-		TileType * tileType = new TileType(tileID, bs);
-		tileTypeByID[tileID] = tileType;
-		// has animations
-		if (tile->FirstChildElement("animation") != NULL){
-			const xml::XMLElement * frame = tile->FirstChildElement("animation")->FirstChildElement("frame");
+		// load animations (if it has)
+		const xml::XMLElement * animation = tile->FirstChildElement("animation");
+		if (animation != NULL){
+			const xml::XMLElement * frame = animation->FirstChildElement("frame");
 			vector<int> * frames = new vector<int>();
 			while(frame){
 				int frameTileID = stoi(frame->Attribute("tileid"));
@@ -179,22 +189,34 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				} else { // is animated
 					map[j*mapSize.x + i] = 0; // empty
 					// create new Entity (for each *single* tile)
-					DeathTile * newDeathTile = new DeathTile();
-					newDeathTile->setTileID(tileID);
-					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
-					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
+					bool isFireTile = (tileID == FIRE_FLOOR || tileID == FIRE_CEILING || tileID == FIRE_RIGHT || tileID == FIRE_LEFT);
+					bool isConveyorBeltTile = (tileID == WATER_FLOOR_RIGHT || tileID == WATER_CEILING_RIGHT || tileID == WATER_FLOOR_LEFT || tileID == WATER_CEILING_LEFT);
+					Entity * newTile;
+					if (isFireTile){
+						newTile = new DeathTile();
+					} else { // if (isConveyorBeltTile)
+						newTile = new ConveyorBelt();
+					}
+					newTile->setTileID(tileID);
+					newTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
+					newTile->setSize(glm::vec2(tileSize, tileSize));
 					// set texture
 					// add texture coordinates of tile
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
-					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+					newTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape
-					if (tileTypeByID.count(tileID) == 1){ // -1 because IDs start with 1
+					if (tileTypeByID.count(tileID) == 1){ // if has custom collision bounds
 						// custom collision bounds (rescaled to fit multi-tile)
 						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 						BoundingShape * copyTileBounds = tileBounds->clone();
-						newDeathTile->setBoundingShape(copyTileBounds);
+						newTile->setBoundingShape(copyTileBounds);
 					}
-					flames.push_back(newDeathTile); // store
+					// store
+					if (isFireTile) {
+						flames.push_back((DeathTile *)newTile); // store
+					} else { // if (isConveyorBeltTile)
+						conveyorBelts.push_back((ConveyorBelt *)newTile); // store
+					}
 				}
 			}
 		}
