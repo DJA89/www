@@ -71,10 +71,15 @@ void Scene::loadLevel(string levelName){
 	map = TileMap::createTileMap(levelName, texProgram);
 	// platforms
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
-		FixedPathEntity * p = it->second;
-		p->init(map->tilesheet, texProgram);
+		if (dynamic_cast<FixedPathEntity*>(it->second)) {
+			FixedPathEntity * p = dynamic_cast<FixedPathEntity*>(it->second);
+			p->init(map->tilesheet, texProgram);
+		}
+		else {
+			ConveyorBelt * p = dynamic_cast<ConveyorBelt *>(it->second);
+			p->init(map->tilesheet, texProgram);
+		}
 	}
-	// checkpoints
 	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
 		Checkpoint * c = it->second;
 		c->init(map->tilesheet, texProgram);
@@ -97,11 +102,15 @@ void Scene::loadLevel(string levelName){
 		} else {
 			cout << tileID << endl;
 		}
+}
+for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
+	ConveyorBelt * cbf = it->second;
+	cbf->init(map->tilesheet, texProgram);
 	}
 }
 
 void Scene::endGame() {
-	sound.releaseSound(soundSample);
+	//sound.releaseSound(soundSample);
 	player->endGame();
 }
 
@@ -144,7 +153,9 @@ void Scene::updateMainGame(int deltaTime) {
 	// update all moving entities: platforms, player, ...
 	if (!player->isDying()) {
 		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
-			it->second->update(deltaTime);
+			if (dynamic_cast<FixedPathEntity*>(it->second)) {
+				dynamic_cast<FixedPathEntity*>(it->second)->update(deltaTime);
+			}
 		}
 		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 			it->second->update(deltaTime);
@@ -152,34 +163,43 @@ void Scene::updateMainGame(int deltaTime) {
 		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
 			(*it)->update(deltaTime);
 		}
+		for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
+			it->second->update(deltaTime);
+		}
 	}
 
 	player->update(deltaTime);
 	// check for collisions between player and entities
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
+	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 	if (!player->isDying()) {
-		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());	if (!player->isDying()) {
-			// FixedPathEntities
-			for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
-				FixedPathEntity * ent = it->second;
-				if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
-					if (ent->IsEnemy()) {
-						player->handleCollisionWithDeath(*ent);
-						break; // can only die once, can we?
+		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+			Entity * ent = it->second;
+			if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
+				if (dynamic_cast<FixedPathEntity*>(ent)) {
+					FixedPathEntity* fpe = dynamic_cast<FixedPathEntity*>(ent);
+					if (fpe->IsEnemy()) {
+						player->handleCollisionWithDeath(*fpe);
+						break;
 					}
-					else {
-						player->handleCollisionWithPlatform(*ent);
-					}
-					// cout << "PLAYER with platform collision" << endl;
 				}
+				player->handleCollisionWithPlatform(*ent);
+				// cout << "PLAYER with platform collision" << endl;
 			}
+		}
+		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
+		for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
+			ConveyorBelt * cbf = it->second;
+			if (Intersection::check(*(cbf->getBoundingShape()), *playerCollisionBounds)) {
+				player->handleCollisionWithPlatform(*cbf);
+			}
+		}
 			// checkpoints
-			for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
-				Checkpoint * cp = it->second;
-				if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
-					handleCheckpointCollision(cp);
-				}
+		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
+			Checkpoint * cp = it->second;
+			if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
+				handleCheckpointCollision(cp);
 			}
 			// flames
 			for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
@@ -191,6 +211,7 @@ void Scene::updateMainGame(int deltaTime) {
 			}
 		}
 	}
+
 	delete playerCollisionBounds;
 
 	// update tilemap
@@ -346,6 +367,9 @@ void Scene::renderMainGame() {
 		(*it)->render();
 	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
+		it->second->render();
+	}
+	for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
 		it->second->render();
 	}
 	player->render();

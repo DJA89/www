@@ -39,5 +39,7 @@
   <object id="11" name="Platform_1_path" x="312" y="324" width="176" height="28"/>
   <object id="13" name="Platform_1_spawn" gid="58" x="356" y="352" width="32" height="28"/>
   <object id="19" name="Checkpoint" gid="592" x="144" y="384" width="16" height="16"/>
+  <object id="22" name="cb_100_rr" gid="8" x="80" y="177" width="97" height="16"/>
+  <object id="23" name="cb_101_ll" gid="8" x="224" y="224" width="160" height="16"/>
  </objectgroup>
 </map>
