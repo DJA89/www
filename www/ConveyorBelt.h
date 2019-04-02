@@ -11,6 +11,7 @@ public:
 	void setTileID(int tileID) { this->tileID = tileID; }
 	void setPosition(glm::vec2 initPos);
 	float getVelocity(bool isBelow) const;
+	void setDirection(int xDirection);
 	void setAboveVelocity(float velocity);
 	void setBelowVelocity(float velocity);
 

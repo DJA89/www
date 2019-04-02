@@ -10,7 +10,7 @@ class BoundingShape;
 class AxisAlignedBoundingBox;
 
 // General game object
-// has a position, a size and a velocity
+// has a position, a size and a speed with direction
 // has a boundingShape (used for collision detection)
 // has a method to handle collisions
 
@@ -30,7 +30,8 @@ public:
 	void setSize(glm::vec2 size){ this->size = size; }
 	glm::vec2 getSize() const { return this->size; }
 	BoundingShape * getBoundingShape() const;
-	float getVelocity() const { return velocity; }
+	glm::vec2 getVelocity() const;
+	void setDirection(int xDirection);
 	void setID(int ID){ this->ID = ID; }
 	int getID(){ return this->ID; }
 	void setTileID(int tileID) { this->tileID = tileID; }
@@ -44,8 +45,8 @@ protected:
 	// physical
 	glm::vec2 position; // top left
 	glm::vec2 size;
-	float velocity; // TODO change to glm::vec2
-	glm::vec2 direction; // moving direction (length 1)
+	float speed; // TODO change to glm::vec2
+	glm::vec2 direction = glm::vec2(1.f, 0.f); // moving direction (length 1)
 	// collision
 	BoundingShape * collisionBounds;
 	AxisAlignedBoundingBox * defaultCollisionBox;

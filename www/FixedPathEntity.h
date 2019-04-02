@@ -11,7 +11,7 @@ class BoundingShape;
 class AxisAlignedBoundingBox;
 
 // General game object
-// has a position, a size and a velocity
+// has a position, a size and a speed
 // has a boundingShape (used for collision detection)
 // has a method to handle collisions
 

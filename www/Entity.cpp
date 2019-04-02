@@ -24,9 +24,8 @@ void Entity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	sprite->setAnimationSpeed(0, 8);
 	sprite->addKeyframe(0, textureCoordinates);
 	sprite->changeAnimation(0);
-	// velocity and direction
-	velocity = 0;
-	direction = glm::vec2(1, 0); // to right
+	// speed (direction has default value in header)
+	speed = 0;
 	// default bounding box
 	defaultCollisionBox = new AxisAlignedBoundingBox(glm::vec2(0, 0), this->size);
 	getBoundingShape()->recalculateFromEntityPosition(this->position);
@@ -34,7 +33,7 @@ void Entity::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 
 void Entity::update(int deltaTime){
 	// move
-	position += velocity * glm::normalize(direction);
+	position += speed * glm::normalize(direction);
 	// update sprite and bounds
 	sprite->setPosition(position);
 	getBoundingShape()->recalculateFromEntityPosition(position);
@@ -62,4 +61,12 @@ void Entity::addAnimation(glm::vec2 newTextureCoords){
 	sprite->setAnimationSpeed(this->animationCount, 8);
 	sprite->addKeyframe(this->animationCount, newTextureCoords);
 	sprite->changeAnimation(this->animationCount);
+}
+
+void Entity::setDirection(int xDirection){
+	this->direction = glm::vec2(xDirection, 0.f);
+}
+
+glm::vec2 Entity::getVelocity() const {
+	return speed * glm::normalize(direction);
 }

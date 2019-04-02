@@ -3,9 +3,8 @@
 
 void ConveyorBelt::init(Texture & tilesheet, ShaderProgram & shaderProgram){
 	Entity::init(tilesheet, shaderProgram);
-	// velocity and direction
-	velocity = 2.f;
-	direction = glm::vec2(1.f, 0.f); // TODO set in TileMap
+	// speed
+	speed = 2.f;
 }
 
 void ConveyorBelt::handleCollision(Entity & e) {

@@ -197,6 +197,11 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 						newTile = new DeathTile();
 					} else { // if (isConveyorBeltTile)
 						newTile = new ConveyorBelt();
+						if (tileID == WATER_FLOOR_RIGHT || tileID == WATER_CEILING_RIGHT){
+							newTile->setDirection(1); // right
+						} else {
+							newTile->setDirection(-1); // right
+						}
 					}
 					newTile->setTileID(tileID);
 					newTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
