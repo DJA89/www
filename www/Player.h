@@ -23,7 +23,6 @@ public:
 	void render();
 
 	void setTileMap(TileMap *tileMap);
-	void setPosition(const glm::vec2 &pos);
 	void playerFalling(int);
 	bool hasDied();
 	bool isDying();
@@ -34,18 +33,14 @@ public:
 	void handleCollisionWithMap(TileMap & map);
 	void handleCollision(Entity & e);
 
-	glm::vec2 getPosition(){ return posPlayer; }
-	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
-	void setPositionY(int yPosition){ this->posPlayer.y = yPosition; }
-	glm::vec2 getSize(){ return sizePlayer; }
+	void setPositionX(int xPosition){ this->position.x = xPosition; }
+	void setPositionY(int yPosition){ this->position.y = yPosition; }
 	bool getIfUpSideDown(){ return upsidedown; }
 	void endGame();
 
 
 
 private:
-	glm::vec2 posPlayer; // TODO change to glm::vec2
-	glm::vec2 sizePlayer; // TODO change to glm::vec2
 	Texture * spritesheet;
 	Sprite *sprite;
 	TileMap *map;
