@@ -38,18 +38,16 @@ public:
 	bool getIfUpSideDown(){ return upsidedown; }
 	void endGame();
 
-
+private:
+	bool renderInDeath();
 
 private:
 	Texture * spritesheet;
-	Sprite *sprite;
-	TileMap *map;
-	int playerMovementSpeed = 4;
+	TileMap *map; // TODO extract to Scene
 	float minimalStandingFractionPlatform = 0.5f; // of sizePlayer.x
 	float minimalStandingFractionConveyorBelt = 0.05f;
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
-	bool renderInDeath();
 	bool isStandingOnMovingEntity;
 	bool collidingWithWall;
 	Entity * standingOn;

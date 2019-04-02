@@ -28,9 +28,6 @@ Player::~Player() {
 	if (spritesheet != NULL){
 		delete spritesheet;
 	}
-	if (sprite != NULL){
-		delete sprite;
-	}
 }
 
 void Player::init(ShaderProgram &shaderProgram)
@@ -40,6 +37,7 @@ void Player::init(ShaderProgram &shaderProgram)
 	dying = false;
 	framesSinceDeath = 0;
 	collidingWithWall = false;
+	speed = 4.f;
 
 	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet = new Texture();
@@ -128,7 +126,7 @@ void Player::update(int deltaTime)
 				sprite->changeAnimation(MOVE_LEFT);
 			}
 		}
-		position.x -= playerMovementSpeed;
+		position.x -= speed;
 		if (map->collisionMoveLeft(position, size)) {
 			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
 				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
@@ -147,11 +145,11 @@ void Player::update(int deltaTime)
 						collidingWithWall = true;
 					}
 					else {
-						position.x += playerMovementSpeed;
+						position.x += speed;
 					}
 			}
 			else {
-				position.x += playerMovementSpeed;
+				position.x += speed;
 			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
@@ -173,7 +171,7 @@ void Player::update(int deltaTime)
 				sprite->changeAnimation(MOVE_RIGHT);
 			}
 		}
-		position.x += playerMovementSpeed;
+		position.x += speed;
 		if (map->collisionMoveRight(position, size)) {
 			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
 				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
@@ -192,11 +190,11 @@ void Player::update(int deltaTime)
 					collidingWithWall = true;
 				}
 				else {
-					position.x -= playerMovementSpeed;
+					position.x -= speed;
 				}
 			}
 			else {
-				position.x -= playerMovementSpeed;
+				position.x -= speed;
 			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
