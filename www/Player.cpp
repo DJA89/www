@@ -113,7 +113,7 @@ void Player::init(ShaderProgram &shaderProgram)
 	SoundSystemClass sound = SoundSystemClass();
 
 	sound.createSound(&soundSample, "sounds/jump.mp3");
-	sound.createSound(&soundSample2, "sounds/death.wav");
+	sound.createSound(&soundSample2, "sounds/death_squeeze.wav");
 }
 
 void Player::flipCollisionBounds(){
