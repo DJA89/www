@@ -34,6 +34,7 @@ void Scene::init()
 	initShaders();
 	initMainGame();
 	initMenu();
+	updateMenu();
 	// map
 
 	SoundSystemClass sound = SoundSystemClass();
