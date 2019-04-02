@@ -1,8 +1,11 @@
 # LEVEL MAP
 # 0 is a filler, all other digits are the levels
 # the first 1 encountered will be the first level loaded
-4 4 # width & height
- 9, 8, 6, 5
-10,11, 7, 4
- 12, 1, 2, 3
- 13, 14, 15, 16
+5 7 # width & height
+21, 9, 8, 6, 5
+22, 10,11, 7, 4
+23, 12, 1, 2, 3
+24, 13, 17, 15, 16
+25, 14, 18, 19, 20
+26, 27, 28, 29, 30
+31, 32, 33, 34, 35
