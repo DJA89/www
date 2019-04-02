@@ -112,8 +112,9 @@ void Player::init(ShaderProgram &shaderProgram)
 
 	SoundSystemClass sound = SoundSystemClass();
 
-	sound.createSound(&soundSample, "sounds/jump.mp3");
-	sound.createSound(&soundSample2, "sounds/death_squeeze.wav");
+	sound.createSound(&soundSample, "sounds/jump_amplified.wav");
+	sound.createSound(&soundSample2, "sounds/death_squeeze_amplified.wav");
+	sound.createSound(&soundSample3, "sounds/checkpoint_amplified.wav");
 }
 
 void Player::flipCollisionBounds(){
@@ -454,6 +455,11 @@ void Player::handleCollisionWithDeath(Entity & e) {
 
 	sprite->changeAnimation(newAnimation);
 
+}
+
+void Player::handleCollisionWithCheckpoint(){
+	// play checkpoint sound
+	sound.playSound(soundSample3, false);
 }
 
 void Player::handleCollision(Entity & e) {

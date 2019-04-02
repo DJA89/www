@@ -32,6 +32,7 @@ public:
 	void handleCollisionWithMovingEntity(Entity & platform);
 	void handleCollisionWithDeath(Entity & e);
 	void handleCollisionWithMap(TileMap & map);
+	void handleCollisionWithCheckpoint();
 	void handleCollision(Entity & e);
 
 	void setPositionX(int xPosition){ this->position.x = xPosition; }
@@ -56,7 +57,7 @@ private:
 	BoundingShape * collisionBoundsUpsidedown;
 	Entity * standingOn;
 	SoundSystemClass sound;
-	SoundClass soundSample, soundSample2;
+	SoundClass soundSample, soundSample2, soundSample3;
 };
 
 

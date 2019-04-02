@@ -281,6 +281,8 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 		}
 	// change checkpoint image from unsaved to saved
 	if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR || checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
+		// if wasn't saved => play sound
+		player->handleCollisionWithCheckpoint();
 		int newTileID;
 		if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR){
 			newTileID = CHECKPOINT_SAVED_FLOOR;
