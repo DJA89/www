@@ -16,6 +16,9 @@ public:
 	virtual bool intersects(const BoundingShape & shape) const = 0;
 	virtual bool intersects(const BoundingEllipse & ellipse) const = 0;
 	virtual bool intersects(const AxisAlignedBoundingBox & box) const = 0;
+	virtual glm::vec2 getMTV(const BoundingShape & shape) const = 0;
+	virtual glm::vec2 getMTV(const BoundingEllipse & ellipse) const = 0;
+	virtual glm::vec2 getMTV(const AxisAlignedBoundingBox & box) const = 0;
 	glm::vec2 getPosition() const { return position; }
 	void recalculateFromEntityPosition(glm::vec2 newPosition) { position = newPosition + positionInTile; }
 	glm::vec2 getSize() const { return size; }

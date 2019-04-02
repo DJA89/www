@@ -14,6 +14,9 @@ public:
 	bool intersects(const BoundingShape & shape) const;
 	bool intersects(const BoundingEllipse & ellipse) const;
 	bool intersects(const AxisAlignedBoundingBox & box) const;
+	glm::vec2 getMTV(const BoundingShape & shape) const;
+	glm::vec2 getMTV(const BoundingEllipse & ellipse) const;
+	glm::vec2 getMTV(const AxisAlignedBoundingBox & box) const;
 
 protected:
 	BoundingEllipse(const BoundingEllipse & b) : BoundingShape(b) {};
