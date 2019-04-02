@@ -29,7 +29,7 @@ public:
 	glm::vec2 getPosition() const { return this->position; }
 	void setSize(glm::vec2 size){ this->size = size; }
 	glm::vec2 getSize() const { return this->size; }
-	BoundingShape * getBoundingShape() const;
+	BoundingShape * getBoundingShape();
 	glm::vec2 getVelocity() const;
 	void setDirection(int xDirection);
 	void setID(int ID){ this->ID = ID; }

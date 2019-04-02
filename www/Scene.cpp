@@ -174,65 +174,51 @@ void Scene::updateMainGame(int deltaTime) {
 	player->update(deltaTime);
 
 	// check for collisions between player and entities
-	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
-	playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 	if (!player->isDying()) {
 		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 			Entity * ent = it->second;
-			if (Intersection::check(*(ent->getBoundingShape()), *playerCollisionBounds)) {
+			if (Intersection::check(*(ent->getBoundingShape()), *(player->getBoundingShape()))) {
 				if (dynamic_cast<FixedPathEntity*>(ent)) {
 					FixedPathEntity* fpe = dynamic_cast<FixedPathEntity*>(ent);
 					if (fpe->IsEnemy()) {
 						player->handleCollisionWithDeath(*fpe);
-						// actualize player collision box
-						playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 						break;
 					}
 				}
 				player->handleCollisionWithMovingEntity(*ent);
-				// actualize player collision box
-				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 			}
 		}
 		// checkpoints
 		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 			Checkpoint * cp = it->second;
-			if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
+			if (Intersection::check(*(cp->getBoundingShape()), *(player->getBoundingShape()))) {
 				handleCheckpointCollision(cp);
-				// actualize player collision box
-				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 			}
 		}
 		// flames
 		for (auto it = map->flames.begin(); it != map->flames.end(); ++it) {
 			DeathTile * dt = *it;
-			if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
+			if (Intersection::check(*(dt->getBoundingShape()), *(player->getBoundingShape()))) {
 				player->handleCollisionWithDeath(*dt);
-				// actualize player collision box
-				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 				break; // can only die once, can we?
 			}
 		}
 		// conveyor belts
 		for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
 			ConveyorBelt * cb = *it;
-			if (Intersection::check(*(cb->getBoundingShape()), *playerCollisionBounds)) {
+			if (Intersection::check(*(cb->getBoundingShape()), *(player->getBoundingShape()))) {
 				// TODO customize
 				player->handleCollisionWithMovingEntity(*cb);
-				// actualize player collision box
-				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 				break; // add velocity just once, not for each tile touching
 			}
 		}
 		// check tile collisions (created by platform/conveyor belt movement)
 		player->handleCollisionWithMap(*map); // TODO rename
 	}
-	delete playerCollisionBounds;
 
 	// update tilemap
 	// if player left level => change level and wrap player position around
-	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
+	glm::vec2 maxPos = glm::vec2(map->mapSize.x, map->mapSize.y) * float(map->getTileSize());
 	if (player->getPosition().x + player->getSize().x >= maxPos.x) {
 		string nextLevelName = levelMap.nameOfNextLevel(RIGHT);
 		loadLevel(nextLevelName);
@@ -263,8 +249,8 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// TODO store checkpoint in checkpoint class (or TileMap class)
 	// TODO => move saving to saveGame() and call if collision
 	// player data
-	glm::ivec2 playerPosition = player->getPosition();
-	glm::ivec2 playerSize = player->getSize();
+	glm::vec2 playerPosition = player->getPosition();
+	glm::vec2 playerSize = player->getSize();
 	bool upsidedown = player->getIfUpSideDown();
 	// checkpoint data
 	glm::vec2 checkpointPosition = cp->getPosition();
@@ -273,11 +259,11 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// get if checkpoint upsidedown
 	bool isCheckpointUpsideDown = (checkpointTileID == CHECKPOINT_UNSAVED_CEILING || checkpointTileID == CHECKPOINT_SAVED_CEILING);
 	// compute normalized checkpoint position
-	glm::ivec2 normalizedCheckpointPosition;
+	glm::vec2 normalizedCheckpointPosition;
 	if (isCheckpointUpsideDown){
-			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y);
+			normalizedCheckpointPosition = glm::vec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y);
 		} else {
-			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
+			normalizedCheckpointPosition = glm::vec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
 	// change checkpoint image from unsaved to saved
 	if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR || checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
@@ -315,7 +301,7 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 }
 
 // normalized: the player will be spawned shifted left by half its length
-void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
+void Scene::saveGame(glm::vec2 normalizedPosition, bool isUpsideDown){
 	int currentScreen = levelMap.getCurrentScreen();
 	savedState.save(normalizedPosition, isUpsideDown, currentScreen);
 }
@@ -338,7 +324,7 @@ void Scene::loadGame(){
 	// player related
 	player->setTileMap(map);
 	bool upsidedown = savedState.getSavedUpsideDown();
-	glm::ivec2 normalizedPosition = savedState.getSavedPlayerPosition();
+	glm::vec2 normalizedPosition = savedState.getSavedPlayerPosition();
 	player->restorePlayerPosition(upsidedown, normalizedPosition);
 }
 

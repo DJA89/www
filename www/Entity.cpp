@@ -44,12 +44,19 @@ void Entity::render(){
 	sprite->render();
 }
 
-BoundingShape * Entity::getBoundingShape() const {
+BoundingShape * Entity::getBoundingShape() {
+	BoundingShape * currentBS;
 	if (this->collisionBounds != NULL){
-		return this->collisionBounds;
-	} else {
-		return this->defaultCollisionBox;
+		currentBS = this->collisionBounds;
+	} else if (this->defaultCollisionBox != NULL){
+		this->defaultCollisionBox->setSize(this->size); // update size
+		currentBS = this->defaultCollisionBox;
+	} else { // set new default collision object
+		this->defaultCollisionBox = new AxisAlignedBoundingBox(glm::vec2(0, 0), this->size);
+		currentBS = this->defaultCollisionBox;
 	}
+	currentBS->recalculateFromEntityPosition(this->position);
+	return currentBS;
 }
 
 void Entity::setNumberAnimations(int numberAnimations){
@@ -73,6 +80,9 @@ glm::vec2 Entity::getVelocity() const {
 
 void Entity::setPosition(glm::vec2 initPos) {
 	this->position = initPos;
+	if (getBoundingShape() != NULL){
+		getBoundingShape()->recalculateFromEntityPosition(this->position);
+	}
 }
 
 void Entity::setTileID(int tileID) {

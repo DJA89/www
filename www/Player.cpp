@@ -1,11 +1,16 @@
+#include "Player.h"
 #include <cmath>
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include "Player.h"
+#include <algorithm>
 #include "Game.h"
 #include "BoundingShape.h"
-#include <algorithm>
+#include "Sprite.h"
+#include "TileMap.h"
+#include "SavedState.h"
+#include "SoundSystem.h"
+#include "AxisAlignedBoundingBox.h"
 
 #define FALL_STEP 9
 #define SPACEBAR 32
@@ -20,19 +25,41 @@ enum PlayerAnims
 	DEATH_LEFT, DEATH_RIGHT, DEATH_LEFTU, DEATH_RIGHTU
 };
 
+Player::~Player() {
+	if (spritesheet != NULL){
+		delete spritesheet;
+	}
+	// remove bounding shapes (created here)
+	// don't need to remove this->collisionBounds: it points to one of these
+	if (collisionBoundsUpright != NULL){
+		delete collisionBoundsUpright;
+	}
+	if (collisionBoundsUpsidedown != NULL){
+		delete collisionBoundsUpsidedown;
+	}
+}
 
 void Player::init(ShaderProgram &shaderProgram)
 {
+	// load spritesheet
+	spritesheet = new Texture();
+	spritesheet->loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	// call Entity::init (now that we have the spritesheet for it)
+	Entity::init(*spritesheet, shaderProgram);
+	// general config
 	upsidedown = false;
 	actionPressedBeforeCollition = false;
 	dying = false;
 	framesSinceDeath = 0;
 	collidingWithWall = false;
-
-	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	spritesheet.loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sizePlayer = glm::vec2(32, 32);
-	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	speed = 4.f;
+	this->size = glm::vec2(32, 32);
+	// initialize manual boundingShapes (for upright and upsidedown)
+	collisionBoundsUpright = new AxisAlignedBoundingBox(glm::vec2(0.f, 7.f), glm::vec2(35.f, 25.f));
+	collisionBoundsUpsidedown = new AxisAlignedBoundingBox(glm::vec2(0.f, 0.f), glm::vec2(35.f, 25.f));
+	this->setBoundingShape(collisionBoundsUpright);
+	// sprite & animations
+	sprite = Sprite::createSprite(size, glm::vec2(0.25, 0.25), spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 
 		sprite->setAnimationSpeed(STAND_LEFT, 8);
@@ -80,12 +107,20 @@ void Player::init(ShaderProgram &shaderProgram)
 		sprite->addKeyframe(DEATH_RIGHTU, glm::vec2(0.75f, 0.75f));
 
 	sprite->changeAnimation(STAND_RIGHT);
-	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+	sprite->setPosition(glm::vec2(position.x, position.y));
 
 
 	SoundSystemClass sound = SoundSystemClass();
 
 	sound.createSound(&soundSample, "sounds/jump.mp3");
+}
+
+bool Player::flipCollisionBounds(){
+	if (this->collisionBounds == collisionBoundsUpright){
+		this->setBoundingShape(collisionBoundsUpsidedown);
+	} else { // upsidedown
+		this->setBoundingShape(collisionBoundsUpright);
+	}
 }
 
 bool Player::isDying() {
@@ -115,30 +150,30 @@ void Player::update(int deltaTime)
 				sprite->changeAnimation(MOVE_LEFT);
 			}
 		}
-		posPlayer.x -= playerMovementSpeed;
-		if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+		position.x -= speed;
+		if (map->collisionMoveLeft(position, size)) {
 			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
 				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
 					float vel = cb->getVelocity().x;
 					if (vel > 0) {
-						posPlayer.x += vel;
-							if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+						position.x += vel;
+							if (map->collisionMoveLeft(position, size)) {
 								float tileSize = map->getTileSize();
-									int aux = ((posPlayer.x) / tileSize);
+									int aux = ((position.x) / tileSize);
 									int aux2 = tileSize * (aux + 1);
-									posPlayer.x = aux2 - vel;
+									position.x = aux2 - vel;
 							}
 							else {
-								posPlayer.x -= vel;
+								position.x -= vel;
 							}
 						collidingWithWall = true;
 					}
 					else {
-						posPlayer.x += playerMovementSpeed;
+						position.x += speed;
 					}
 			}
 			else {
-				posPlayer.x += playerMovementSpeed;
+				position.x += speed;
 			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
@@ -160,30 +195,30 @@ void Player::update(int deltaTime)
 				sprite->changeAnimation(MOVE_RIGHT);
 			}
 		}
-		posPlayer.x += playerMovementSpeed;
-		if (map->collisionMoveRight(posPlayer, sizePlayer)) {
+		position.x += speed;
+		if (map->collisionMoveRight(position, size)) {
 			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
 				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
 				float vel = cb->getVelocity().x;
 				if (vel < 0) {
-					posPlayer.x += vel;
-					if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+					position.x += vel;
+					if (map->collisionMoveLeft(position, size)) {
 						float tileSize = map->getTileSize();
-						int aux = (((posPlayer.x + sizePlayer.x - 1) / tileSize) - 2);
+						int aux = (((position.x + size.x - 1) / tileSize) - 2);
 						int aux2 = tileSize * aux;
-						posPlayer.x = aux2 - vel;
+						position.x = aux2 - vel;
 					}
 					else {
-						posPlayer.x -= vel;
+						position.x -= vel;
 					}
 					collidingWithWall = true;
 				}
 				else {
-					posPlayer.x -= playerMovementSpeed;
+					position.x -= speed;
 				}
 			}
 			else {
-				posPlayer.x -= playerMovementSpeed;
+				position.x -= speed;
 			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
@@ -219,39 +254,39 @@ void Player::update(int deltaTime)
 	}
 	// if moved by entity, add entity velocity to player's
 	if (isStandingOnMovingEntity && standingOn != NULL){
-		posPlayer += standingOn->getVelocity();
+		position += standingOn->getVelocity();
 		isStandingOnMovingEntity = false; // wait for next collision
 	}
 
-	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+	sprite->setPosition(glm::vec2(position.x, position.y));
 }
 
 // center means in the middle of the player touching the floor/ceiling it is standing on
-void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
+void Player::restorePlayerPosition(bool upsidedown, glm::vec2 normalizedCheckpointPosition){
 	// player specific restoring
 	int xCenter = normalizedCheckpointPosition.x;
 	int yCenter = normalizedCheckpointPosition.y;
 	int xPos, yPos;
 	if (upsidedown) {
-		xPos = xCenter - sizePlayer.x/2;
+		xPos = xCenter - size.x/2;
 		yPos = yCenter;
 		sprite->changeAnimation(STAND_RIGHTU);
 	} else {
-		xPos = xCenter - sizePlayer.x/2;
-		yPos = yCenter - sizePlayer.y;
+		xPos = xCenter - size.x/2;
+		yPos = yCenter - size.y;
 		sprite->changeAnimation(STAND_RIGHT);
 	}
 	framesSinceDeath = 0;
 	dying = false;
 	this->upsidedown = upsidedown;
-	setPosition(glm::ivec2(xPos, yPos));
+	setPosition(glm::vec2(xPos, yPos));
 }
 
 void Player::playerFalling(int pixels) {
-	posPlayer.y += pixels;
+	position.y += pixels;
 
-	bool collition = collidingWithWall || map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
-		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
+	bool collition = collidingWithWall || map->collisionMoveUp(position, size, &position.y) ||
+		map->collisionMoveDown(position, size, &position.y);
 	collidingWithWall = false;
 	if(collition || isStandingOnMovingEntity) {
 		if (!actionPressedBeforeCollition) {
@@ -260,6 +295,7 @@ void Player::playerFalling(int pixels) {
 				Game::instance().getKey(W_KEY)) {
 				actionPressedBeforeCollition = true;
 				upsidedown = !upsidedown;
+				flipCollisionBounds();
 				sound.playSound(soundSample, false);
 				switch (sprite->animation()) {
 				case MOVE_LEFT:
@@ -335,25 +371,19 @@ void Player::setTileMap(TileMap *tileMap)
 	map = tileMap;
 }
 
-void Player::setPosition(const glm::vec2 &pos)
-{
-	posPlayer = pos;
-	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
-}
-
 void Player::handleCollisionWithMap(TileMap & map){
 	// get MTV (see: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
-	glm::vec2 mtv = map.getMinimumTranslationVector(posPlayer, sizePlayer);
+	glm::vec2 mtv = map.getMinimumTranslationVector(*this);
 	// correct player position by this vector
-	posPlayer -= glm::ivec2(int(mtv.x), int(mtv.x));
+	position -= mtv;
 }
 
 void Player::handleCollisionWithMovingEntity(Entity & platform) {
-	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
-	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
+	glm::vec2 position_f = (glm::vec2)position;
+	glm::vec2 size_f = (glm::vec2)size;
 	BoundingShape * platBound = platform.getBoundingShape();
-	float leftPlayerFoot = posPlayer_f.x;
-	float rightPlayerFoot = posPlayer_f.x + sizePlayer_f.x;
+	float leftPlayerFoot = position_f.x;
+	float rightPlayerFoot = position_f.x + size_f.x;
 	float leftPlatformBorder = platBound->getPosition().x;
 	float rightPlatformBorder = platBound->getPosition().x + platBound->getSize().x;
 	float minStanding;
@@ -363,14 +393,14 @@ void Player::handleCollisionWithMovingEntity(Entity & platform) {
 	else {
 		minStanding = minimalStandingFractionPlatform;
 	}
-	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minStanding * sizePlayer_f.x){
+	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minStanding * size_f.x){
 		// can stand on platform
-		if (posPlayer_f.y < platBound->getPosition().y){
+		if (position_f.y < platBound->getPosition().y){
 			// is above
-			posPlayer_f.y = platBound->getPosition().y - sizePlayer_f.y;
-		} else if (posPlayer_f.y > platBound->getPosition().y){
+			position_f.y = platBound->getPosition().y - size_f.y;
+		} else if (position_f.y > platBound->getPosition().y){
 			// is below
-			posPlayer_f.y = platBound->getPosition().y + platBound->getSize().y;
+			position_f.y = platBound->getPosition().y + platBound->getSize().y;
 		} else { // honestly I don't know why we can get here...
 			// cout << "ERROR: player was neither below, nor above platform" << endl;
 		}
@@ -378,19 +408,19 @@ void Player::handleCollisionWithMovingEntity(Entity & platform) {
 		standingOn = &platform; // store platform to follow movement
 	} else {
 		// is next to platform, so just pull out
-		if (posPlayer_f.x < platBound->getPosition().x){
+		if (position_f.x < platBound->getPosition().x){
 			// is left
-			posPlayer_f.x = platBound->getPosition().x - sizePlayer_f.x;
-		} else if (posPlayer_f.x > platBound->getPosition().x){
+			position_f.x = platBound->getPosition().x - size_f.x;
+		} else if (position_f.x > platBound->getPosition().x){
 			// is right
-			posPlayer_f.x = platBound->getPosition().x + platBound->getSize().x;
+			position_f.x = platBound->getPosition().x + platBound->getSize().x;
 		} else { // honestly I don't know why we can get here...
 			// cout << "ERROR: player was neither left, nor right of platform" << endl;
 		}
 	}
-	posPlayer = (glm::ivec2) posPlayer_f;
-	sizePlayer = (glm::ivec2) sizePlayer_f;
-	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
+	position = position_f;
+	size = size_f;
+	sprite->setPosition(glm::vec2(position.x, position.y));
 }
 
 void Player::endGame() {
@@ -419,4 +449,8 @@ void Player::handleCollisionWithDeath(Entity & e) {
 	}
 
 	sprite->changeAnimation(newAnimation);
+}
+
+void Player::handleCollision(Entity & e) {
+	e.handleCollision(*this);
 }

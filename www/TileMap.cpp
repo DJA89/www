@@ -12,6 +12,7 @@
 #include "Utils.h"
 #include "Checkpoint.h"
 #include "Intersection.h"
+#include "Player.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -393,27 +394,30 @@ bool TileMap::tileIsCollidable(int tileID) const {
 	        == std::end(non_collision_tiles));
 }
 
-glm::vec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const {
+glm::vec2 TileMap::getMinimumTranslationVector(Player & player) const {
 	// collision shapes
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::ivec2(0, 0), playerSize);
-	playerCollisionBounds->recalculateFromEntityPosition(playerPos);
+	BoundingShape * playerCollisionBounds = player.getBoundingShape();
 	BoundingShape * tileCollisionBounds;
 	glm::vec2 maximumMTV = glm::vec2(0.f, 0.f);
+	// player collision shape edges
+	glm::vec2 playerPos = playerCollisionBounds->getPosition();
+	glm::vec2 playerSize = playerCollisionBounds->getSize();
 
+	// TODO this fails when using Ellipses
 	int x0, x1, y0, y1;
-	x0 = min(playerPos.x / tileSize, mapSize.x-1);
-	x1 = min((playerPos.x + playerSize.x - 1) / tileSize, mapSize.x-1);
-	y0 = min(playerPos.y / tileSize, mapSize.y-1);
-	y1 = min((playerPos.y + playerSize.y - 1) / tileSize, mapSize.y-1);
+	x0 = min(int(playerPos.x / tileSize), mapSize.x-1);
+	x1 = min(int((playerPos.x + playerSize.x - 1) / tileSize), mapSize.x-1);
+	y0 = min(int(playerPos.y / tileSize), mapSize.y-1);
+	y1 = min(int((playerPos.y + playerSize.y - 1) / tileSize), mapSize.y-1);
 	for (int y = y0; y <= y1; y++){
 		for (int x = x0; x <= x1; x++){
 			// TODO: quite inefficient, better only on tiles touched by player...
 			if (tileIsCollidable(map[y*mapSize.x + x])){
 				// if collidable
 				tileCollisionBounds = new AxisAlignedBoundingBox(
-				                        glm::ivec2(0, 0),
-				                        glm::ivec2(tileSize, tileSize));
-				tileCollisionBounds->recalculateFromEntityPosition(glm::ivec2(x * tileSize, y * tileSize));
+				                        glm::vec2(0, 0),
+				                        glm::vec2(tileSize, tileSize));
+				tileCollisionBounds->recalculateFromEntityPosition(glm::vec2(x * tileSize, y * tileSize));
 				glm::vec2 currentMTV = Intersection::getMTV(*tileCollisionBounds, *playerCollisionBounds);
 				if (abs(currentMTV.x) > abs(maximumMTV.x)){
 					maximumMTV.x = currentMTV.x;
@@ -428,13 +432,13 @@ glm::vec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, cons
 	return maximumMTV;
 }
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveLeft(const glm::vec2 &pos, const glm::vec2 &size) const
 {
 	int x, y0, y1;
 
-	x = min(pos.x / tileSize, mapSize.x-1);
-	y0 = min(pos.y / tileSize, mapSize.y-1);
-	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
+	x = min(int(pos.x / tileSize), mapSize.x-1);
+	y0 = min(int(pos.y / tileSize), mapSize.y-1);
+	y1 = min(int((pos.y + size.y - 1) / tileSize), mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (tileIsCollidable(map[y*mapSize.x + x])){
@@ -445,13 +449,13 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
+bool TileMap::collisionMoveRight(const glm::vec2 &pos, const glm::vec2 &size) const
 {
 	int x, y0, y1;
 
-	x = min((pos.x + size.x - 1) / tileSize, mapSize.x-1);
-	y0 = min(pos.y / tileSize, mapSize.y-1);
-	y1 = min((pos.y + size.y - 1) / tileSize, mapSize.y-1);
+	x = min(int((pos.x + size.x - 1) / tileSize), mapSize.x-1);
+	y0 = min(int(pos.y / tileSize), mapSize.y-1);
+	y1 = min(int((pos.y + size.y - 1) / tileSize), mapSize.y-1);
 	for(int y=y0; y<=y1; y++)
 	{
 		if (tileIsCollidable(map[y*mapSize.x + x])){
@@ -461,13 +465,13 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+bool TileMap::collisionMoveDown(const glm::vec2 &pos, const glm::vec2 &size, float *posY) const
 {
 	int x0, x1, y;
 
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	y = (pos.y + size.y - 1) / tileSize;
+	x0 = int(pos.x / tileSize);
+	x1 = int((pos.x + size.x - 1) / tileSize);
+	y = int((pos.y + size.y - 1) / tileSize);
 	for(int x=x0; x<=x1; x++)
 	{
 		if (tileIsCollidable(map[y*mapSize.x + x])){
@@ -478,13 +482,13 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	return false;
 }
 
-bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+bool TileMap::collisionMoveUp(const glm::vec2 &pos, const glm::vec2 &size, float *posY) const
 {
 	int x0, x1, y;
 
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	y = (pos.y - 1) / tileSize;
+	x0 = int(pos.x / tileSize);
+	x1 = int((pos.x + size.x - 1) / tileSize);
+	y = int((pos.y - 1) / tileSize);
 	for(int x=x0; x<=x1; x++)
 	{
 		if (tileIsCollidable(map[y*mapSize.x + x])){

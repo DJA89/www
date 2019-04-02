@@ -22,3 +22,7 @@ void BoundingShape::recalculateFromEntityPosition(glm::vec2 newPosition) {
 glm::vec2 BoundingShape::getSize() const {
 	return size;
 }
+
+void BoundingShape::setSize(glm::vec2 newSize){
+	size = newSize;
+}

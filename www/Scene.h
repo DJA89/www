@@ -33,7 +33,7 @@ public:
 
 private:
 	void initShaders();
-	void saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown);
+	void saveGame(glm::vec2 normalizedPosition, bool isUpsideDown);
 	void loadGame();
 	void handleCheckpointCollision(Checkpoint * cp);
 	void initMainGame();
