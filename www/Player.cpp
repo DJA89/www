@@ -113,9 +113,10 @@ void Player::init(ShaderProgram &shaderProgram)
 	SoundSystemClass sound = SoundSystemClass();
 
 	sound.createSound(&soundSample, "sounds/jump.mp3");
+	sound.createSound(&soundSample2, "sounds/death.wav");
 }
 
-bool Player::flipCollisionBounds(){
+void Player::flipCollisionBounds(){
 	if (this->collisionBounds == collisionBoundsUpright){
 		this->setBoundingShape(collisionBoundsUpsidedown);
 	} else { // upsidedown
@@ -447,8 +448,10 @@ void Player::handleCollisionWithDeath(Entity & e) {
 	else if (currentAnimation == MOVE_LEFTU || currentAnimation == STAND_LEFTU) {
 		newAnimation = DEATH_LEFTU;
 	}
+	sound.playSound(soundSample2, false);
 
 	sprite->changeAnimation(newAnimation);
+
 }
 
 void Player::handleCollision(Entity & e) {

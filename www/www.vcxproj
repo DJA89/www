@@ -40,6 +40,7 @@
   <ItemGroup>
     <ClCompile Include="AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="BoundingEllipse.cpp" />
+    <ClCompile Include="BoundingShape.cpp" />
     <ClCompile Include="ConveyorBelt.cpp" />
     <ClCompile Include="Checkpoint.cpp" />
     <ClCompile Include="DeathTile.cpp" />
