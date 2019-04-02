@@ -1,11 +1,15 @@
+#include "Player.h"
 #include <cmath>
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include "Player.h"
+#include <algorithm>
 #include "Game.h"
 #include "BoundingShape.h"
-#include <algorithm>
+#include "Sprite.h"
+#include "TileMap.h"
+#include "SavedState.h"
+#include "SoundSystem.h"
 
 #define FALL_STEP 9
 #define SPACEBAR 32
@@ -20,6 +24,14 @@ enum PlayerAnims
 	DEATH_LEFT, DEATH_RIGHT, DEATH_LEFTU, DEATH_RIGHTU
 };
 
+Player::~Player() {
+	if (spritesheet != NULL){
+		delete spritesheet;
+	}
+	if (sprite != NULL){
+		delete sprite;
+	}
+}
 
 void Player::init(ShaderProgram &shaderProgram)
 {
@@ -30,9 +42,10 @@ void Player::init(ShaderProgram &shaderProgram)
 	collidingWithWall = false;
 
 	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	spritesheet.loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet = new Texture();
+	spritesheet->loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sizePlayer = glm::vec2(32, 32);
-	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.25, 0.25), spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 
 		sprite->setAnimationSpeed(STAND_LEFT, 8);
@@ -419,4 +432,8 @@ void Player::handleCollisionWithDeath(Entity & e) {
 	}
 
 	sprite->changeAnimation(newAnimation);
+}
+
+void Player::handleCollision(Entity & e) {
+	e.handleCollision(*this);
 }

@@ -1,21 +1,23 @@
 #ifndef _PLAYER_INCLUDE
 #define _PLAYER_INCLUDE
 
+#include "Entity.h"
+#include "SoundSystem.h" // includes SoundSystemClass and SoundClass
 
-#include "Sprite.h"
-#include "TileMap.h"
-#include "SavedState.h"
-#include "SoundSystem.h"
+class Sprite;
+class TileMap;
+class SavedState;
 
 
 // Player is basically a Sprite that represents the player. As such it has
 // all properties it needs to track its movement, jumping, and collisions.
 
 
-class Player
+class Player : public Entity
 {
 
 public:
+	~Player();
 	void init(ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
@@ -30,6 +32,7 @@ public:
 	void handleCollisionWithMovingEntity(Entity & platform);
 	void handleCollisionWithDeath(Entity & e);
 	void handleCollisionWithMap(TileMap & map);
+	void handleCollision(Entity & e);
 
 	glm::ivec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
@@ -43,7 +46,7 @@ public:
 private:
 	glm::ivec2 posPlayer; // TODO change to glm::vec2
 	glm::ivec2 sizePlayer; // TODO change to glm::vec2
-	Texture spritesheet;
+	Texture * spritesheet;
 	Sprite *sprite;
 	TileMap *map;
 	int playerMovementSpeed = 4;
