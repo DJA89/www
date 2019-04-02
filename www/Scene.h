@@ -55,9 +55,10 @@ private:
 	float currentTime;
 	glm::mat4 projection;
 	SoundSystemClass sound;
-	SoundClass soundSample;
+	SoundClass soundSample, soundSample2;
 	int currentScreen;
 	int enterFrames;
+	bool level2;
 };
 
 

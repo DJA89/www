@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="33">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="34">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="2" name="Tile Layer 1" width="40" height="30">
   <data encoding="csv">
@@ -38,7 +38,8 @@
  <objectgroup id="4" name="Object Layer 1">
   <object id="25" name="Enemy_1_spawn" gid="383" x="273" y="263" width="48" height="48"/>
   <object id="27" name="Enemy_1_path" x="273" y="207" width="48" height="192"/>
-  <object id="31" name="Enemy_1_spawn" gid="383" x="345" y="392" width="48" height="48"/>
-  <object id="32" name="Enemy_1_path" x="345" y="207" width="48" height="192"/>
+  <object id="31" name="Enemy_2_spawn" gid="383" x="345" y="392" width="48" height="48"/>
+  <object id="32" name="Enemy_2_path" x="345" y="207" width="48" height="192"/>
+  <object id="33" name="Checkpoint" gid="592" x="464" y="416" width="16" height="16"/>
  </objectgroup>
 </map>

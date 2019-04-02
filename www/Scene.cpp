@@ -36,14 +36,16 @@ void Scene::init()
 	initMenu();
 	updateMenu();
 	string mapName = LEVEL_DIR + "level01.tmx";
+	level2 = false;
 	loadLevel(mapName);
 	// map
 
 	SoundSystemClass sound = SoundSystemClass();
 
-	//sound.createSound(&soundSample, "sounds/music.mp3");
+	sound.createSound(&soundSample, "sounds/music.mp3");
+	sound.createSound(&soundSample2, "sounds/music2.mp3");
 
-	//sound.playSound(soundSample, true);
+	sound.playSound(soundSample, true);
 
 }
 
@@ -71,6 +73,15 @@ void Scene::initMainGame() {
 
 void Scene::loadLevel(string levelName){
 	// tilemap
+	if (!level2 && levelName == LEVEL_DIR + "level14.tmx") {
+		level2 = true;
+
+		sound.releaseSound(soundSample);
+
+		sound.playSound(soundSample2, true);
+
+	}
+
 	map = TileMap::createTileMap(levelName, texProgram);
 	// FixedPathEntities
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
@@ -115,7 +126,8 @@ void Scene::addAnimationsToEntity(Entity * e){
 }
 
 void Scene::endGame() {
-	//sound.releaseSound(soundSample);
+	sound.releaseSound(soundSample);
+	sound.releaseSound(soundSample2);
 	player->endGame();
 }
 
