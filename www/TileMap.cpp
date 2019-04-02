@@ -11,6 +11,7 @@
 #include "BoundingEllipse.h"
 #include "Utils.h"
 #include "Checkpoint.h"
+#include "Intersection.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -473,6 +474,28 @@ bool TileMap::tileIsCollidable(int tileID) const {
 	                  std::end(non_collision_tiles),
 	                  tileID)
 	        == std::end(non_collision_tiles));
+}
+
+glm::ivec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const {
+	// collision shapes
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(playerPos, playerSize);
+	BoundingShape * tileCollisionBounds;
+	glm::ivec2 maximumMTV;
+	for (int y = 0; y < mapSize.y; y++){
+		for (int x = 0; x < mapSize.x; x++){
+			// TODO: quite inefficient, better only on tiles touched by player...
+			if (tileIsCollidable(map[y*mapSize.x + x])){
+				// if collidable
+				tileCollisionBounds = new AxisAlignedBoundingBox(
+				                        glm::ivec2(x * tileSize, y * tileSize),
+				                        glm::ivec2(tileSize, tileSize));
+				glm::ivec2 currentMTV = (glm::ivec2) Intersection::getMTV(*tileCollisionBounds, *playerCollisionBounds);
+				maximumMTV = glm::ivec2(max(currentMTV.x, maximumMTV.x), max(currentMTV.y, maximumMTV.y));
+				delete tileCollisionBounds;
+			}
+		}
+	}
+	return maximumMTV;
 }
 
 bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const

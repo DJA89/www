@@ -233,6 +233,8 @@ void Scene::updateMainGame(int deltaTime) {
 				break; // add velocity just once, not for each tile touching
 			}
 		}
+		// check tile collisions (created by platform/conveyor belt movement)
+		player->handleCollisionWithMap(*map); // TODO rename
 	}
 	delete playerCollisionBounds;
 

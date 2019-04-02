@@ -341,6 +341,13 @@ void Player::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 
+void Player::handleCollisionWithMap(TileMap & map){
+	// get MTV (see: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
+	glm::ivec2 mtv = map.getMinimumTranslationVector(posPlayer, sizePlayer);
+	// correct player position by this vector
+	posPlayer -= mtv;
+}
+
 void Player::handleCollisionWithPlatform(Entity & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;

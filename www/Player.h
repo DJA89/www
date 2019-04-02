@@ -29,6 +29,7 @@ public:
 
 	void handleCollisionWithPlatform(Entity & platform);
 	void handleCollisionWithDeath(Entity & e);
+	void handleCollisionWithMap(TileMap & map);
 
 	glm::ivec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
