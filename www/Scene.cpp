@@ -35,13 +35,15 @@ void Scene::init()
 	initMainGame();
 	initMenu();
 	updateMenu();
+	string mapName = LEVEL_DIR + "level01.tmx";
+	loadLevel(mapName);
 	// map
 
 	SoundSystemClass sound = SoundSystemClass();
 
-	sound.createSound(&soundSample, "sounds/music.mp3");
+	//sound.createSound(&soundSample, "sounds/music.mp3");
 
-	sound.playSound(soundSample, true);
+	//sound.playSound(soundSample, true);
 
 }
 
