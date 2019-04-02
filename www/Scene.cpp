@@ -232,7 +232,7 @@ void Scene::updateMainGame(int deltaTime) {
 
 	// update tilemap
 	// if player left level => change level and wrap player position around
-	glm::ivec2 maxPos = glm::ivec2(map->mapSize.x, map->mapSize.y) * map->getTileSize();
+	glm::vec2 maxPos = glm::vec2(map->mapSize.x, map->mapSize.y) * float(map->getTileSize());
 	if (player->getPosition().x + player->getSize().x >= maxPos.x) {
 		string nextLevelName = levelMap.nameOfNextLevel(RIGHT);
 		loadLevel(nextLevelName);
@@ -263,8 +263,8 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// TODO store checkpoint in checkpoint class (or TileMap class)
 	// TODO => move saving to saveGame() and call if collision
 	// player data
-	glm::ivec2 playerPosition = player->getPosition();
-	glm::ivec2 playerSize = player->getSize();
+	glm::vec2 playerPosition = player->getPosition();
+	glm::vec2 playerSize = player->getSize();
 	bool upsidedown = player->getIfUpSideDown();
 	// checkpoint data
 	glm::vec2 checkpointPosition = cp->getPosition();
@@ -273,11 +273,11 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 	// get if checkpoint upsidedown
 	bool isCheckpointUpsideDown = (checkpointTileID == CHECKPOINT_UNSAVED_CEILING || checkpointTileID == CHECKPOINT_SAVED_CEILING);
 	// compute normalized checkpoint position
-	glm::ivec2 normalizedCheckpointPosition;
+	glm::vec2 normalizedCheckpointPosition;
 	if (isCheckpointUpsideDown){
-			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y);
+			normalizedCheckpointPosition = glm::vec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y);
 		} else {
-			normalizedCheckpointPosition = glm::ivec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
+			normalizedCheckpointPosition = glm::vec2(checkpointPosition.x + checkpointSize.x/2, checkpointPosition.y + checkpointSize.y);
 		}
 	// change checkpoint image from unsaved to saved
 	if (checkpointTileID == CHECKPOINT_UNSAVED_FLOOR || checkpointTileID == CHECKPOINT_UNSAVED_CEILING){
@@ -315,7 +315,7 @@ void Scene::handleCheckpointCollision(Checkpoint * cp){
 }
 
 // normalized: the player will be spawned shifted left by half its length
-void Scene::saveGame(glm::ivec2 normalizedPosition, bool isUpsideDown){
+void Scene::saveGame(glm::vec2 normalizedPosition, bool isUpsideDown){
 	int currentScreen = levelMap.getCurrentScreen();
 	savedState.save(normalizedPosition, isUpsideDown, currentScreen);
 }
@@ -338,7 +338,7 @@ void Scene::loadGame(){
 	// player related
 	player->setTileMap(map);
 	bool upsidedown = savedState.getSavedUpsideDown();
-	glm::ivec2 normalizedPosition = savedState.getSavedPlayerPosition();
+	glm::vec2 normalizedPosition = savedState.getSavedPlayerPosition();
 	player->restorePlayerPosition(upsidedown, normalizedPosition);
 }
 

@@ -240,7 +240,7 @@ void Player::update(int deltaTime)
 }
 
 // center means in the middle of the player touching the floor/ceiling it is standing on
-void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition){
+void Player::restorePlayerPosition(bool upsidedown, glm::vec2 normalizedCheckpointPosition){
 	// player specific restoring
 	int xCenter = normalizedCheckpointPosition.x;
 	int yCenter = normalizedCheckpointPosition.y;
@@ -257,7 +257,7 @@ void Player::restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpo
 	framesSinceDeath = 0;
 	dying = false;
 	this->upsidedown = upsidedown;
-	setPosition(glm::ivec2(xPos, yPos));
+	setPosition(glm::vec2(xPos, yPos));
 }
 
 void Player::playerFalling(int pixels) {
@@ -358,7 +358,7 @@ void Player::handleCollisionWithMap(TileMap & map){
 	// get MTV (see: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
 	glm::vec2 mtv = map.getMinimumTranslationVector(posPlayer, sizePlayer);
 	// correct player position by this vector
-	posPlayer -= glm::ivec2(int(mtv.x), int(mtv.x));
+	posPlayer -= mtv;
 }
 
 void Player::handleCollisionWithMovingEntity(Entity & platform) {
@@ -401,8 +401,8 @@ void Player::handleCollisionWithMovingEntity(Entity & platform) {
 			// cout << "ERROR: player was neither left, nor right of platform" << endl;
 		}
 	}
-	posPlayer = (glm::ivec2) posPlayer_f;
-	sizePlayer = (glm::ivec2) sizePlayer_f;
+	posPlayer = posPlayer_f;
+	sizePlayer = sizePlayer_f;
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
 }
 

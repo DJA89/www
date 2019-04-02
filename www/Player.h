@@ -27,25 +27,25 @@ public:
 	void playerFalling(int);
 	bool hasDied();
 	bool isDying();
-	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
+	void restorePlayerPosition(bool upsidedown, glm::vec2 normalizedCheckpointPosition);
 
 	void handleCollisionWithMovingEntity(Entity & platform);
 	void handleCollisionWithDeath(Entity & e);
 	void handleCollisionWithMap(TileMap & map);
 	void handleCollision(Entity & e);
 
-	glm::ivec2 getPosition(){ return posPlayer; }
+	glm::vec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
 	void setPositionY(int yPosition){ this->posPlayer.y = yPosition; }
-	glm::ivec2 getSize(){ return sizePlayer; }
+	glm::vec2 getSize(){ return sizePlayer; }
 	bool getIfUpSideDown(){ return upsidedown; }
 	void endGame();
 
 
 
 private:
-	glm::ivec2 posPlayer; // TODO change to glm::vec2
-	glm::ivec2 sizePlayer; // TODO change to glm::vec2
+	glm::vec2 posPlayer; // TODO change to glm::vec2
+	glm::vec2 sizePlayer; // TODO change to glm::vec2
 	Texture * spritesheet;
 	Sprite *sprite;
 	TileMap *map;

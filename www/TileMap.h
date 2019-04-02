@@ -54,11 +54,11 @@ public:
 
 	int getTileSize() const { return tileSize; }
 
-	glm::vec2 getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const;
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
+	glm::vec2 getMinimumTranslationVector(const glm::vec2 &playerPos, const glm::vec2 &playerSize) const;
+	bool collisionMoveLeft(const glm::vec2 &pos, const glm::vec2 &size) const;
+	bool collisionMoveRight(const glm::vec2 &pos, const glm::vec2 &size) const;
+	bool collisionMoveDown(const glm::vec2 &pos, const glm::vec2 &size, float *posY) const;
+	bool collisionMoveUp(const glm::vec2 &pos, const glm::vec2 &size, float *posY) const;
 	bool checkpointValid(int xCheckpoint, int yCheckpoint, bool upsidedown) const;
 	glm::vec2 getHalfTexel();
 	glm::vec2 getTextureCoordsForTileID(int tileID);
@@ -72,7 +72,7 @@ private:
 	bool tileIsCollidable(int tileID) const;
 
 public:
-	glm::ivec2 position, mapSize, tilesheetSize;
+	glm::ivec2 mapSize, tilesheetSize;
 	std::unordered_map<int, Entity *> entities;
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
