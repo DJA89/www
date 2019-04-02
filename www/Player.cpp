@@ -396,18 +396,16 @@ void Player::handleCollisionWithMovingEntity(Entity & platform) {
 	}
 	if (min(rightPlayerFoot, rightPlatformBorder) - max(leftPlayerFoot, leftPlatformBorder) >= minStanding * size_f.x){
 		// can stand on platform
-		if (true){//!dynamic_cast<ConveyorBelt*> (&platform)) {
-			if (position_f.y < platBound->getPosition().y) {
-				// is above
-				position_f.y = platBound->getPosition().y - size_f.y;
-			}
-			else if (position_f.y > platBound->getPosition().y) {
-				// is below
-				position_f.y = platBound->getPosition().y + platBound->getSize().y;
-			}
-			else { // honestly I don't know why we can get here...
-		 // cout << "ERROR: player was neither below, nor above platform" << endl;
-			}
+		if (position_f.y < platBound->getPosition().y) {
+			// is above
+			position_f.y = platBound->getPosition().y - size_f.y;
+		}
+		else if (position_f.y > platBound->getPosition().y) {
+			// is below
+			position_f.y = platBound->getPosition().y + platBound->getSize().y;
+		}
+		else { // honestly I don't know why we can get here...
+		// cout << "ERROR: player was neither below, nor above platform" << endl;
 		}
 		isStandingOnMovingEntity = true; // stand on platform
 		standingOn = &platform; // store platform to follow movement
