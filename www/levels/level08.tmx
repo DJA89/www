@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="9">
  <tileset firstgid="1" source="mc_sprites.tsx"/>
  <layer id="3" name="Tile Layer 1" width="40" height="30">
   <data encoding="csv">
@@ -30,9 +30,16 @@
 0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,
 0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,
 0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,
-0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,222,0,0,0,0,0,2,2,2,2,
+0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,2,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 </data>
  </layer>
+ <objectgroup id="4" name="Object Layer 1">
+  <object id="2" name="Enemy_1_spawn" gid="40" x="159" y="214" width="48" height="48"/>
+  <object id="4" name="Enemy_2_spawn" gid="40" x="402" y="279" width="48" height="48"/>
+  <object id="5" name="Enemy_1_path" x="140" y="178" width="324" height="27"/>
+  <object id="6" name="Enemy_2_path" x="140" y="240" width="324" height="33"/>
+  <object id="8" name="Checkpoint" gid="592" x="606" y="222" width="16" height="16"/>
+ </objectgroup>
 </map>

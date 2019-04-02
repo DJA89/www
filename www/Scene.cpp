@@ -34,6 +34,9 @@ void Scene::init()
 	initShaders();
 	initMainGame();
 	initMenu();
+	updateMenu();
+	string mapName = LEVEL_DIR + "level01.tmx";
+	loadLevel(mapName);
 	// map
 
 	SoundSystemClass sound = SoundSystemClass();
