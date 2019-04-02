@@ -28,6 +28,7 @@ public:
 	void update(int deltaTime);
 	void render();
 	void loadLevel(string levelName);
+	void addAnimationsToEntity(Entity * e);
 	void endGame();
 
 private:

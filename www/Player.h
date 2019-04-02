@@ -27,8 +27,9 @@ public:
 	bool isDying();
 	void restorePlayerPosition(bool upsidedown, glm::ivec2 normalizedCheckpointPosition);
 
-	void handleCollisionWithPlatform(Entity & platform);
+	void handleCollisionWithMovingEntity(Entity & platform);
 	void handleCollisionWithDeath(Entity & e);
+	void handleCollisionWithMap(TileMap & map);
 
 	glm::ivec2 getPosition(){ return posPlayer; }
 	void setPositionX(int xPosition){ this->posPlayer.x = xPosition; }
@@ -51,7 +52,7 @@ private:
 	bool upsidedown, actionPressedBeforeCollition, dying;
 	int framesSinceDeath;
 	bool renderInDeath();
-	bool isStandingOnPlatform;
+	bool isStandingOnMovingEntity;
 	bool collidingWithWall;
 	Entity * standingOn;
 	SoundSystemClass sound;

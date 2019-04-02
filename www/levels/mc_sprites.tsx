@@ -84,4 +84,63 @@
    </object>
   </objectgroup>
  </tile>
+ <tile id="664">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+  <animation>
+   <frame tileid="664" duration="100"/>
+   <frame tileid="704" duration="100"/>
+   <frame tileid="744" duration="100"/>
+   <frame tileid="784" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="665">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="0" width="16" height="2"/>
+  </objectgroup>
+  <animation>
+   <frame tileid="665" duration="100"/>
+   <frame tileid="705" duration="100"/>
+   <frame tileid="745" duration="100"/>
+   <frame tileid="785" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="666">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+  <animation>
+   <frame tileid="666" duration="100"/>
+   <frame tileid="706" duration="100"/>
+   <frame tileid="746" duration="100"/>
+   <frame tileid="786" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="667">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="0" width="16" height="2"/>
+  </objectgroup>
+  <animation>
+   <frame tileid="667" duration="100"/>
+   <frame tileid="707" duration="100"/>
+   <frame tileid="747" duration="100"/>
+   <frame tileid="787" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="704">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+ </tile>
+ <tile id="744">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+ </tile>
+ <tile id="784">
+  <objectgroup draworder="index">
+   <object id="1" x="0" y="14" width="16" height="2"/>
+  </objectgroup>
+ </tile>
 </tileset>

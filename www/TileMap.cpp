@@ -11,6 +11,7 @@
 #include "BoundingEllipse.h"
 #include "Utils.h"
 #include "Checkpoint.h"
+#include "Intersection.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -56,10 +57,11 @@ TileMap::~TileMap()
 		delete *it; // first => because vector
 	}
 	flames.clear();
-	for (auto it = cbfs.begin(); it != cbfs.cend(); ++it ){
-		delete it->second;
+	// remove all conveyor belts
+	for (auto it = conveyorBelts.begin(); it != conveyorBelts.cend(); ++it ){
+		delete *it; // first => because vector
 	}
-	cbfs.clear();
+	conveyorBelts.clear();
 }
 
 void TileMap::render() const
@@ -120,29 +122,34 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 	// for each tile found
 	tile = tileSetConf->FirstChildElement("tile");
 	while (tile){
-		// extract of xml
+		// extract tile attributes
 		int tileID = stoi(tile->Attribute("id"));
-		const xml::XMLElement * object = tile->FirstChildElement("objectgroup")->FirstChildElement("object");
-		int xPos = stoi(object->Attribute("x"));
-		int yPos = stoi(object->Attribute("y"));
-		int width = stoi(object->Attribute("width"));
-		int height = stoi(object->Attribute("height"));
-		// store in objects
-		glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
-		glm::vec2 size = glm::vec2(width, height);
-		BoundingShape * bs;
-		if (object->FirstChildElement("ellipse") != NULL){
-			// is an ellipse
-			bs = new BoundingEllipse(positionInTile, size);
-		} else {
-			// is normal rectangle
-			bs = new AxisAlignedBoundingBox(positionInTile, size);
+		// load custom collision boxes (if it has)
+		const xml::XMLElement * objectGroup = tile->FirstChildElement("objectgroup");
+		if (objectGroup != NULL) {
+			const xml::XMLElement * object = objectGroup->FirstChildElement("object");
+			int xPos = stoi(object->Attribute("x"));
+			int yPos = stoi(object->Attribute("y"));
+			int width = stoi(object->Attribute("width"));
+			int height = stoi(object->Attribute("height"));
+			// store in objects
+			glm::vec2 positionInTile = glm::vec2(xPos, yPos); // relative to tile
+			glm::vec2 size = glm::vec2(width, height);
+			BoundingShape * bs;
+			if (object->FirstChildElement("ellipse") != NULL){
+				// is an ellipse
+				bs = new BoundingEllipse(positionInTile, size);
+			} else {
+				// is normal rectangle
+				bs = new AxisAlignedBoundingBox(positionInTile, size);
+			}
+			TileType * tileType = new TileType(tileID, bs);
+			tileTypeByID[tileID] = tileType;
 		}
-		TileType * tileType = new TileType(tileID, bs);
-		tileTypeByID[tileID] = tileType;
-		// has animations
-		if (tile->FirstChildElement("animation") != NULL){
-			const xml::XMLElement * frame = tile->FirstChildElement("animation")->FirstChildElement("frame");
+		// load animations (if it has)
+		const xml::XMLElement * animation = tile->FirstChildElement("animation");
+		if (animation != NULL){
+			const xml::XMLElement * frame = animation->FirstChildElement("frame");
 			vector<int> * frames = new vector<int>();
 			while(frame){
 				int frameTileID = stoi(frame->Attribute("tileid"));
@@ -179,22 +186,39 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 				} else { // is animated
 					map[j*mapSize.x + i] = 0; // empty
 					// create new Entity (for each *single* tile)
-					DeathTile * newDeathTile = new DeathTile();
-					newDeathTile->setTileID(tileID);
-					newDeathTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
-					newDeathTile->setSize(glm::vec2(tileSize, tileSize));
+					bool isFireTile = (tileID == FIRE_FLOOR || tileID == FIRE_CEILING || tileID == FIRE_RIGHT || tileID == FIRE_LEFT);
+					bool isConveyorBeltTile = (tileID == WATER_FLOOR_RIGHT || tileID == WATER_CEILING_RIGHT || tileID == WATER_FLOOR_LEFT || tileID == WATER_CEILING_LEFT);
+					Entity * newTile;
+					if (isFireTile){
+						newTile = new DeathTile();
+					} else { // if (isConveyorBeltTile)
+						newTile = new ConveyorBelt();
+						if (tileID == WATER_FLOOR_RIGHT || tileID == WATER_CEILING_RIGHT){
+							newTile->setDirection(1); // right
+						} else {
+							newTile->setDirection(-1); // right
+						}
+					}
+					newTile->setTileID(tileID);
+					newTile->setPosition(glm::vec2(i*tileSize, j*tileSize));
+					newTile->setSize(glm::vec2(tileSize, tileSize));
 					// set texture
 					// add texture coordinates of tile
 					glm::vec2 textureCoords = getTextureCoordsForTileID(tileID);
-					newDeathTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
+					newTile->setTextureBounds(textureCoords, getCorrectedTileTextureSize());
 					// add bounding shape
-					if (tileTypeByID.count(tileID) == 1){ // -1 because IDs start with 1
+					if (tileTypeByID.count(tileID) == 1){ // if has custom collision bounds
 						// custom collision bounds (rescaled to fit multi-tile)
 						BoundingShape * tileBounds = tileTypeByID[tileID]->collisionBounds;
 						BoundingShape * copyTileBounds = tileBounds->clone();
-						newDeathTile->setBoundingShape(copyTileBounds);
+						newTile->setBoundingShape(copyTileBounds);
 					}
-					flames.push_back(newDeathTile); // store
+					// store
+					if (isFireTile) {
+						flames.push_back((DeathTile *)newTile); // store
+					} else { // if (isConveyorBeltTile)
+						conveyorBelts.push_back((ConveyorBelt *)newTile); // store
+					}
 				}
 			}
 		}
@@ -287,90 +311,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					ent->setPathEnd(glm::vec2(xPos + width, yPos + height));
 				}
 			}
-			else if (objectAttribs.at(0) == "cb") {
-				int ID = stoi(objectAttribs.at(1));
-				ConveyorBelt *cb;
-				if (entities.count(ID) == 1) {
-					cb = dynamic_cast<ConveyorBelt*>(entities[ID]); // exists, add new data to it
-				}
-				else {
-					cb = new ConveyorBelt(); // else create new and store
-					cb->setID(ID);
-					entities[ID] = cb;
-				}
-				int tileID = stoi(object->Attribute("gid"));
-				cb->setTileID(tileID); // tile idx in spritesheet
-				// position is bottom left => correct to top left
-				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
-				cb->setPosition(glm::vec2(xPos, yPos - height));
-				cb->setSize(glm::vec2(width, height));
-				// add texture coordinates of tile
-				// TODO extract: duplicate of this code in prepareArrays()
-				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-				glm::vec2 textureCoords = glm::vec2(float((tileID - 1) % tilesheetSize.x) / tilesheetSize.x, float((tileID - 1) / tilesheetSize.x) / tilesheetSize.y);
-				cb->setTextureBounds(textureCoords, tileTexSize - halfTexel);
-				char aboveDir = objectAttribs.at(2)[0];
-				if (aboveDir == 'r') {
-					cb->setAboveVelocity(2);
-				}
-				else if (aboveDir == 'l') {
-					cb->setAboveVelocity(-2);
-				}
-				else {
-					cb->setAboveVelocity(0);
-				}
-				char belowDir = objectAttribs.at(2)[1];
-				if (belowDir == 'r') {
-					cb->setBelowVelocity(2);
-				}
-				else if (belowDir == 'l') {
-					cb->setBelowVelocity(-2);
-				}
-				else {
-					cb->setBelowVelocity(0);
-				}
-				if (tileTypeByID.count(tileID - 1) == 1) { // -1 because IDs start with 1
-					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
-					BoundingShape * copyTileBounds = tileBounds->clone();
-					copyTileBounds->rescale(cb->getSize() / float(tileSize));
-					cb->setBoundingShape(copyTileBounds);
-				}
-			}
-			if (objectAttribs.at(0) == "cbf") {
-				int ID = stoi(objectAttribs.at(1));
-
-				// check if there is already a platform with this ID
-				ConveyorBelt *cbf;
-				if (cbfs.count(ID) == 1) {
-					cbf = cbfs[ID]; // exists, add new data to it
-				}
-				else {
-					cbf = new ConveyorBelt(); // else create new and store
-					cbf->setID(ID);
-					cbfs[ID] = cbf;
-				}
-				int tileID = stoi(object->Attribute("gid"));
-				cbf->setTileID(tileID); // tile idx in spritesheet
-				// position is bottom left => correct to top left
-				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
-				cbf->setPosition(glm::vec2(xPos, yPos - height));
-				cbf->setSize(glm::vec2(width, height));
-				// add texture coordinates of tile
-				// TODO extract: duplicate of this code in prepareArrays()
-				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-				glm::vec2 textureCoords = glm::vec2(float((tileID - 1) % tilesheetSize.x) / tilesheetSize.x, float((tileID - 1) / tilesheetSize.x) / tilesheetSize.y);
-				cbf->setTextureBounds(textureCoords, tileTexSize - halfTexel);
-				// add bounding shape to platform
-				if (tileTypeByID.count(tileID - 1) == 1) { // -1 because IDs start with 1
-					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
-					BoundingShape * copyTileBounds = tileBounds->clone();
-					copyTileBounds->rescale(cbf->getSize() / float(tileSize));
-					cbf->setBoundingShape(copyTileBounds);
-				}
-
-			}
 			object = object->NextSiblingElement("object");
 		}
 	}
@@ -451,6 +391,41 @@ bool TileMap::tileIsCollidable(int tileID) const {
 	                  std::end(non_collision_tiles),
 	                  tileID)
 	        == std::end(non_collision_tiles));
+}
+
+glm::vec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const {
+	// collision shapes
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::ivec2(0, 0), playerSize);
+	playerCollisionBounds->recalculateFromEntityPosition(playerPos);
+	BoundingShape * tileCollisionBounds;
+	glm::vec2 maximumMTV = glm::vec2(0.f, 0.f);
+
+	int x0, x1, y0, y1;
+	x0 = min(playerPos.x / tileSize, mapSize.x-1);
+	x1 = min((playerPos.x + playerSize.x - 1) / tileSize, mapSize.x-1);
+	y0 = min(playerPos.y / tileSize, mapSize.y-1);
+	y1 = min((playerPos.y + playerSize.y - 1) / tileSize, mapSize.y-1);
+	for (int y = y0; y <= y1; y++){
+		for (int x = x0; x <= x1; x++){
+			// TODO: quite inefficient, better only on tiles touched by player...
+			if (tileIsCollidable(map[y*mapSize.x + x])){
+				// if collidable
+				tileCollisionBounds = new AxisAlignedBoundingBox(
+				                        glm::ivec2(0, 0),
+				                        glm::ivec2(tileSize, tileSize));
+				tileCollisionBounds->recalculateFromEntityPosition(glm::ivec2(x * tileSize, y * tileSize));
+				glm::vec2 currentMTV = Intersection::getMTV(*tileCollisionBounds, *playerCollisionBounds);
+				if (abs(currentMTV.x) > abs(maximumMTV.x)){
+					maximumMTV.x = currentMTV.x;
+				}
+				if (abs(currentMTV.y) > abs(maximumMTV.y)){
+					maximumMTV.y = currentMTV.y;
+				}
+				delete tileCollisionBounds;
+			}
+		}
+	}
+	return maximumMTV;
 }
 
 bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const

@@ -19,6 +19,14 @@ class Checkpoint;
 
 // hardcoded tile IDs (like in tilesheet)
 #define EMPTY_TILE 0
+#define FIRE_FLOOR 464
+#define FIRE_CEILING 465
+#define FIRE_RIGHT 466
+#define FIRE_LEFT 467
+#define WATER_FLOOR_RIGHT 664
+#define WATER_CEILING_RIGHT 665
+#define WATER_FLOOR_LEFT 666
+#define WATER_CEILING_LEFT 667
 #define CHECKPOINT_UNSAVED_FLOOR 591
 #define CHECKPOINT_UNSAVED_CEILING 592
 #define CHECKPOINT_SAVED_FLOOR 593
@@ -46,6 +54,7 @@ public:
 
 	int getTileSize() const { return tileSize; }
 
+	glm::vec2 getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const;
 	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
@@ -65,10 +74,10 @@ private:
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, Entity *> entities;
-	std::unordered_map<int, ConveyorBelt *> cbfs;
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
 	vector<DeathTile *> flames;
+	vector<ConveyorBelt *> conveyorBelts;
 	Texture tilesheet;
 
 private:

@@ -24,12 +24,9 @@ public:
 	int getTileID() { return this->tileID; }
 	void handleCollision(Entity & e);
 	void setTextureSize(glm::vec2 textureSize);
-	void setNumberAnimations(int numberAnimations);
-	void addAnimation(glm::vec2 newTextureCoords);
 
 private:
 	int tileID; // index in stylesheet
-	int animationCount = 0;
 
 };
 
