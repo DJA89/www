@@ -12,6 +12,7 @@
 #include "Utils.h"
 #include "Checkpoint.h"
 #include "Intersection.h"
+#include "Player.h"
 
 using namespace std;
 namespace xml = tinyxml2;
@@ -393,13 +394,16 @@ bool TileMap::tileIsCollidable(int tileID) const {
 	        == std::end(non_collision_tiles));
 }
 
-glm::vec2 TileMap::getMinimumTranslationVector(const glm::vec2 &playerPos, const glm::vec2 &playerSize) const {
+glm::vec2 TileMap::getMinimumTranslationVector(Player & player) const {
 	// collision shapes
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), playerSize);
-	playerCollisionBounds->recalculateFromEntityPosition(playerPos);
+	BoundingShape * playerCollisionBounds = player.getBoundingShape();
 	BoundingShape * tileCollisionBounds;
 	glm::vec2 maximumMTV = glm::vec2(0.f, 0.f);
+	// player collision shape edges
+	glm::vec2 playerPos = playerCollisionBounds->getPosition();
+	glm::vec2 playerSize = playerCollisionBounds->getSize();
 
+	// TODO this fails when using Ellipses
 	int x0, x1, y0, y1;
 	x0 = min(int(playerPos.x / tileSize), mapSize.x-1);
 	x1 = min(int((playerPos.x + playerSize.x - 1) / tileSize), mapSize.x-1);

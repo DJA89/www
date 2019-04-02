@@ -14,6 +14,7 @@
 #include "DeathTile.h"
 
 class Checkpoint;
+class Player;
 
 #define LEVEL_DIR string("levels/")
 
@@ -54,7 +55,7 @@ public:
 
 	int getTileSize() const { return tileSize; }
 
-	glm::vec2 getMinimumTranslationVector(const glm::vec2 &playerPos, const glm::vec2 &playerSize) const;
+	glm::vec2 getMinimumTranslationVector(Player & player) const;
 	bool collisionMoveLeft(const glm::vec2 &pos, const glm::vec2 &size) const;
 	bool collisionMoveRight(const glm::vec2 &pos, const glm::vec2 &size) const;
 	bool collisionMoveDown(const glm::vec2 &pos, const glm::vec2 &size, float *posY) const;

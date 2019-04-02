@@ -32,17 +32,20 @@ Player::~Player() {
 
 void Player::init(ShaderProgram &shaderProgram)
 {
+	// load spritesheet
+	spritesheet = new Texture();
+	spritesheet->loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	// call Entity::init (now that we have the spritesheet for it)
+	Entity::init(*spritesheet, shaderProgram);
+	// general config
 	upsidedown = false;
 	actionPressedBeforeCollition = false;
 	dying = false;
 	framesSinceDeath = 0;
 	collidingWithWall = false;
 	speed = 4.f;
-
-	// spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	spritesheet = new Texture();
-	spritesheet->loadFromFile("images/spider_sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	size = glm::vec2(32, 32);
+	this->size = glm::vec2(32, 32);
+	// sprite & animations
 	sprite = Sprite::createSprite(size, glm::vec2(0.25, 0.25), spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 
@@ -348,7 +351,7 @@ void Player::setTileMap(TileMap *tileMap)
 
 void Player::handleCollisionWithMap(TileMap & map){
 	// get MTV (see: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
-	glm::vec2 mtv = map.getMinimumTranslationVector(position, size);
+	glm::vec2 mtv = map.getMinimumTranslationVector(*this);
 	// correct player position by this vector
 	position -= mtv;
 }

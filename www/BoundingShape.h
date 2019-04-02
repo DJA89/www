@@ -23,6 +23,7 @@ public:
 	glm::vec2 getPositionInTile() const;
 	void recalculateFromEntityPosition(glm::vec2 newPosition);
 	glm::vec2 getSize() const;
+	void setSize(glm::vec2 newSize);
 
 protected:
 	// copy constructor
