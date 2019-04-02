@@ -70,3 +70,11 @@ void Entity::setDirection(int xDirection){
 glm::vec2 Entity::getVelocity() const {
 	return speed * glm::normalize(direction);
 }
+
+void Entity::setPosition(glm::vec2 initPos) {
+	this->position = initPos;
+}
+
+void Entity::setTileID(int tileID) {
+	this->tileID = tileID;
+}

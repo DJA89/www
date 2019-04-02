@@ -25,7 +25,7 @@ public:
 	void render();
 	void setBoundingShape(BoundingShape * collisionBounds){ this->collisionBounds = collisionBounds; }
 	void setTextureBounds(glm::vec2 textureCoordinates, glm::vec2 textureSize);
-	void setPosition(glm::vec2 initPos){ this->position = initPos; }
+	void setPosition(glm::vec2 initPos);
 	glm::vec2 getPosition() const { return this->position; }
 	void setSize(glm::vec2 size){ this->size = size; }
 	glm::vec2 getSize() const { return this->size; }
@@ -34,7 +34,7 @@ public:
 	void setDirection(int xDirection);
 	void setID(int ID){ this->ID = ID; }
 	int getID(){ return this->ID; }
-	void setTileID(int tileID) { this->tileID = tileID; }
+	void setTileID(int tileID);
 	int getTileID() { return this->tileID; }
 	void setNumberAnimations(int numberAnimations);
 	void addAnimation(glm::vec2 newTextureCoords);

@@ -69,17 +69,12 @@ void Scene::initMainGame() {
 void Scene::loadLevel(string levelName){
 	// tilemap
 	map = TileMap::createTileMap(levelName, texProgram);
-	// platforms
+	// FixedPathEntities
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it){
-		if (dynamic_cast<FixedPathEntity*>(it->second)) {
-			FixedPathEntity * p = dynamic_cast<FixedPathEntity*>(it->second);
-			p->init(map->tilesheet, texProgram);
-		}
-		else {
-			ConveyorBelt * p = dynamic_cast<ConveyorBelt *>(it->second);
-			p->init(map->tilesheet, texProgram);
-		}
+		FixedPathEntity * p = dynamic_cast<FixedPathEntity*>(it->second);
+		p->init(map->tilesheet, texProgram);
 	}
+	// checkpoints
 	for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it){
 		Checkpoint * c = it->second;
 		c->init(map->tilesheet, texProgram);
@@ -97,10 +92,6 @@ void Scene::loadLevel(string levelName){
 		cb->init(map->tilesheet, texProgram);
 		// animations can be added ONLY after init call (sprite must exist)
 		addAnimationsToEntity(cb);
-	}
-	for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
-		ConveyorBelt * cbf = it->second;
-		cbf->init(map->tilesheet, texProgram);
 	}
 }
 
@@ -161,7 +152,7 @@ void Scene::updateMainGame(int deltaTime) {
 	if (player->hasDied()) {
 		loadGame();
 	}
-	// update all moving entities: platforms, player, ...
+	// update all entities: platforms, player, ...
 	if (!player->isDying()) {
 		for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
 			if (dynamic_cast<FixedPathEntity*>(it->second)) {
@@ -177,12 +168,10 @@ void Scene::updateMainGame(int deltaTime) {
 		for (auto it = map->conveyorBelts.begin(); it != map->conveyorBelts.end(); ++it) {
 			(*it)->update(deltaTime);
 		}
-		for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
-			it->second->update(deltaTime);
-		}
 	}
 
 	player->update(deltaTime);
+
 	// check for collisions between player and entities
 	// TODO move playerCollisionBounds to player (as pointer variable); later load from xml
 	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::vec2(0, 0), player->getSize());
@@ -195,25 +184,23 @@ void Scene::updateMainGame(int deltaTime) {
 					FixedPathEntity* fpe = dynamic_cast<FixedPathEntity*>(ent);
 					if (fpe->IsEnemy()) {
 						player->handleCollisionWithDeath(*fpe);
+						// actualize player collision box
+						playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 						break;
 					}
 				}
-				player->handleCollisionWithPlatform(*ent);
-				// cout << "PLAYER with platform collision" << endl;
+				player->handleCollisionWithMovingEntity(*ent);
+				// actualize player collision box
+				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 			}
 		}
-		playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
-		for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
-			ConveyorBelt * cbf = it->second;
-			if (Intersection::check(*(cbf->getBoundingShape()), *playerCollisionBounds)) {
-				player->handleCollisionWithPlatform(*cbf);
-			}
-		}
-			// checkpoints
+		// checkpoints
 		for (auto it = map->checkpoints.begin(); it != map->checkpoints.end(); ++it) {
 			Checkpoint * cp = it->second;
 			if (Intersection::check(*(cp->getBoundingShape()), *playerCollisionBounds)) {
 				handleCheckpointCollision(cp);
+				// actualize player collision box
+				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 			}
 		}
 		// flames
@@ -221,6 +208,8 @@ void Scene::updateMainGame(int deltaTime) {
 			DeathTile * dt = *it;
 			if (Intersection::check(*(dt->getBoundingShape()), *playerCollisionBounds)) {
 				player->handleCollisionWithDeath(*dt);
+				// actualize player collision box
+				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 				break; // can only die once, can we?
 			}
 		}
@@ -229,7 +218,9 @@ void Scene::updateMainGame(int deltaTime) {
 			ConveyorBelt * cb = *it;
 			if (Intersection::check(*(cb->getBoundingShape()), *playerCollisionBounds)) {
 				// TODO customize
-				player->handleCollisionWithPlatform(*cb);
+				player->handleCollisionWithMovingEntity(*cb);
+				// actualize player collision box
+				playerCollisionBounds->recalculateFromEntityPosition(player->getPosition());
 				break; // add velocity just once, not for each tile touching
 			}
 		}
@@ -394,9 +385,6 @@ void Scene::renderMainGame() {
 		(*it)->render();
 	}
 	for (auto it = map->entities.begin(); it != map->entities.end(); ++it) {
-		it->second->render();
-	}
-	for (auto it = map->cbfs.begin(); it != map->cbfs.end(); ++it) {
 		it->second->render();
 	}
 	player->render();

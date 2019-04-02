@@ -62,10 +62,6 @@ TileMap::~TileMap()
 		delete *it; // first => because vector
 	}
 	conveyorBelts.clear();
-	for (auto it = cbfs.begin(); it != cbfs.cend(); ++it ){
-		delete it->second;
-	}
-	cbfs.clear();
 }
 
 void TileMap::render() const
@@ -314,90 +310,6 @@ bool TileMap::loadLevelTmx(const string &levelFile){
 					ent->setPathStart(glm::vec2(xPos, yPos));
 					ent->setPathEnd(glm::vec2(xPos + width, yPos + height));
 				}
-			}
-			else if (objectAttribs.at(0) == "cb") {
-				int ID = stoi(objectAttribs.at(1));
-				ConveyorBelt *cb;
-				if (entities.count(ID) == 1) {
-					cb = dynamic_cast<ConveyorBelt*>(entities[ID]); // exists, add new data to it
-				}
-				else {
-					cb = new ConveyorBelt(); // else create new and store
-					cb->setID(ID);
-					entities[ID] = cb;
-				}
-				int tileID = stoi(object->Attribute("gid"));
-				cb->setTileID(tileID); // tile idx in spritesheet
-				// position is bottom left => correct to top left
-				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
-				cb->setPosition(glm::vec2(xPos, yPos - height));
-				cb->setSize(glm::vec2(width, height));
-				// add texture coordinates of tile
-				// TODO extract: duplicate of this code in prepareArrays()
-				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-				glm::vec2 textureCoords = glm::vec2(float((tileID - 1) % tilesheetSize.x) / tilesheetSize.x, float((tileID - 1) / tilesheetSize.x) / tilesheetSize.y);
-				cb->setTextureBounds(textureCoords, tileTexSize - halfTexel);
-				char aboveDir = objectAttribs.at(2)[0];
-				if (aboveDir == 'r') {
-					cb->setAboveVelocity(2);
-				}
-				else if (aboveDir == 'l') {
-					cb->setAboveVelocity(-2);
-				}
-				else {
-					cb->setAboveVelocity(0);
-				}
-				char belowDir = objectAttribs.at(2)[1];
-				if (belowDir == 'r') {
-					cb->setBelowVelocity(2);
-				}
-				else if (belowDir == 'l') {
-					cb->setBelowVelocity(-2);
-				}
-				else {
-					cb->setBelowVelocity(0);
-				}
-				if (tileTypeByID.count(tileID - 1) == 1) { // -1 because IDs start with 1
-					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
-					BoundingShape * copyTileBounds = tileBounds->clone();
-					copyTileBounds->rescale(cb->getSize() / float(tileSize));
-					cb->setBoundingShape(copyTileBounds);
-				}
-			}
-			if (objectAttribs.at(0) == "cbf") {
-				int ID = stoi(objectAttribs.at(1));
-
-				// check if there is already a platform with this ID
-				ConveyorBelt *cbf;
-				if (cbfs.count(ID) == 1) {
-					cbf = cbfs[ID]; // exists, add new data to it
-				}
-				else {
-					cbf = new ConveyorBelt(); // else create new and store
-					cbf->setID(ID);
-					cbfs[ID] = cbf;
-				}
-				int tileID = stoi(object->Attribute("gid"));
-				cbf->setTileID(tileID); // tile idx in spritesheet
-				// position is bottom left => correct to top left
-				// see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#object
-				cbf->setPosition(glm::vec2(xPos, yPos - height));
-				cbf->setSize(glm::vec2(width, height));
-				// add texture coordinates of tile
-				// TODO extract: duplicate of this code in prepareArrays()
-				glm::vec2 halfTexel = glm::vec2(0.5f / tilesheet.width(), 0.5f / tilesheet.height());
-				glm::vec2 textureCoords = glm::vec2(float((tileID - 1) % tilesheetSize.x) / tilesheetSize.x, float((tileID - 1) / tilesheetSize.x) / tilesheetSize.y);
-				cbf->setTextureBounds(textureCoords, tileTexSize - halfTexel);
-				// add bounding shape to platform
-				if (tileTypeByID.count(tileID - 1) == 1) { // -1 because IDs start with 1
-					// custom collision bounds (rescaled to fit multi-tile)
-					BoundingShape * tileBounds = tileTypeByID[tileID - 1]->collisionBounds;
-					BoundingShape * copyTileBounds = tileBounds->clone();
-					copyTileBounds->rescale(cbf->getSize() / float(tileSize));
-					cbf->setBoundingShape(copyTileBounds);
-				}
-
 			}
 			object = object->NextSiblingElement("object");
 		}

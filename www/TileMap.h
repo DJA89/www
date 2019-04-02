@@ -74,7 +74,6 @@ private:
 public:
 	glm::ivec2 position, mapSize, tilesheetSize;
 	std::unordered_map<int, Entity *> entities;
-	std::unordered_map<int, ConveyorBelt *> cbfs;
 	std::unordered_map<int, Checkpoint *> checkpoints;
 	std::unordered_map<int, vector<int> *> animatedTiles; // tileID -> tileIDs
 	vector<DeathTile *> flames;

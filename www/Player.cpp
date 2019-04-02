@@ -117,29 +117,7 @@ void Player::update(int deltaTime)
 		}
 		posPlayer.x -= playerMovementSpeed;
 		if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
-			if (isStandingOnPlatform && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
-				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
-				float vel = cb->getVelocity(upsidedown);
-				if (vel > 0) {
-					posPlayer.x += vel;
-					if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
-						float tileSize = map->getTileSize();
-						int aux = ((posPlayer.x) / tileSize);
-						int aux2 = tileSize * (aux + 1);
-						posPlayer.x = aux2 - vel;
-					}
-					else {
-						posPlayer.x -= vel;
-					}
-					collidingWithWall = true;
-				}
-				else {
-					posPlayer.x += playerMovementSpeed;
-				}
-			}
-			else {
-				posPlayer.x += playerMovementSpeed;
-			}
+			posPlayer.x += playerMovementSpeed;
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
 			}
@@ -162,29 +140,7 @@ void Player::update(int deltaTime)
 		}
 		posPlayer.x += playerMovementSpeed;
 		if (map->collisionMoveRight(posPlayer, sizePlayer)) {
-			if (isStandingOnPlatform && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
-				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
-				float vel = cb->getVelocity(upsidedown);
-				if (vel < 0) {
-					posPlayer.x += vel;
-					if (map->collisionMoveRight(posPlayer, sizePlayer)) {
-						float tileSize = map->getTileSize();
-						int aux = (((posPlayer.x + sizePlayer.x - 1) / tileSize) - 2);
-						int aux2 = tileSize * aux;
-						posPlayer.x = aux2 - vel;
-					}
-					else {
-						posPlayer.x -= vel;
-					}
-					collidingWithWall = true;
-				}
-				else {
-					posPlayer.x -= playerMovementSpeed;
-				}
-			}
-			else {
-				posPlayer.x -= playerMovementSpeed;
-			}
+			posPlayer.x -= playerMovementSpeed;
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_RIGHTU);
 			}
@@ -211,10 +167,10 @@ void Player::update(int deltaTime)
 	else {
 		playerFalling(FALL_STEP);
 	}
-	// if moving on a platform, add platform velocity
-	if (isStandingOnPlatform && standingOn != NULL){
+	// if moved by entity, add entity velocity to player's
+	if (isStandingOnMovingEntity && standingOn != NULL){
 		posPlayer += standingOn->getVelocity();
-		isStandingOnPlatform = false; // wait for next collision
+		isStandingOnMovingEntity = false; // wait for next collision
 	}
 
 	sprite->setPosition(glm::vec2(float(posPlayer.x), float(posPlayer.y)));
@@ -247,7 +203,7 @@ void Player::playerFalling(int pixels) {
 	bool collition = collidingWithWall || map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y) ||
 		map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y);
 	collidingWithWall = false;
-	if(collition || isStandingOnPlatform) {
+	if(collition || isStandingOnMovingEntity) {
 		if (!actionPressedBeforeCollition) {
 			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(SPACEBAR) ||
 				Game::instance().getSpecialKey(GLUT_KEY_DOWN) || Game::instance().getKey(S_KEY) ||
@@ -342,7 +298,7 @@ void Player::handleCollisionWithMap(TileMap & map){
 	posPlayer -= glm::ivec2(int(mtv.x), int(mtv.x));
 }
 
-void Player::handleCollisionWithPlatform(Entity & platform) {
+void Player::handleCollisionWithMovingEntity(Entity & platform) {
 	glm::vec2 posPlayer_f = (glm::vec2)posPlayer;
 	glm::vec2 sizePlayer_f = (glm::vec2)sizePlayer;
 	BoundingShape * platBound = platform.getBoundingShape();
@@ -365,10 +321,10 @@ void Player::handleCollisionWithPlatform(Entity & platform) {
 		} else if (posPlayer_f.y > platBound->getPosition().y){
 			// is below
 			posPlayer_f.y = platBound->getPosition().y + platBound->getSize().y;
-		} else { // let's just hope we never get here
-			cout << "ERROR: player was neither below, nor above platform" << endl;
+		} else { // honestly I don't know why we can get here...
+			// cout << "ERROR: player was neither below, nor above platform" << endl;
 		}
-		isStandingOnPlatform = true; // stand on platform
+		isStandingOnMovingEntity = true; // stand on platform
 		standingOn = &platform; // store platform to follow movement
 	} else {
 		// is next to platform, so just pull out
@@ -378,8 +334,8 @@ void Player::handleCollisionWithPlatform(Entity & platform) {
 		} else if (posPlayer_f.x > platBound->getPosition().x){
 			// is right
 			posPlayer_f.x = platBound->getPosition().x + platBound->getSize().x;
-		} else { // let's just hope we never get here
-			cout << "ERROR: player was neither left, nor right of platform" << endl;
+		} else { // honestly I don't know why we can get here...
+			// cout << "ERROR: player was neither left, nor right of platform" << endl;
 		}
 	}
 	posPlayer = (glm::ivec2) posPlayer_f;
@@ -393,7 +349,7 @@ void Player::endGame() {
 
 void Player::handleCollisionWithDeath(Entity & e) {
 	// detach from platform
-	isStandingOnPlatform = false;
+	isStandingOnMovingEntity = false;
 	standingOn = NULL;
 	// die
 	dying = true;
