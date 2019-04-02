@@ -117,7 +117,29 @@ void Player::update(int deltaTime)
 		}
 		posPlayer.x -= playerMovementSpeed;
 		if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
-			posPlayer.x += playerMovementSpeed;
+			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
+				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+					float vel = cb->getVelocity().x;
+					if (vel > 0) {
+						posPlayer.x += vel;
+							if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+								float tileSize = map->getTileSize();
+									int aux = ((posPlayer.x) / tileSize);
+									int aux2 = tileSize * (aux + 1);
+									posPlayer.x = aux2 - vel;
+							}
+							else {
+								posPlayer.x -= vel;
+							}
+						collidingWithWall = true;
+					}
+					else {
+						posPlayer.x += playerMovementSpeed;
+					}
+			}
+			else {
+				posPlayer.x += playerMovementSpeed;
+			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_LEFTU);
 			}
@@ -140,7 +162,35 @@ void Player::update(int deltaTime)
 		}
 		posPlayer.x += playerMovementSpeed;
 		if (map->collisionMoveRight(posPlayer, sizePlayer)) {
-			posPlayer.x -= playerMovementSpeed;
+			if (isStandingOnMovingEntity && standingOn != NULL && dynamic_cast<ConveyorBelt*>(standingOn)) {
+				ConveyorBelt * cb = dynamic_cast<ConveyorBelt*>(standingOn);
+				float vel = cb->getVelocity().x;
+				if (vel < 0) {
+					posPlayer.x += vel;
+					if (map->collisionMoveLeft(posPlayer, sizePlayer)) {
+						float tileSize = map->getTileSize();
+						int aux = (((posPlayer.x + sizePlayer.x - 1) / tileSize) - 2);
+						int aux2 = tileSize * aux;
+						posPlayer.x = aux2 - vel;
+					}
+					else {
+						posPlayer.x -= vel;
+					}
+					collidingWithWall = true;
+				}
+				else {
+					posPlayer.x -= playerMovementSpeed;
+				}
+			}
+			else {
+				posPlayer.x -= playerMovementSpeed;
+			}
+			if (upsidedown) {
+				sprite->changeAnimation(STAND_LEFTU);
+			}
+			else {
+				sprite->changeAnimation(STAND_LEFT);
+			}
 			if (upsidedown) {
 				sprite->changeAnimation(STAND_RIGHTU);
 			}
