@@ -10,6 +10,7 @@
 #include "TileMap.h"
 #include "SavedState.h"
 #include "SoundSystem.h"
+#include "AxisAlignedBoundingBox.h"
 
 #define FALL_STEP 9
 #define SPACEBAR 32
@@ -28,6 +29,14 @@ Player::~Player() {
 	if (spritesheet != NULL){
 		delete spritesheet;
 	}
+	// remove bounding shapes (created here)
+	// don't need to remove this->collisionBounds: it points to one of these
+	if (collisionBoundsUpright != NULL){
+		delete collisionBoundsUpright;
+	}
+	if (collisionBoundsUpsidedown != NULL){
+		delete collisionBoundsUpsidedown;
+	}
 }
 
 void Player::init(ShaderProgram &shaderProgram)
@@ -45,6 +54,10 @@ void Player::init(ShaderProgram &shaderProgram)
 	collidingWithWall = false;
 	speed = 4.f;
 	this->size = glm::vec2(32, 32);
+	// initialize manual boundingShapes (for upright and upsidedown)
+	collisionBoundsUpright = new AxisAlignedBoundingBox(glm::vec2(0.f, 7.f), glm::vec2(35.f, 25.f));
+	collisionBoundsUpsidedown = new AxisAlignedBoundingBox(glm::vec2(0.f, 0.f), glm::vec2(35.f, 25.f));
+	this->setBoundingShape(collisionBoundsUpright);
 	// sprite & animations
 	sprite = Sprite::createSprite(size, glm::vec2(0.25, 0.25), spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
@@ -100,6 +113,14 @@ void Player::init(ShaderProgram &shaderProgram)
 	SoundSystemClass sound = SoundSystemClass();
 
 	sound.createSound(&soundSample, "sounds/jump.mp3");
+}
+
+bool Player::flipCollisionBounds(){
+	if (this->collisionBounds == collisionBoundsUpright){
+		this->setBoundingShape(collisionBoundsUpsidedown);
+	} else { // upsidedown
+		this->setBoundingShape(collisionBoundsUpright);
+	}
 }
 
 bool Player::isDying() {
@@ -274,6 +295,7 @@ void Player::playerFalling(int pixels) {
 				Game::instance().getKey(W_KEY)) {
 				actionPressedBeforeCollition = true;
 				upsidedown = !upsidedown;
+				flipCollisionBounds();
 				sound.playSound(soundSample, false);
 				switch (sprite->animation()) {
 				case MOVE_LEFT:

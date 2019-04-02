@@ -24,6 +24,7 @@ public:
 
 	void setTileMap(TileMap *tileMap);
 	void playerFalling(int);
+	bool flipCollisionBounds();
 	bool hasDied();
 	bool isDying();
 	void restorePlayerPosition(bool upsidedown, glm::vec2 normalizedCheckpointPosition);
@@ -50,6 +51,9 @@ private:
 	int framesSinceDeath;
 	bool isStandingOnMovingEntity;
 	bool collidingWithWall;
+	// upright and upsidedown collision bounds (assign on flip to this->collisionBounds)
+	BoundingShape * collisionBoundsUpright;
+	BoundingShape * collisionBoundsUpsidedown;
 	Entity * standingOn;
 	SoundSystemClass sound;
 	SoundClass soundSample;
