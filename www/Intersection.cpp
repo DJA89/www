@@ -47,17 +47,27 @@ glm::vec2 Intersection::getMTV(const AxisAlignedBoundingBox & aabb1, const AxisA
 		glm::vec2 size1 = aabb1.getSize();
 		glm::vec2 pos2 = aabb2.getPosition();
 		glm::vec2 size2 = aabb2.getSize();
-		int overlapX = 0;
-		int overlapY = 0;
-		if (pos1.x < pos2.x + size2.x && pos1.x + size1.x > pos2.x){
-			// collision in x-direction
-			overlapX = min(abs(pos1.x - pos2.x + size2.x), abs(pos1.x + size1.x - pos2.x));
+		// see: https://developer.roblox.com/articles/2D-Collision-Detection
+		if (Intersection::check(aabb1, aabb2)){
+			glm::vec2 edge1 = glm::vec2(pos1.x - (pos2.x + size2.x), 0); // left
+			glm::vec2 edge2 = glm::vec2((pos1.x + size1.x) - pos2.x, 0); // right
+			glm::vec2 edge3 = glm::vec2(0, pos1.y - (pos2.y + size2.y)); // top
+			glm::vec2 edge4 = glm::vec2(0, (pos1.y + size1.y) - pos2.y); // bottom
+			// I'm tired, ok!
+			glm::vec2 shortestEdge = edge1;
+			if (glm::length(edge2) < glm::length(shortestEdge)){
+				shortestEdge = edge2;
+			}
+			if (glm::length(edge3) < glm::length(shortestEdge)){
+				shortestEdge = edge3;
+			}
+			if (glm::length(edge4) < glm::length(shortestEdge)){
+				shortestEdge = edge4;
+			}
+			return shortestEdge;
+		} else {
+			return glm::vec2(0, 0);
 		}
-		if (pos1.y < pos2.y + size2.y && pos1.y + size1.y > pos2.y){
-			// collision in y-direction
-			overlapY = min(abs(pos1.y - pos2.y + size2.y), abs(pos1.y + size1.y - pos2.y));
-		}
-		return glm::vec2(overlapX, overlapY);
 }
 
 glm::vec2 Intersection::getMTV(const AxisAlignedBoundingBox & aabb, const BoundingEllipse & be){

@@ -343,9 +343,9 @@ void Player::setPosition(const glm::vec2 &pos)
 
 void Player::handleCollisionWithMap(TileMap & map){
 	// get MTV (see: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
-	glm::ivec2 mtv = map.getMinimumTranslationVector(posPlayer, sizePlayer);
+	glm::vec2 mtv = map.getMinimumTranslationVector(posPlayer, sizePlayer);
 	// correct player position by this vector
-	posPlayer -= mtv;
+	posPlayer -= glm::ivec2(int(mtv.x), int(mtv.x));
 }
 
 void Player::handleCollisionWithPlatform(Entity & platform) {

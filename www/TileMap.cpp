@@ -476,21 +476,34 @@ bool TileMap::tileIsCollidable(int tileID) const {
 	        == std::end(non_collision_tiles));
 }
 
-glm::ivec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const {
+glm::vec2 TileMap::getMinimumTranslationVector(const glm::ivec2 &playerPos, const glm::ivec2 &playerSize) const {
 	// collision shapes
-	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(playerPos, playerSize);
+	BoundingShape * playerCollisionBounds = new AxisAlignedBoundingBox(glm::ivec2(0, 0), playerSize);
+	playerCollisionBounds->recalculateFromEntityPosition(playerPos);
 	BoundingShape * tileCollisionBounds;
-	glm::ivec2 maximumMTV;
-	for (int y = 0; y < mapSize.y; y++){
-		for (int x = 0; x < mapSize.x; x++){
+	glm::vec2 maximumMTV = glm::vec2(0.f, 0.f);
+
+	int x0, x1, y0, y1;
+	x0 = min(playerPos.x / tileSize, mapSize.x-1);
+	x1 = min((playerPos.x + playerSize.x - 1) / tileSize, mapSize.x-1);
+	y0 = min(playerPos.y / tileSize, mapSize.y-1);
+	y1 = min((playerPos.y + playerSize.y - 1) / tileSize, mapSize.y-1);
+	for (int y = y0; y <= y1; y++){
+		for (int x = x0; x <= x1; x++){
 			// TODO: quite inefficient, better only on tiles touched by player...
 			if (tileIsCollidable(map[y*mapSize.x + x])){
 				// if collidable
 				tileCollisionBounds = new AxisAlignedBoundingBox(
-				                        glm::ivec2(x * tileSize, y * tileSize),
+				                        glm::ivec2(0, 0),
 				                        glm::ivec2(tileSize, tileSize));
-				glm::ivec2 currentMTV = (glm::ivec2) Intersection::getMTV(*tileCollisionBounds, *playerCollisionBounds);
-				maximumMTV = glm::ivec2(max(currentMTV.x, maximumMTV.x), max(currentMTV.y, maximumMTV.y));
+				tileCollisionBounds->recalculateFromEntityPosition(glm::ivec2(x * tileSize, y * tileSize));
+				glm::vec2 currentMTV = Intersection::getMTV(*tileCollisionBounds, *playerCollisionBounds);
+				if (abs(currentMTV.x) > abs(maximumMTV.x)){
+					maximumMTV.x = currentMTV.x;
+				}
+				if (abs(currentMTV.y) > abs(maximumMTV.y)){
+					maximumMTV.y = currentMTV.y;
+				}
 				delete tileCollisionBounds;
 			}
 		}
